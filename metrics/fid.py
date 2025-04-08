@@ -66,13 +66,13 @@ def main(args):
 
     # Load real images
     real_df = pd.read_csv(real_csv)
+    # Drop rows with duplicate prompts
+    real_df = real_df.drop_duplicates(subset=['annotated_prompt']).reset_index(drop=True)
     real_df[args.real_img_col] = real_df[args.real_img_col].apply(lambda x: os.path.join(args.real_img_dir, x))
     real_image_paths = real_df[args.real_img_col].tolist()  # Adjust column name if needed
 
     # Load synthetic images
     synthetic_df = pd.read_csv(synthetic_csv)
-    # Drop rows with duplicate prompts
-    synthetic_df = synthetic_df.drop_duplicates(subset=['prompt']).reset_index(drop=True)
     synthetic_df[args.synthetic_img_col] = synthetic_df[args.synthetic_img_col].apply(lambda x: os.path.join(args.synthetic_img_dir, x))
     synthetic_image_paths = synthetic_df[args.synthetic_img_col].tolist()  # The image path col in the CSV is 'img_savename'
     
@@ -104,7 +104,7 @@ def main(args):
         
         batch = batch.to(device)
         # Scale images from [0, 1] to [0, 255] as expected by torchmetrics
-        batch = batch * 255
+        batch = (batch * 255).to(torch.uint8)
         
         # Update FID and KID with real images
         fid.update(batch, real=True)
@@ -115,7 +115,7 @@ def main(args):
     for batch in tqdm(synthetic_dataloader):
         
         batch = batch.to(device)
-        batch = batch * 255
+        batch = (batch * 255).to(torch.uint8)
 
         # Update FID and KID with synthetic images
         fid.update(batch, real=False)
@@ -126,9 +126,9 @@ def main(args):
 
     # Calculate metrics
     print("Calculating metrics...")
-    fid_value = fid.compute()
-    kid_mean, kid_std = kid.compute()
-    is_mean, is_std = inception_score.compute()
+    fid_value = round(fid.compute(), 3)
+    kid_mean, kid_std = round(kid.compute(), 3)
+    is_mean, is_std = round(inception_score.compute(), 3)
 
     print(f"FID: {fid_value.item()}")
     print(f"KID: {kid_mean.item()} ± {kid_std.item()}")
