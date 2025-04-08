@@ -14,6 +14,7 @@ from torchmetrics.image.inception import InceptionScore
 from torchmetrics.image.kid import KernelInceptionDistance
 import argparse
 import warnings
+from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
 
 
 def seed_everything(seed=42):
@@ -21,6 +22,35 @@ def seed_everything(seed=42):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
+
+
+# RadDino Model: https://huggingface.co/microsoft/rad-dino
+def load_RadDino_encoder():
+    repo = "microsoft/rad-dino"
+    model = AutoModel.from_pretrained(repo)
+
+    processor = AutoImageProcessor.from_pretrained(repo)
+
+    return model, processor
+
+
+class RadDinoFeatureExtractor(torch.nn.Module):
+    def __init__(self, model, processor):
+        super().__init__()
+        self.model = model
+        self.processor = processor
+
+    def encode_image(self, model, processor, image):
+        inputs = processor(images=image, return_tensors="pt")
+
+        with torch.inference_mode():
+            inputs = inputs.to(model.device)
+            outputs = model(**inputs)
+        cls_embeddings = outputs.pooler_output
+        return cls_embeddings
+
+    def forward(self, images):
+        return self.encode_image(self.model, self.processor, images)
 
 
 class ImageDataset(Dataset):
@@ -139,6 +169,11 @@ def main(args):
 
     # Initialize metrics
     fid = FrechetInceptionDistance(feature=2048).to(device)
+    # Use RadDino for feature extraction
+    model, processor = load_RadDino_encoder()
+    rad_dino_fe = RadDinoFeatureExtractor(model, processor)
+    fid_raddino = FrechetInceptionDistance(feature=rad_dino_fe).to(device)
+
     kid = KernelInceptionDistance(subset_size=1000, feature=2048).to(device)
     inception_score = InceptionScore(feature=2048).to(device)
 
@@ -154,6 +189,9 @@ def main(args):
         fid.update(batch, real=True)
         kid.update(batch, real=True)
 
+        # Update FID with RadDino Features
+        fid_raddino.update(batch, real=True)
+
     # Process synthetic images
     print("Processing synthetic images...")
     for batch in tqdm(synthetic_dataloader):
@@ -163,6 +201,9 @@ def main(args):
 
         # Update FID and KID with synthetic images
         fid.update(batch, real=False)
+        # Update FID with RadDino features
+        fid_raddino.update(batch, real=False)
+
         kid.update(batch, real=False)
 
         # Update inception score
@@ -171,16 +212,19 @@ def main(args):
     # Calculate metrics
     print("Calculating metrics...")
     fid_value = fid.compute()
+    fid_raddino_value = fid_raddino.compute()
     kid_mean, kid_std = kid.compute()
     is_mean, is_std = inception_score.compute()
 
     print(f"FID: {fid_value.item()}")
+    print(f"FID (RadDino): {fid_raddino_value.item()}")
     print(f"KID: {kid_mean.item()} ± {kid_std.item()}")
     print(f"Inception Score: {is_mean.item()} ± {is_std.item()}")
 
     # Save results
     results = {
         "FID": round(fid_value.item(), 3),
+        "FID (RadDino)": round(fid_raddino_value.item(), 3),
         "KID": round(kid_mean.item(), 3),
         # 'KID (std)': kid_std.item(),
         "Inception Score": round(is_mean.item(), 3),
