@@ -13,6 +13,7 @@ from torchmetrics.image.fid import FrechetInceptionDistance
 from torchmetrics.image.inception import InceptionScore
 from torchmetrics.image.kid import KernelInceptionDistance
 import argparse
+import warnings
 
 def seed_everything(seed=42):
     random.seed(seed)
@@ -50,7 +51,9 @@ class ImageDataset(Dataset):
 
 def main(args):
 
-    print(os.getcwd())
+    if(args.debug):
+        warnings.filterwarnings("ignore")
+        print("Debug mode is ON. Make sure this behavior is intended.")
 
     # Set random seed for reproducibility
     seed_everything(42)
@@ -66,6 +69,11 @@ def main(args):
 
     # Load real images
     real_df = pd.read_csv(real_csv)
+
+    if args.debug:
+        n_samples = 100
+        real_df = real_df.sample(n=n_samples, random_state=42).reset_index(drop=True)
+    
     # Drop rows with duplicate prompts
     real_df = real_df.drop_duplicates(subset=['annotated_prompt']).reset_index(drop=True)
     real_df[args.real_img_col] = real_df[args.real_img_col].apply(lambda x: os.path.join(args.real_img_dir, x))
@@ -73,6 +81,9 @@ def main(args):
 
     # Load synthetic images
     synthetic_df = pd.read_csv(synthetic_csv)
+    if args.debug:
+        synthetic_df = synthetic_df.sample(n=n_samples, random_state=42).reset_index(drop=True)
+    
     synthetic_df[args.synthetic_img_col] = synthetic_df[args.synthetic_img_col].apply(lambda x: os.path.join(args.synthetic_img_dir, x))
     synthetic_image_paths = synthetic_df[args.synthetic_img_col].tolist()  # The image path col in the CSV is 'img_savename'
     
@@ -126,9 +137,9 @@ def main(args):
 
     # Calculate metrics
     print("Calculating metrics...")
-    fid_value = round(fid.compute(), 3)
-    kid_mean, kid_std = round(kid.compute(), 3)
-    is_mean, is_std = round(inception_score.compute(), 3)
+    fid_value = fid.compute()
+    kid_mean, kid_std = kid.compute()
+    is_mean, is_std = inception_score.compute()
 
     print(f"FID: {fid_value.item()}")
     print(f"KID: {kid_mean.item()} ± {kid_std.item()}")
@@ -136,17 +147,28 @@ def main(args):
 
     # Save results
     results = {
-        'FID': fid_value.item(),
-        'KID (mean)': kid_mean.item(),
-        'KID (std)': kid_std.item(),
-        'Inception Score (mean)': is_mean.item(),
-        'Inception Score (std)': is_std.item()
+        'FID': round(fid_value.item(), 3),
+        'KID': round(kid_mean.item(), 3),
+        # 'KID (std)': kid_std.item(),
+        'Inception Score': round(is_mean.item(), 3),
+        # 'Inception Score (std)': is_std.item()
     }
     
     # Save to CSV
     results_df = pd.DataFrame([results])
     savename = 'image_generation_metrics.csv'
     savepath = os.path.join(args.results_savedir, savename) if args.results_savedir else savename
+
+    if os.path.exists(savepath):
+        print("Appending to existing results file.")
+        existing_df = pd.read_csv(savepath)
+        results_df = pd.concat([existing_df, results_df], ignore_index=True)
+    else:
+        print("Creating new results file.")
+        results_df = pd.DataFrame([results])
+        # results_df = pd.DataFrame(columns=["FID", "KID (mean)", "Inception Score (mean)"])
+        # results_df = pd.concat([results_df, results_df], ignore_index=True)
+
     results_df.to_csv(savepath, index=False)
     print("Results saved to ", savepath)
 
@@ -165,6 +187,8 @@ if __name__ == "__main__":
     parser.add_argument("--num_workers", type=int, default=4, help="Number of workers for data loading.")
 
     parser.add_argument("--results_savedir", type=str, default='Results', help="Directory to save the results.")
+
+    parser.add_argument("--debug", action="store_true", help="Debug mode to run on a small subset of data.")
 
     args = parser.parse_args()
     main(args)

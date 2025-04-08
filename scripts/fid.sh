@@ -4,6 +4,7 @@ source /raid/s2198939/miniconda3/bin/activate sana
 
 SYNTHETIC_CSV="assets/CSV/prompts_INFO.csv"
 SYNTHETIC_IMG_DIR="/raid/s2198939/Sana/output/debug/vis/custom_epoch9_step60000_scale4.5_step20_size512_bs1_sampflow_dpm-solver_seed0_float16_flowshift3.0_imgnums100000"
+# SYNTHETIC_IMG_DIR="assets/synthetic_images/"
 
 REAL_CSV="MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv"
 REAL_IMG_DIR="/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
