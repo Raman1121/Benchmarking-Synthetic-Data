@@ -17,4 +17,3 @@ CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES python metrics/img_text_alignment_sco
     --results_savedir=$RESULTS_SAVEDIR \
     --batch_size=$BATCH_SIZE \
     --num_workers=$NUM_WORKERS \
-    --debug

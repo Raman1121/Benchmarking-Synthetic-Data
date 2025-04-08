@@ -3,7 +3,7 @@ A Benchmark to evaluate the quality of medical synthetic data from T2I Models
 
 ## Calculating Generative Quality Metrics
 
-#### FID, KID, Inception Score
+#### FID, KID, Inception Score and Image-Text Alignment
 
 - Place the synthetic images in the 'assets/synthetic_images' folder
 - Place the CSV containing path to synthetic images in the 'assets/CSV' folder
@@ -12,6 +12,4 @@ A Benchmark to evaluate the quality of medical synthetic data from T2I Models
 ```
 cd Benchmarking-Synthetic-Data
 ./scripts/img_quality_metrics.sh
-```
-
-#### Image-Text Alignment
+``` 
