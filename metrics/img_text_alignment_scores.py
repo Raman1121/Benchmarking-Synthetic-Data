@@ -123,9 +123,6 @@ def main(args):
     if os.path.exists(savepath):
 
         print("Appending to existing results file found at ", savepath)
-        import pdb
-
-        pdb.set_trace()
         results_df = pd.read_csv(savepath)
         results_df["Alignment_score"] = mean_alignment_scores
     else:
