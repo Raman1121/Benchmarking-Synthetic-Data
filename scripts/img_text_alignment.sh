@@ -2,14 +2,9 @@
 
 source /raid/s2198939/miniconda3/bin/activate himl
 
-SYNTHETIC_CSV="assets/CSV/prompts_INFO.csv"
-SYNTHETIC_IMG_DIR="/raid/s2198939/Sana/output/debug/vis/custom_epoch9_step60000_scale4.5_step20_size512_bs1_sampflow_dpm-solver_seed0_float16_flowshift3.0_imgnums100000"
-
-RESULTS_SAVEDIR="Results"
-
-BATCH_SIZE=32
-NUM_WORKERS=4
-CUDA_VISIBLE_DEVICES=0
+echo "SYNTHETIC CSV CSV: $SYNTHETIC_CSV"
+echo "SYNTHETIC IMG DIR: $SYNTHETIC_IMG_DIR"
+echo "Saving Results at: $RESULTS_SAVEDIR"
 
 CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES python metrics/img_text_alignment_scores.py \
     --synthetic_csv=$SYNTHETIC_CSV \
