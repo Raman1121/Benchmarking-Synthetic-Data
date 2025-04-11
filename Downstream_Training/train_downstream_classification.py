@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import ast
 from tqdm import tqdm
 import random
+from termcolor import colored
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -84,6 +85,9 @@ class MultiLabelClassifier(nn.Module):
         elif hasattr(self.model, 'classifier'):
             in_features = self.model.classifier.in_features
             self.model.classifier = nn.Linear(in_features, num_classes)
+        elif hasattr(self.model, 'head'):
+            in_features = self.model.head.in_features
+            self.model.head = nn.Linear(in_features, num_classes)
         else:
             # Handle other model architectures
             in_features = self.model.get_classifier().in_features
@@ -286,7 +290,14 @@ def main(args):
     # Create model
     num_classes = 14  # Fixed for MIMIC-CXR dataset
     model = MultiLabelClassifier(args.model_name, num_classes, pretrained=True)
+    # Enable multi-GPU if available
+    if torch.cuda.device_count() > 1:
+        print(f"Using {torch.cuda.device_count()} GPUs with DataParallel")
+        model = nn.DataParallel(model)
+
     model = model.to(device)
+
+    print(colored(f"{model}", "green"))
     
     # Define loss function and optimizer
     criterion = nn.BCEWithLogitsLoss()
@@ -301,7 +312,7 @@ def main(args):
     train_losses = []
     val_losses = []
 
-    os.makedirs("checkpoints", exist_ok=True)
+    os.makedirs(f"checkpoints/{args.model_name}", exist_ok=True)
     os.makedirs("training_results", exist_ok=True)
     
     print(f"Starting training for {args.epochs} epochs...")
