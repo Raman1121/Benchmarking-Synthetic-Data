@@ -229,7 +229,11 @@ def main(args):
         # 'KID (std)': kid_std.item(),
         "Inception Score": round(is_mean.item(), 3),
         # 'Inception Score (std)': is_std.item()
+        "Extra Info": args.extra_info,
     }
+
+    print("RESULTS ... ")
+    print(results)
 
     # Save to CSV
     results_df = pd.DataFrame([results])
@@ -294,6 +298,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--num_workers", type=int, default=4, help="Number of workers for data loading."
+    )
+    parser.add_argument(
+        "--extra_info", type=str, default="Some AI Model", help="Extra info to link the results with the specific model."
     )
 
     parser.add_argument(

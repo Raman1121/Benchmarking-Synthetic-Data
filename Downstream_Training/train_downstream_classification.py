@@ -14,9 +14,18 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import ast
 from tqdm import tqdm
+import random
+import warnings
+warnings.filterwarnings("ignore")
 
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+def seed_everything(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 
 class MIMICCXRDataset(Dataset):
@@ -167,8 +176,51 @@ def calculate_metrics(outputs, labels, threshold=0.5):
 def get_labels_dict_from_string(x):
     return ast.literal_eval(x)
 
+def variable_size_collate_fn(batch):
+    """
+    Collate function for handling variable-sized images.
+    Pads images to the maximum size in the batch.
+    """
+    # Filter out None values
+    valid_samples = [(img, lbl) for img, lbl in batch if img is not None and lbl is not None]
+    
+    if len(valid_samples) == 0:
+        return None, None
+    
+    images = []
+    labels = []
+    
+    # Find max dimensions in this batch
+    max_h = max([img.shape[1] for img, _ in valid_samples])
+    max_w = max([img.shape[2] for img, _ in valid_samples])
+    
+    # Pad images to max dimensions
+    for image, label in valid_samples:
+        # Current image dimensions
+        c, h, w = image.shape
+        
+        # Create new padded tensor
+        padded_img = torch.zeros((c, max_h, max_w), dtype=image.dtype)
+        padded_img[:, :h, :w] = image
+        
+        images.append(padded_img)
+        
+        # Handle any issues with labels
+        if torch.isnan(label).any() or (label == -1).any():
+            label = torch.nan_to_num(label, nan=0.0)
+            label = torch.where(label == -1, torch.tensor(0.0), label)
+            
+        labels.append(label)
+    
+    # Stack the images and labels
+    batched_images = torch.stack(images, dim=0)
+    batched_labels = torch.stack(labels, dim=0)
+    
+    return batched_images, batched_labels
 
 def main(args):
+    seed_everything(42)
+
     # Set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
@@ -228,8 +280,8 @@ def main(args):
     print("Validation dataset size:", len(val_dataset))
     
     # Create dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, collate_fn=variable_size_collate_fn)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, collate_fn=variable_size_collate_fn)
     
     # Create model
     num_classes = 14  # Fixed for MIMIC-CXR dataset
@@ -250,7 +302,7 @@ def main(args):
     val_losses = []
 
     os.makedirs("checkpoints", exist_ok=True)
-    os.makedirs("results", exist_ok=True)
+    os.makedirs("training_results", exist_ok=True)
     
     print(f"Starting training for {args.epochs} epochs...")
     # for epoch in tqdm(range(args.epochs), desc="Training Progress"):
@@ -260,10 +312,10 @@ def main(args):
         train_losses.append(train_loss)
         
         # Validate
-        if(epoch + 1) % args.va_epochs == 0:
-            val_loss, val_outputs, val_labels = validate(model, val_loader, criterion, device)
-            val_losses.append(val_loss)
-        
+        # if(epoch + 1) % args.va_epochs == 0:
+        val_loss, val_outputs, val_labels = validate(model, val_loader, criterion, device)
+        val_losses.append(val_loss)
+    
         # Calculate metrics
         metrics = calculate_metrics(val_outputs, val_labels, threshold=args.threshold)
         
@@ -299,7 +351,7 @@ def main(args):
     plt.ylabel('Loss')
     plt.title('Training and Validation Loss')
     plt.legend()
-    plt.savefig(f"results/{args.model_name}_loss_curves.png")
+    plt.savefig(f"training_results/{args.model_name}_loss_curves.png")
     
     # Print final best metrics
     print("\nBest Validation Performance:")
@@ -316,7 +368,7 @@ def main(args):
 
     # Wriwte the best metrics to a CSV file
     results_df = pd.DataFrame([best_metrics])
-    results_df.to_csv(f"results/{args.model_name}_best_metrics.csv", index=False)
+    results_df.to_csv(f"training_results/{args.model_name}_best_metrics.csv", index=False)
 
 
 if __name__ == "__main__":
@@ -327,14 +379,18 @@ if __name__ == "__main__":
     parser.add_argument("--va_epochs", type=int, default=10, help="Number of epochs for validation")
     parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate")
     parser.add_argument("--weight_decay", type=float, default=1e-5, help="Weight decay for regularization")
+    parser.add_argument("--run", type=str, default="training", choices=['training', 'inference'], help="Run either training or inference.")
+
     parser.add_argument("--csv_path", type=str, required=True, help="Path to CSV with image paths and labels")
     parser.add_argument("--image_col", type=str, default="path", help="Column name in CSV that contains image paths")
-    parser.add_argument("--image_dir", type=str, default="path", help="Base Directory containing images")
+    parser.add_argument("--image_dir", type=str, default=None, help="Base Directory containing images")
+
     parser.add_argument("--threshold", type=float, default=0.5, help="Threshold for binary classification")
     parser.add_argument("--num_workers", type=int, default=4, help="Number of workers for data loading")
     parser.add_argument("--stratify", action="store_true", help="Whether to stratify the train/val split")
+
     parser.add_argument("--debug", action="store_true", help="Run in debug mode with a small subset of data")
-    parser.add_argument("--debug_samples", type=int, help="Number of samples to use in debug mode")
+    parser.add_argument("--debug_samples", type=int, default=500, help="Number of samples to use in debug mode")
     
     args = parser.parse_args()
     main(args)

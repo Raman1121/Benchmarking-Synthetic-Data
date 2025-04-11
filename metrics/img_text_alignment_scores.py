@@ -62,7 +62,9 @@ def parse_args():
     parser.add_argument(
         "--num_workers", type=int, default=4, help="Number of workers for data loading."
     )
-
+    parser.add_argument(
+        "--extra_info", type=str, default="Some AI Model", help="Extra info to link the results with the specific model."
+    )
     parser.add_argument(
         "--debug",
         action="store_true",
@@ -116,6 +118,9 @@ def main(args):
         all_scores.append(_score)
     mean_alignment_scores = round(np.mean(all_scores, axis=0), 3)
 
+    print("RESULTS...")
+    print("Mean Img-Text Alignment Score: ", mean_alignment_scores)
+
     savename = "image_generation_metrics.csv"
     savepath = os.path.join(args.results_savedir, savename)
 
@@ -125,10 +130,12 @@ def main(args):
         print("Appending to existing results file found at ", savepath)
         results_df = pd.read_csv(savepath)
         results_df["Alignment_score"] = mean_alignment_scores
+        results_df["Extra Info"] = args.extra_info
     else:
         print("Creating new results file.")
-        results_df = pd.DataFrame(columns=["Alignment_score"])
+        results_df = pd.DataFrame(columns=["Alignment_score", "Extra Info"])
         results_df["Alignment_score"] = mean_alignment_scores
+        results_df["Extra Info"] = args.extra_info
 
     results_df.to_csv(savepath, index=False)
     print("Mean Image-Text Alignment Score: ", mean_alignment_scores)
