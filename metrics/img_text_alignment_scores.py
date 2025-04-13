@@ -70,6 +70,9 @@ def parse_args():
         action="store_true",
         help="Debug mode to run on a small subset of data.",
     )
+    parser.add_argument(
+        "--debug_samples", type=int, default=100, help="Debug Samples."
+    )
 
     return parser.parse_args()
 
@@ -97,7 +100,7 @@ def main(args):
     prompts_df = pd.read_csv(args.synthetic_csv)
 
     if args.debug:
-        prompts_df = prompts_df.sample(n=10, random_state=42).reset_index(drop=True)
+        prompts_df = prompts_df.sample(n=args.debug_samples, random_state=42).reset_index(drop=True)
 
     prompts_df[args.synthetic_img_col] = prompts_df[args.synthetic_img_col].apply(
         lambda x: args.synthetic_img_dir.joinpath(x)
@@ -121,7 +124,8 @@ def main(args):
     print("RESULTS...")
     print("Mean Img-Text Alignment Score: ", mean_alignment_scores)
 
-    savename = "image_generation_metrics.csv"
+    savename = "image_generation_metrics_debug.csv" if args.debug else "image_generation_metrics.csv"
+    # savename = "image_generation_metrics_debug.csv"
     savepath = os.path.join(args.results_savedir, savename)
 
     # Try to read if the dataframe already exists
@@ -131,15 +135,16 @@ def main(args):
         results_df = pd.read_csv(savepath)
         results_df["Alignment_score"] = mean_alignment_scores
         results_df["Extra Info"] = args.extra_info
+        results_df.to_csv(savepath, index=False)
+        print("Image-Text Alignment Scores saved to : ", savepath)
     else:
-        print("Creating new results file.")
-        results_df = pd.DataFrame(columns=["Alignment_score", "Extra Info"])
-        results_df["Alignment_score"] = mean_alignment_scores
-        results_df["Extra Info"] = args.extra_info
-
-    results_df.to_csv(savepath, index=False)
-    print("Mean Image-Text Alignment Score: ", mean_alignment_scores)
-    print("Image-Text Alignment Scores saved to : ", savepath)
+        # print("Creating new results file.")
+        # results_df = pd.DataFrame(columns=["Alignment_score", "Extra Info"])
+        # results_df["Alignment_score"] = mean_alignment_scores
+        # results_df["Extra Info"] = args.extra_info
+        print("ERROR!! Results CSV not found!!")
+    
+    
 
 
 if __name__ == "__main__":

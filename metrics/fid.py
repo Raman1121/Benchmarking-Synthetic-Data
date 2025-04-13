@@ -112,7 +112,7 @@ def main(args):
     real_df = pd.read_csv(real_csv)
 
     if args.debug:
-        n_samples = 100
+        n_samples = args.debug_samples
         real_df = real_df.sample(n=n_samples, random_state=42).reset_index(drop=True)
 
     # Drop rows with duplicate prompts
@@ -230,6 +230,7 @@ def main(args):
         "Inception Score": round(is_mean.item(), 3),
         # 'Inception Score (std)': is_std.item()
         "Extra Info": args.extra_info,
+        "Alignment_score": np.nan,
     }
 
     print("RESULTS ... ")
@@ -237,7 +238,7 @@ def main(args):
 
     # Save to CSV
     results_df = pd.DataFrame([results])
-    savename = "image_generation_metrics.csv"
+    savename = "image_generation_metrics_debug.csv" if args.debug else "image_generation_metrics.csv"
     savepath = (
         os.path.join(args.results_savedir, savename)
         if args.results_savedir
@@ -247,12 +248,15 @@ def main(args):
     if os.path.exists(savepath):
         print("Appending to existing results file.")
         existing_df = pd.read_csv(savepath)
-        results_df = pd.concat([existing_df, results_df], ignore_index=True)
+        results_row = list(results.values())
+
+        existing_df.loc[len(results_df)] = results_row
+        existing_df.to_csv(savepath, index=False)
     else:
         print("Creating new results file.")
         results_df = pd.DataFrame([results])
+        results_df.to_csv(savepath, index=False)
 
-    results_df.to_csv(savepath, index=False)
     print("Results saved to ", savepath)
 
 
@@ -314,6 +318,9 @@ if __name__ == "__main__":
         "--debug",
         action="store_true",
         help="Debug mode to run on a small subset of data.",
+    )
+    parser.add_argument(
+        "--debug_samples", type=int, default=100, help="Debug Samples."
     )
 
     args = parser.parse_args()
