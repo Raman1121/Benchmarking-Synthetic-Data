@@ -205,8 +205,9 @@ def main(args):
         results_df = pd.read_csv(savepath)
         # results_df["Alignment_score"] = mean_alignment_scores
         # results_df["Extra Info"] = args.extra_info
-        results_df.iloc[-1]["Alignment_score"] = mean_alignment_scores
-        results_df.iloc[-1]["Extra Info"] = args.extra_info
+        # results_df.iloc[-1]["Alignment_score"] = mean_alignment_scores
+        # results_df.iloc[-1]["Extra Info"] = args.extra_info
+        results_df.loc[results_df.index[-1], 'Alignment_score'] = mean_alignment_scores
 
         if(args.experiment_type == 'conditional'):
             results_df.iloc[-1]["Pathology"] = args.pathology
