@@ -15,4 +15,7 @@ CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES python metrics/fid.py --synthetic_csv
                                                     --results_savedir=$RESULTS_SAVEDIR \
                                                     --batch_size=$BATCH_SIZE \
                                                     --num_workers=$NUM_WORKERS \
-                                                    --extra_info=$EXTRA_INFO
+                                                    --extra_info=$EXTRA_INFO \
+                                                    --experiment_type=$EXPERIMENT_TYPE \
+                                                    --pathology="$PATHOLOGY" \
+                                                    

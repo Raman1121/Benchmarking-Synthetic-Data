@@ -1,4 +1,5 @@
 import os
+import ast
 import torch
 import pandas as pd
 import numpy as np
@@ -103,8 +104,19 @@ class ImageDataset(Dataset):
             blank = Image.new("RGB", (299, 299), (0, 0, 0))
             return self.transform(blank)
 
+def get_labels_dict_from_string(x):
+    return ast.literal_eval(x)
+
+MIMIC_PATHOLOGIES = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 
+                     'Edema', 'Enlarged Cardiomediastinum', 'Fracture', 
+                     'Lung Lesion', 'Lung Opacity', 'No Finding', 'Pleural Effusion', 
+                     'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices']
 
 def main(args):
+
+    if(args.experiment_type == 'conditional'):
+        assert args.pathology is not None
+        assert args.pathology in MIMIC_PATHOLOGIES
 
     if args.debug:
         print(colored("Debug mode is ON. Make sure this behavior is intended.", "yellow"))
@@ -121,34 +133,60 @@ def main(args):
     synthetic_csv = args.synthetic_csv  # Contains 'prompt' and 'img_savename'
     real_csv = args.real_csv
 
+    ######### Real Data #########
+
     # Load real images
     real_df = pd.read_csv(real_csv)
-
-    if args.debug:
-        n_samples = args.debug_samples
-        real_df = real_df.sample(n=n_samples, random_state=42).reset_index(drop=True)
-
+    # Creating paths to the images
+    real_df[args.real_img_col] = real_df[args.real_img_col].apply(
+        lambda x: os.path.join(args.real_img_dir, x)
+    )
     # Drop rows with duplicate prompts
     real_df = real_df.drop_duplicates(subset=["annotated_prompt"]).reset_index(
         drop=True
     )
-    real_df[args.real_img_col] = real_df[args.real_img_col].apply(
-        lambda x: os.path.join(args.real_img_dir, x)
-    )
-    real_image_paths = real_df[
-        args.real_img_col
-    ].tolist()  
+        
+    ######### Synthetic Data #########
 
     # Load synthetic images
     synthetic_df = pd.read_csv(synthetic_csv)
     if args.debug:
+        n_samples = args.debug_samples
+        real_df = real_df.sample(n=n_samples, random_state=42).reset_index(drop=True)
         synthetic_df = synthetic_df.sample(n=n_samples, random_state=42).reset_index(
             drop=True
         )
-
+    # Creating paths to the images
     synthetic_df[args.synthetic_img_col] = synthetic_df[args.synthetic_img_col].apply(
         lambda x: os.path.join(args.synthetic_img_dir, x)
     )
+
+    
+    # TODO: Implement the logic for running analysis on conditional prompts i.e. Calculating metrics only for a specific pathology
+    if(args.experiment_type == 'conditional'):
+
+        print(colored(f"Calculating metrics for the samples containing the pathology: {args.pathology}", "yellow"))
+        real_df['chexpert_labels'] = real_df['chexpert_labels'].apply(get_labels_dict_from_string)
+        # Create a separate column for pathology labels
+        for col in MIMIC_PATHOLOGIES:
+            real_df[col] = real_df['chexpert_labels'].apply(lambda x: x[col])
+        
+        # Fill NaN values with 0
+        real_df.fillna(0, inplace=True)
+
+        # Create a subset of the real dataset with the specified pathology
+        real_df = real_df[real_df[args.pathology] == 1].reset_index(drop=True)
+        
+        # Include only those images from the synthetic dataset that have the same prompts as the real dataset containing the pathology
+        real_prompts = real_df['annotated_prompt'].to_list()
+        synthetic_df = synthetic_df[synthetic_df['prompt'].isin(real_prompts)].reset_index(drop=True)
+
+    # import pdb; pdb.set_trace()
+    
+    real_image_paths = real_df[
+        args.real_img_col
+    ].tolist()  
+    
     synthetic_image_paths = synthetic_df[
         args.synthetic_img_col
     ].tolist()  # The image path col in the CSV is 'img_savename'
@@ -257,15 +295,6 @@ def main(args):
         synthetic_features=ALL_SYNTHETIC_FEATURES,
     )
 
-    print(ALL_REAL_FEATURES.shape)
-    print(ALL_SYNTHETIC_FEATURES.shape)
-
-    # print(f"FID: {fid_value.item()}")
-    # print(f"FID (RadDino): {fid_raddino_value.item()}")
-    # print(f"KID: {kid_mean.item()} ± {kid_std.item()}")
-    # print(f"KID (RadDino): {kid_raddino_mean.item()} ± {kid_raddino_std.item()}")
-    # print(f"Inception Score: {is_mean.item()} ± {is_std.item()}")
-
     # Save results
     results = {
         "FID": round(fid_value.item(), 3),
@@ -284,12 +313,20 @@ def main(args):
         # 'KID (std)': kid_std.item(),
     }
 
+    if(args.experiment_type == 'conditional'):
+        results['Pathology'] = args.pathology
+
     print("RESULTS ... ")
-    print(colored(results, "green"))
+    # print(colored(results, "green"))
+    for k,v in results.items():
+        print(colored(f"{k}: {v}", "green"))
 
     # Save to CSV
     results_df = pd.DataFrame([results])
-    savename = "image_generation_metrics_debug.csv" if args.debug else "image_generation_metrics.csv"
+    savename = "conditional_image_generation_metrics.csv" if args.experiment_type == 'conditional' else "image_generation_metrics.csv"
+    if args.debug:
+        savename = "debug_" + savename
+    
     savepath = (
         os.path.join(args.results_savedir, savename)
         if args.results_savedir
@@ -365,6 +402,13 @@ if __name__ == "__main__":
         help="Directory to save the results.",
     )
 
+    # Experiment Arguments
+    parser.add_argument(
+        "--experiment_type", type=str, default=None, help="Type of experiment to run (regular, conditional)"
+    )
+    parser.add_argument(
+        "--pathology", type=str, default='regular', help="Type of experiment to run (regular, conditional)"
+    )
     parser.add_argument(
         "--debug",
         action="store_true",
