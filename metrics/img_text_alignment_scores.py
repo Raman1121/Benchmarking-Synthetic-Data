@@ -16,6 +16,7 @@ import os
 from tqdm import tqdm
 from PIL import Image
 from pathlib import Path
+from termcolor import colored
 import warnings
 
 
@@ -88,7 +89,7 @@ def main(args):
 
     if args.debug:
         warnings.filterwarnings("ignore")
-        print("Debug mode is ON. Make sure this behavior is intended.")
+        print(colored("Debug mode is ON. Make sure this behavior is intended.", "yellow"))
 
     text_inference = get_bert_inference()
     image_inference = get_image_inference()
@@ -108,7 +109,7 @@ def main(args):
     synthetic_img_paths = prompts_df[args.synthetic_img_col].tolist()
     prompts = prompts_df[args.synthetic_prompts_col].tolist()
 
-    print("Length of the dataset: ", len(prompts_df))
+    print(colored(f"Length of the dataset: {len(prompts_df)}", "yellow"))
 
     all_scores = []
 
@@ -121,28 +122,30 @@ def main(args):
         all_scores.append(_score)
     mean_alignment_scores = round(np.mean(all_scores, axis=0), 3)
 
-    print("RESULTS...")
-    print("Mean Img-Text Alignment Score: ", mean_alignment_scores)
+    print(colored("RESULTS...", "green"))
+    print(colored(f"Mean Img-Text Alignment Score: {mean_alignment_scores}", "green"))
 
-    savename = "image_generation_metrics_debug.csv" if args.debug else "image_generation_metrics.csv"
+    savename = "image_generation_metrics_debug.csv" if args.debug else "image_generation_metric.csv"
     # savename = "image_generation_metrics_debug.csv"
     savepath = os.path.join(args.results_savedir, savename)
 
     # Try to read if the dataframe already exists
     if os.path.exists(savepath):
 
-        print("Appending to existing results file found at ", savepath)
+        print(colored("Appending to existing results file found at {savepath}", "yellow"))
         results_df = pd.read_csv(savepath)
-        results_df["Alignment_score"] = mean_alignment_scores
-        results_df["Extra Info"] = args.extra_info
+        # results_df["Alignment_score"] = mean_alignment_scores
+        # results_df["Extra Info"] = args.extra_info
+        results_df.iloc[-1]["Alignment_score"] = mean_alignment_scores
+        results_df.iloc[-1]["Extra Info"] = args.extra_info
         results_df.to_csv(savepath, index=False)
-        print("Image-Text Alignment Scores saved to : ", savepath)
+        print(colored(f"Image-Text Alignment Scores saved to: {savepath}", "green"))
     else:
         # print("Creating new results file.")
         # results_df = pd.DataFrame(columns=["Alignment_score", "Extra Info"])
         # results_df["Alignment_score"] = mean_alignment_scores
         # results_df["Extra Info"] = args.extra_info
-        print("ERROR!! Results CSV not found!!")
+        print(colored("ERROR!! Results CSV not found!!", "red"))
     
     
 

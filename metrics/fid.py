@@ -14,8 +14,11 @@ from torchmetrics.image.inception import InceptionScore
 from torchmetrics.image.kid import KernelInceptionDistance
 import argparse
 import warnings
+warnings.filterwarnings("ignore")
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
+from termcolor import colored
 
+from prdc import compute_prdc
 
 def seed_everything(seed=42):
     random.seed(seed)
@@ -32,6 +35,17 @@ def load_RadDino_encoder():
     processor = AutoImageProcessor.from_pretrained(repo)
 
     return model, processor
+
+# PRDC Metric from: https://proceedings.mlr.press/v119/naeem20a/naeem20a.pdf
+def compute_prdc_metric(real_features, synthetic_features):
+    nearest_k = 5
+    metrics = compute_prdc(
+                real_features=real_features,
+                fake_features=synthetic_features,
+                nearest_k=nearest_k
+                )
+
+    return metrics
 
 
 class RadDinoFeatureExtractor(torch.nn.Module):
@@ -93,8 +107,7 @@ class ImageDataset(Dataset):
 def main(args):
 
     if args.debug:
-        warnings.filterwarnings("ignore")
-        print("Debug mode is ON. Make sure this behavior is intended.")
+        print(colored("Debug mode is ON. Make sure this behavior is intended.", "yellow"))
 
     # Set random seed for reproducibility
     seed_everything(42)
@@ -124,7 +137,7 @@ def main(args):
     )
     real_image_paths = real_df[
         args.real_img_col
-    ].tolist()  # Adjust column name if needed
+    ].tolist()  
 
     # Load synthetic images
     synthetic_df = pd.read_csv(synthetic_csv)
@@ -164,7 +177,7 @@ def main(args):
     )
 
     print(
-        f"Processing {len(real_dataset)} real images and {len(synthetic_dataset)} synthetic images..."
+        colored(f"Processing {len(real_dataset)} real images and {len(synthetic_dataset)} synthetic images...", 'yellow')
     )
 
     # Initialize metrics
@@ -175,10 +188,13 @@ def main(args):
     fid_raddino = FrechetInceptionDistance(feature=rad_dino_fe).to(device)
 
     kid = KernelInceptionDistance(subset_size=1000, feature=2048).to(device)
+    kid_raddino = KernelInceptionDistance(feature=rad_dino_fe).to(device)
+
     inception_score = InceptionScore(feature=2048).to(device)
 
     # Process real images
-    print("Processing real images...")
+    print(colored("Processing real images...", "yellow"))
+    ALL_REAL_FEATURES = []
     for batch in tqdm(real_dataloader):
 
         batch = batch.to(device)
@@ -187,13 +203,22 @@ def main(args):
 
         # Update FID and KID with real images
         fid.update(batch, real=True)
-        kid.update(batch, real=True)
-
         # Update FID with RadDino Features
         fid_raddino.update(batch, real=True)
 
+        # kid.update(batch, real=True)
+        # Update KID with RadDino Features
+        # kid_raddino.update(batch, real=True)
+
+        # Collect all real features for PRDC
+        with torch.inference_mode():
+            real_features = rad_dino_fe(batch)
+            ALL_REAL_FEATURES.append(real_features.cpu())
+
+
     # Process synthetic images
-    print("Processing synthetic images...")
+    print(colored("Processing synthetic images...", "yellow"))
+    ALL_SYNTHETIC_FEATURES = []
     for batch in tqdm(synthetic_dataloader):
 
         batch = batch.to(device)
@@ -204,37 +229,63 @@ def main(args):
         # Update FID with RadDino features
         fid_raddino.update(batch, real=False)
 
-        kid.update(batch, real=False)
+        # kid.update(batch, real=False)
+        # Update KID with RadDino Features
+        # kid_raddino.update(batch, real=False)
 
         # Update inception score
         inception_score.update(batch)
 
+        # Collect all synthetic features for PRDC
+        with torch.inference_mode():
+            synthetic_features = rad_dino_fe(batch)
+            ALL_SYNTHETIC_FEATURES.append(synthetic_features.cpu())
+
     # Calculate metrics
-    print("Calculating metrics...")
+    print(colored("Calculating metrics...", "yellow"))
     fid_value = fid.compute()
     fid_raddino_value = fid_raddino.compute()
-    kid_mean, kid_std = kid.compute()
+    # kid_mean, kid_std = kid.compute()
+    # kid_raddino_mean, kid_raddino_std = kid_raddino.compute()
     is_mean, is_std = inception_score.compute()
 
-    print(f"FID: {fid_value.item()}")
-    print(f"FID (RadDino): {fid_raddino_value.item()}")
-    print(f"KID: {kid_mean.item()} ± {kid_std.item()}")
-    print(f"Inception Score: {is_mean.item()} ± {is_std.item()}")
+    # Concatenate all features for PRDC
+    ALL_REAL_FEATURES = torch.cat(ALL_REAL_FEATURES, dim=0)
+    ALL_SYNTHETIC_FEATURES = torch.cat(ALL_SYNTHETIC_FEATURES, dim=0)
+    prdc_metrics = compute_prdc_metric(
+        real_features=ALL_REAL_FEATURES,
+        synthetic_features=ALL_SYNTHETIC_FEATURES,
+    )
+
+    print(ALL_REAL_FEATURES.shape)
+    print(ALL_SYNTHETIC_FEATURES.shape)
+
+    # print(f"FID: {fid_value.item()}")
+    # print(f"FID (RadDino): {fid_raddino_value.item()}")
+    # print(f"KID: {kid_mean.item()} ± {kid_std.item()}")
+    # print(f"KID (RadDino): {kid_raddino_mean.item()} ± {kid_raddino_std.item()}")
+    # print(f"Inception Score: {is_mean.item()} ± {is_std.item()}")
 
     # Save results
     results = {
         "FID": round(fid_value.item(), 3),
         "FID (RadDino)": round(fid_raddino_value.item(), 3),
-        "KID": round(kid_mean.item(), 3),
-        # 'KID (std)': kid_std.item(),
         "Inception Score": round(is_mean.item(), 3),
-        # 'Inception Score (std)': is_std.item()
-        "Extra Info": args.extra_info,
+        "Precision": round(prdc_metrics["precision"].item(), 3),
+        "Recall": round(prdc_metrics["recall"].item(), 3),
+        "Density": round(prdc_metrics["density"].item(), 3),
+        "Coverage": round(prdc_metrics["coverage"].item(), 3),
         "Alignment_score": np.nan,
+        "Extra Info": args.extra_info,
+        # "KID": round(kid_mean.item(), 3),
+        # 'KID (RadDino)': round(kid_raddino_mean.item(), 3),
+        # "KID (std)": round(kid_std.item(), 3),
+        # 'KID (RadDino std)': round(kid_raddino_std.item(), 3),
+        # 'KID (std)': kid_std.item(),
     }
 
     print("RESULTS ... ")
-    print(results)
+    print(colored(results, "green"))
 
     # Save to CSV
     results_df = pd.DataFrame([results])
@@ -257,7 +308,7 @@ def main(args):
         results_df = pd.DataFrame([results])
         results_df.to_csv(savepath, index=False)
 
-    print("Results saved to ", savepath)
+    print(colored(f"Results saved to {savepath}", "green"))
 
 
 if __name__ == "__main__":
