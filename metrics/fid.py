@@ -162,7 +162,7 @@ def main(args):
     )
 
     
-    # TODO: Implement the logic for running analysis on conditional prompts i.e. Calculating metrics only for a specific pathology
+    # Implement the logic for running analysis on conditional prompts i.e. Calculating metrics only for a specific pathology
     if(args.experiment_type == 'conditional'):
 
         print(colored(f"Calculating metrics for the samples containing the pathology: {args.pathology}", "yellow"))
@@ -180,8 +180,6 @@ def main(args):
         # Include only those images from the synthetic dataset that have the same prompts as the real dataset containing the pathology
         real_prompts = real_df['annotated_prompt'].to_list()
         synthetic_df = synthetic_df[synthetic_df['prompt'].isin(real_prompts)].reset_index(drop=True)
-
-    # import pdb; pdb.set_trace()
     
     real_image_paths = real_df[
         args.real_img_col

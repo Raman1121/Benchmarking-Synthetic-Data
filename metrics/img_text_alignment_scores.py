@@ -13,12 +13,13 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 import os
+import ast
 from tqdm import tqdm
 from PIL import Image
 from pathlib import Path
 from termcolor import colored
 import warnings
-
+warnings.filterwarnings("ignore")
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -49,7 +50,19 @@ def parse_args():
         default="img_savename",
         help="Column name in the CSV file containing the image paths.",
     )
-
+    parser.add_argument(
+        "--real_csv",
+        type=str,
+        required=True,
+        help="CSV file containing paths to real images.",
+    )
+    parser.add_argument(
+        "--real_img_col",
+        type=str,
+        default="path",
+        help="Col name in real CSV for image paths.",
+    )
+    
     parser.add_argument(
         "--results_savedir",
         type=str,
@@ -66,6 +79,14 @@ def parse_args():
     parser.add_argument(
         "--extra_info", type=str, default="Some AI Model", help="Extra info to link the results with the specific model."
     )
+
+    # Experiment Arguments
+    parser.add_argument(
+        "--experiment_type", type=str, default=None, help="Type of experiment to run (regular, conditional)"
+    )
+    parser.add_argument(
+        "--pathology", type=str, default='regular', help="Type of experiment to run (regular, conditional)"
+    )
     parser.add_argument(
         "--debug",
         action="store_true",
@@ -77,6 +98,11 @@ def parse_args():
 
     return parser.parse_args()
 
+MIMIC_PATHOLOGIES = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 
+                     'Edema', 'Enlarged Cardiomediastinum', 'Fracture', 
+                     'Lung Lesion', 'Lung Opacity', 'No Finding', 'Pleural Effusion', 
+                     'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices']
+
 
 def seed_everything(seed=42):
     random.seed(seed)
@@ -84,13 +110,21 @@ def seed_everything(seed=42):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
+def get_labels_dict_from_string(x):
+    return ast.literal_eval(x)
 
 def main(args):
 
+    if(args.experiment_type == 'conditional'):
+        assert args.pathology is not None
+        assert args.pathology in MIMIC_PATHOLOGIES
+
     if args.debug:
-        warnings.filterwarnings("ignore")
         print(colored("Debug mode is ON. Make sure this behavior is intended.", "yellow"))
 
+    # Set random seed for reproducibility
+    seed_everything(42)
+    
     text_inference = get_bert_inference()
     image_inference = get_image_inference()
     image_text_inference = ImageTextInferenceEngine(
@@ -103,6 +137,39 @@ def main(args):
     if args.debug:
         prompts_df = prompts_df.sample(n=args.debug_samples, random_state=42).reset_index(drop=True)
 
+    if args.experiment_type == 'conditional':
+        print(colored(f"Calculating metrics for the samples containing the pathology: {args.pathology}", "yellow"))
+        real_csv = args.real_csv
+        prompts_df = prompts_df
+
+        # Load real images
+        real_df = pd.read_csv(real_csv)
+        # Creating paths to the images
+        # real_df[args.real_img_col] = real_df[args.real_img_col].apply(
+        #     lambda x: os.path.join(args.real_img_dir, x)
+        # )
+        # Drop rows with duplicate prompts
+        real_df = real_df.drop_duplicates(subset=["annotated_prompt"]).reset_index(
+            drop=True
+        )
+
+        # Create a separate column for pathology labels
+        real_df['chexpert_labels'] = real_df['chexpert_labels'].apply(get_labels_dict_from_string)
+
+        for col in MIMIC_PATHOLOGIES:
+            real_df[col] = real_df['chexpert_labels'].apply(lambda x: x[col])
+
+        # Fill NaN values with 0
+        real_df.fillna(0, inplace=True)
+
+        # Create a subset of the real dataset with the specified pathology
+        real_df = real_df[real_df[args.pathology] == 1].reset_index(drop=True)
+
+        # Include only those images from the synthetic dataset that have the same prompts as the real dataset containing the pathology
+        real_prompts = real_df['annotated_prompt'].to_list()
+        prompts_df = prompts_df[prompts_df['prompt'].isin(real_prompts)].reset_index(drop=True)
+        
+    # Prepare paths for the synthetic images
     prompts_df[args.synthetic_img_col] = prompts_df[args.synthetic_img_col].apply(
         lambda x: args.synthetic_img_dir.joinpath(x)
     )
@@ -125,38 +192,43 @@ def main(args):
     print(colored("RESULTS...", "green"))
     print(colored(f"Mean Img-Text Alignment Score: {mean_alignment_scores}", "green"))
 
-    savename = "image_generation_metrics_debug.csv" if args.debug else "image_generation_metric.csv"
+    savename = "conditional_image_generation_metrics.csv" if args.experiment_type == 'conditional' else "image_generation_metrics.csv"
+    if args.debug:
+        savename = "debug_" + savename
     # savename = "image_generation_metrics_debug.csv"
     savepath = os.path.join(args.results_savedir, savename)
 
     # Try to read if the dataframe already exists
     if os.path.exists(savepath):
 
-        print(colored("Appending to existing results file found at {savepath}", "yellow"))
+        print(colored(f"Appending to existing results file found at {savepath}", "yellow"))
         results_df = pd.read_csv(savepath)
         # results_df["Alignment_score"] = mean_alignment_scores
         # results_df["Extra Info"] = args.extra_info
         results_df.iloc[-1]["Alignment_score"] = mean_alignment_scores
         results_df.iloc[-1]["Extra Info"] = args.extra_info
+
+        if(args.experiment_type == 'conditional'):
+            results_df.iloc[-1]["Pathology"] = args.pathology
+
         results_df.to_csv(savepath, index=False)
         print(colored(f"Image-Text Alignment Scores saved to: {savepath}", "green"))
     else:
-        # print("Creating new results file.")
-        # results_df = pd.DataFrame(columns=["Alignment_score", "Extra Info"])
-        # results_df["Alignment_score"] = mean_alignment_scores
-        # results_df["Extra Info"] = args.extra_info
-        print(colored("ERROR!! Results CSV not found!!", "red"))
-    
-    
+        results = {
+            "Alignment_score": mean_alignment_scores,
+            "Extra Info": args.extra_info,
+        }
+        if(args.experiment_type == 'conditional'):
+            results["Pathology"] = args.pathology
 
+        print("Creating new results file.")
+        results_df = pd.DataFrame([results])
+        results_df.to_csv(savepath, index=False)
 
 if __name__ == "__main__":
     args = parse_args()
 
     # Create the results directory if it doesn't exist
     os.makedirs(args.results_savedir, exist_ok=True)
-
-    # Set random seed for reproducibility
-    seed_everything(42)
 
     main(args)
