@@ -210,7 +210,7 @@ def main(args):
         results_df.loc[results_df.index[-1], 'Alignment_score'] = mean_alignment_scores
 
         if(args.experiment_type == 'conditional'):
-            results_df.iloc[-1]["Pathology"] = args.pathology
+            results_df.loc[results_df.index[-1], 'Pathology'] = args.pathology
 
         results_df.to_csv(savepath, index=False)
         print(colored(f"Image-Text Alignment Scores saved to: {savepath}", "green"))
