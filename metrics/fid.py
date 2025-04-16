@@ -242,9 +242,9 @@ def main(args):
         # Update FID with RadDino Features
         fid_raddino.update(batch, real=True)
 
-        # kid.update(batch, real=True)
+        kid.update(batch, real=True)
         # Update KID with RadDino Features
-        # kid_raddino.update(batch, real=True)
+        kid_raddino.update(batch, real=True)
 
         # Collect all real features for PRDC
         with torch.inference_mode():
@@ -265,9 +265,9 @@ def main(args):
         # Update FID with RadDino features
         fid_raddino.update(batch, real=False)
 
-        # kid.update(batch, real=False)
+        kid.update(batch, real=False)
         # Update KID with RadDino Features
-        # kid_raddino.update(batch, real=False)
+        kid_raddino.update(batch, real=False)
 
         # Update inception score
         inception_score.update(batch)
@@ -281,8 +281,8 @@ def main(args):
     print(colored("Calculating metrics...", "yellow"))
     fid_value = fid.compute()
     fid_raddino_value = fid_raddino.compute()
-    # kid_mean, kid_std = kid.compute()
-    # kid_raddino_mean, kid_raddino_std = kid_raddino.compute()
+    kid_mean, kid_std = kid.compute()
+    kid_raddino_mean, kid_raddino_std = kid_raddino.compute()
     is_mean, is_std = inception_score.compute()
 
     # Concatenate all features for PRDC
@@ -304,8 +304,8 @@ def main(args):
         "Coverage": round(prdc_metrics["coverage"].item(), 3),
         "Alignment_score": np.nan,
         "Extra Info": args.extra_info,
-        # "KID": round(kid_mean.item(), 3),
-        # 'KID (RadDino)': round(kid_raddino_mean.item(), 3),
+        "KID": round(kid_mean.item(), 3),
+        'KID (RadDino)': round(kid_raddino_mean.item(), 3),
         # "KID (std)": round(kid_std.item(), 3),
         # 'KID (RadDino std)': round(kid_raddino_std.item(), 3),
         # 'KID (std)': kid_std.item(),
