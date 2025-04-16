@@ -114,6 +114,11 @@ MIMIC_PATHOLOGIES = ['Atelectasis', 'Cardiomegaly', 'Consolidation',
 
 def main(args):
 
+    if(args.num_shards == -1):
+        args.num_shards = None
+    if(args.shard == -1):
+        args.shard = None
+
     if(args.experiment_type == 'conditional'):
         assert args.pathology is not None
         assert args.pathology in MIMIC_PATHOLOGIES
@@ -189,6 +194,15 @@ def main(args):
         args.synthetic_img_col
     ].tolist()  # The image path col in the CSV is 'img_savename'
 
+    if(args.num_shards is not None):
+        print(colored(f"Dividing the dataset into {args.num_shards} shards.", "yellow"))
+        print(colored(f"Shard Index: {args.shard}", "yellow"))
+        ALL_REAL_PATHS = np.array_split(real_image_paths, args.num_shards)
+        ALL_SYNTHETIC_PATHS = np.array_split(synthetic_image_paths, args.num_shards)
+        real_image_paths = ALL_REAL_PATHS[args.shard]
+        synthetic_image_paths = ALL_SYNTHETIC_PATHS[args.shard]
+
+
     # Define transform for loading images
     # Note: torchmetrics FID expects images in range [0, 1] without normalization
     transform = transforms.Compose(
@@ -223,8 +237,11 @@ def main(args):
     rad_dino_fe = RadDinoFeatureExtractor(model, processor)
     fid_raddino = FrechetInceptionDistance(feature=rad_dino_fe).to(device)
 
-    kid = KernelInceptionDistance(subset_size=1000, feature=2048).to(device)
-    kid_raddino = KernelInceptionDistance(feature=rad_dino_fe).to(device)
+    NUM_KID_SUBSETS = 100   # Default
+    KID_SUBSET_SIZE = min(len(synthetic_dataset), len(real_dataset))
+
+    kid = KernelInceptionDistance(subset_size=KID_SUBSET_SIZE, feature=2048).to(device)
+    kid_raddino = KernelInceptionDistance(subset_size=KID_SUBSET_SIZE, feature=rad_dino_fe).to(device)
 
     inception_score = InceptionScore(feature=2048).to(device)
 
@@ -246,11 +263,10 @@ def main(args):
         # Update KID with RadDino Features
         kid_raddino.update(batch, real=True)
 
-        # Collect all real features for PRDC
+        # Collect all synthetic features for PRDC
         with torch.inference_mode():
             real_features = rad_dino_fe(batch)
             ALL_REAL_FEATURES.append(real_features.cpu())
-
 
     # Process synthetic images
     print(colored("Processing synthetic images...", "yellow"))
@@ -298,14 +314,14 @@ def main(args):
         "FID": round(fid_value.item(), 3),
         "FID (RadDino)": round(fid_raddino_value.item(), 3),
         "Inception Score": round(is_mean.item(), 3),
+        "KID": round(kid_mean.item(), 3),
+        'KID (RadDino)': round(kid_raddino_mean.item(), 3),
         "Precision": round(prdc_metrics["precision"].item(), 3),
         "Recall": round(prdc_metrics["recall"].item(), 3),
         "Density": round(prdc_metrics["density"].item(), 3),
         "Coverage": round(prdc_metrics["coverage"].item(), 3),
         "Alignment_score": np.nan,
         "Extra Info": args.extra_info,
-        "KID": round(kid_mean.item(), 3),
-        'KID (RadDino)': round(kid_raddino_mean.item(), 3),
         # "KID (std)": round(kid_std.item(), 3),
         # 'KID (RadDino std)': round(kid_raddino_std.item(), 3),
         # 'KID (std)': kid_std.item(),
@@ -321,9 +337,22 @@ def main(args):
 
     # Save to CSV
     results_df = pd.DataFrame([results])
-    savename = "conditional_image_generation_metrics.csv" if args.experiment_type == 'conditional' else "image_generation_metrics.csv"
-    if args.debug:
-        savename = "debug_" + savename
+
+    def prepare_savename(args):
+        if args.experiment_type == 'conditional':
+            savename = "conditional_image_generation_metrics.csv"
+        else:
+            if(args.num_shards is not None):
+                savename = f"image_generation_metrics_shard_{args.shard}.csv"
+            else:
+                savename = "image_generation_metrics.csv"
+
+        if args.debug:
+            savename = "debug_" + savename
+
+        return savename
+    
+    savename = prepare_savename(args)
     
     savepath = (
         os.path.join(args.results_savedir, savename)
@@ -331,12 +360,16 @@ def main(args):
         else savename
     )
 
+
     if os.path.exists(savepath):
         print("Appending to existing results file.")
         existing_df = pd.read_csv(savepath)
         results_row = list(results.values())
 
-        existing_df.loc[len(results_df)] = results_row
+        # existing_df.loc[len(results_df)] = results_row
+        # Append the new results to the existing DataFrame
+        new_row = pd.DataFrame([results_row], columns=results_df.columns)
+        existing_df = pd.concat([existing_df, new_row], ignore_index=True)
         existing_df.to_csv(savepath, index=False)
     else:
         print("Creating new results file.")
@@ -407,6 +440,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pathology", type=str, default='regular', help="Type of experiment to run (regular, conditional)"
     )
+
+    parser.add_argument(
+        "--num_shards", type=int, default=-1, help="Number of shards to divide into."
+    )
+    parser.add_argument(
+        "--shard", type=int, default=None, help="Shard Index."
+    )
+
     parser.add_argument(
         "--debug",
         action="store_true",

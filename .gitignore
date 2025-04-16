@@ -5,3 +5,4 @@ Notebooks/*
 Downstream_Training/checkpoints/*
 Downstream_Training/training_results/*
 Downstream_Training/inference_results/*
+logs/*
