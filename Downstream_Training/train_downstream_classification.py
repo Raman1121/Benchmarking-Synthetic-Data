@@ -17,6 +17,7 @@ from tqdm import tqdm
 import random
 from termcolor import colored
 import warnings
+from time import time
 warnings.filterwarnings("ignore")
 
 from PIL import ImageFile
@@ -27,6 +28,13 @@ def seed_everything(seed=42):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
+
+def format_elapsed_time(elapsed_time):
+    hours, rem = divmod(elapsed_time, 3600)
+    minutes, seconds = divmod(rem, 60)
+
+    print(f"Time Taken: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
+
 
 
 class MIMICCXRDataset(Dataset):
@@ -320,6 +328,7 @@ def main(args):
     # for epoch in tqdm(range(args.epochs), desc="Training Progress"):
     for epoch in range(args.epochs):
         # Train
+        start_time = time()
         train_loss = train_epoch(model, train_loader, criterion, optimizer, device)
         train_losses.append(train_loss)
         
@@ -331,9 +340,11 @@ def main(args):
         # Calculate metrics
         metrics = calculate_metrics(val_outputs, val_labels, threshold=args.threshold)
         
+        elapsed_time = time() - start_time
         # Print progress
         print(f"Epoch {epoch+1}/{args.epochs}")
         print(f"Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
+        format_elapsed_time(elapsed_time)
         print(f"Metrics: ")
         for metric, value in metrics.items():
             if metric != 'auc_per_class':  # Don't print per-class AUC in the log
