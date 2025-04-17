@@ -312,8 +312,9 @@ def main(args):
     train_losses = []
     val_losses = []
 
-    os.makedirs(f"checkpoints/{args.model_name}", exist_ok=True)
-    os.makedirs("training_results", exist_ok=True)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.makedirs(f"{script_dir}/checkpoints/{args.model_name}", exist_ok=True)
+    os.makedirs(f"{script_dir}/training_results", exist_ok=True)
     
     print(f"Starting training for {args.epochs} epochs...")
     # for epoch in tqdm(range(args.epochs), desc="Training Progress"):
@@ -362,7 +363,7 @@ def main(args):
     plt.ylabel('Loss')
     plt.title('Training and Validation Loss')
     plt.legend()
-    plt.savefig(f"training_results/{args.model_name}_loss_curves.png")
+    plt.savefig(f"{script_dir}/training_results/{args.model_name}_loss_curves.png")
     
     # Print final best metrics
     print("\nBest Validation Performance:")
@@ -379,7 +380,7 @@ def main(args):
 
     # Wriwte the best metrics to a CSV file
     results_df = pd.DataFrame([best_metrics])
-    results_df.to_csv(f"training_results/{args.model_name}_best_metrics.csv", index=False)
+    results_df.to_csv(f"{script_dir}/training_results/{args.model_name}_best_metrics.csv", index=False)
 
 
 if __name__ == "__main__":
