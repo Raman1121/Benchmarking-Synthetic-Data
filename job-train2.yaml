@@ -60,7 +60,9 @@ spec:
             - |
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
-              python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"              
+              python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+              pip install ninja
+              pip install flash-attn --no-build-isolation           
               sleep 10000
           resources:
             limits:
