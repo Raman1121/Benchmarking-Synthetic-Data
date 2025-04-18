@@ -27,7 +27,7 @@ spec:
                   - key: nvidia.com/gpu.product
                     operator: In
                     values:
-                      - NVIDIA-H200
+                      - NVIDIA-A100-SXM4-40GB
       # Add tolerations to allow scheduling on nodes with specific taints.
       tolerations:
         - key: "eidf098"
