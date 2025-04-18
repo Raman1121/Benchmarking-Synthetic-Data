@@ -9,7 +9,7 @@ export MODEL="vit_base_patch16_224.orig_in21k_ft_in1k" #resnet50, vit_base_patch
 export BATCH_SIZE=64
 export EPOCHS=15
 
-export CUDA_VISIBLE_DEVICES=0,4
+export CUDA_VISIBLE_DEVICES=0,1,2,4
 
 CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES python Downstream_Training/train_downstream_classification.py \
                                             --batch_size=$BATCH_SIZE \

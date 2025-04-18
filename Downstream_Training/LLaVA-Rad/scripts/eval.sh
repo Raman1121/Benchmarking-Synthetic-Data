@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /raid/s2198939/miniconda3/bin/activate llavarad
+
 set -e
 set -o pipefail
 
@@ -14,17 +16,33 @@ prediction_file=$prediction_dir/test
 run_name="${4:-llavarad}"
 
 
-# query_file=/PATH_TO/physionet.org/files/llava-rad-mimic-cxr-annotation/1.0.0/chat_test_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+query_file=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_test_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+image_folder=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
 
-# image_folder=/PATH_TO/physionet.org/files/mimic-cxr-jpg/2.0.0/files
 loader="mimic_test_findings"
 conv_mode="v1"
 
 CHUNKS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
+CHUNK_IDX=0
+NUM_CHUNKS=1
 
-for (( idx=0; idx<$CHUNKS; idx++ ))
-do
-    CUDA_VISIBLE_DEVICES=$idx python -m llava.eval.model_mimic_cxr \
+# for (( idx=0; idx<$CHUNKS; idx++ ))
+# do
+#     CUDA_VISIBLE_DEVICES=$idx python -m llava.eval.model_mimic_cxr \
+#         --query_file ${query_file} \
+#         --loader ${loader} \
+#         --image_folder ${image_folder} \
+#         --conv_mode ${conv_mode} \
+#         --prediction_file ${prediction_file}_${idx}.jsonl \
+#         --temperature 0 \
+#         --model_path ${model_path} \
+#         --model_base ${model_base} \
+#         --chunk_idx ${idx} \
+#         --num_chunks ${CHUNKS} \
+#         --batch_size 8 \
+#         --group_by_length &
+# done
+CUDA_VISIBLE_DEVICES=7 python -m llava.eval.model_mimic_cxr \
         --query_file ${query_file} \
         --loader ${loader} \
         --image_folder ${image_folder} \
@@ -33,11 +51,11 @@ do
         --temperature 0 \
         --model_path ${model_path} \
         --model_base ${model_base} \
-        --chunk_idx ${idx} \
-        --num_chunks ${CHUNKS} \
+        --chunk_idx ${CHUNK_IDX} \
+        --num_chunks ${NUM_CHUNKS} \
         --batch_size 8 \
         --group_by_length &
-done
+
 
 wait
 

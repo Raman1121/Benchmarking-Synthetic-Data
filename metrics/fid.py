@@ -355,9 +355,9 @@ def main(args):
     savename = prepare_savename(args)
     
     savepath = (
-        os.path.join(args.results_savedir, savename)
-        if args.results_savedir
-        else savename
+        os.path.join(args.results_savedir, "saved_shards", savename)
+        if args.num_shards is not None
+        else os.path.join(args.results_savedir, savename)
     )
 
 

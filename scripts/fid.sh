@@ -18,4 +18,6 @@ CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES python metrics/fid.py --synthetic_csv
                                                     --extra_info=$EXTRA_INFO \
                                                     --experiment_type=$EXPERIMENT_TYPE \
                                                     --pathology="$PATHOLOGY" \
+                                                    --num_shards=$NUM_SHARDS \
+                                                    --shard=$SHARD \
                                                     

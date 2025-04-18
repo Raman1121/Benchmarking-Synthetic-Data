@@ -39,7 +39,7 @@ spec:
           value: "True"
           effect: "NoSchedule"
       containers:
-        - name: test_run1
+        - name: testrun1
           image: raman07/myapp:latest  # Ensure CUDA version matches host drivers
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
