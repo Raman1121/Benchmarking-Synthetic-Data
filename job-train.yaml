@@ -58,6 +58,7 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
+              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               bash scripts/test_docker.sh
               sleep 10000
           resources:
