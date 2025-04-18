@@ -64,7 +64,8 @@ spec:
           args:
             - |
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
-              /workspace/Benchmarking-Synthetic-Data/test_docker.sh
+              python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+              pip install flash-attn --no-build-isolation
               sleep 10000
           resources:
             limits:
