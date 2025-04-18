@@ -1,4 +1,4 @@
-# Base image with CUDA 12.6 and MIG tools
+# # Base image with CUDA 12.6 and MIG tools
 FROM nvidia/cuda:12.6.0-devel-ubuntu22.04
 
 # Set timezone non-interactively
@@ -74,3 +74,5 @@ RUN git clone https://github.com/Raman1121/Benchmarking-Synthetic-Data.git /work
 # Set working directory
 WORKDIR /workspace/Benchmarking-Synthetic-Data/
 CMD ["true"]
+
+##########################################

@@ -59,7 +59,7 @@ spec:
           args:
             - |
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
-              python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+              ./scripts/test_docker.sh
               sleep 10000
           resources:
             limits:
