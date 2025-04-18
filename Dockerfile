@@ -39,7 +39,7 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 # Install PyTorch 2.6.0 with CUDA 12.6 compatibility
 RUN pip3 install --no-cache-dir \
     torch==2.6.0 \
-    torchvision==0.21.0+cu126 \
+    torchvision \
     --index-url https://download.pytorch.org/whl/cu126  # Updated to cu126
 
 # Install remaining Python dependencies
@@ -52,15 +52,15 @@ RUN pip install --no-cache-dir \
     click \
     requests \
     tqdm \
-    pyspng \
     scikit-learn \
-    statsmodels \
     seaborn \
     pycryptodome \
     cryptography \
     lpips \
     imageio-ffmpeg==0.4.3 \
-    xtermcolor
+    xtermcolor 
+
+# RUN pip install -U flash-attn --no-build-isolation
 
 # Configure writable directories
 ENV TORCH_EXTENSIONS_DIR=/workspace/torch_extensions
