@@ -70,7 +70,7 @@ RUN mkdir -p ${TORCH_EXTENSIONS_DIR} && chmod -R 777 ${TORCH_EXTENSIONS_DIR}
 ARG CACHEBUST=1
 
 # Clone repositories
-RUN git clone https://github.com/Raman1121/Benchmarking-Synthetic-Data.git /workspace/Benchmarking-Synthetic-Data/ \
+RUN git clone https://github.com/Raman1121/Benchmarking-Synthetic-Data.git /workspace/Benchmarking-Synthetic-Data/
 
 # Set working directory
 WORKDIR /workspace/Benchmarking-Synthetic-Data/
