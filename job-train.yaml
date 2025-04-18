@@ -59,6 +59,7 @@ spec:
           args:
             - |
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
+              chmod +x /scripts/test_docker.sh
               ./scripts/test_docker.sh
               sleep 10000
           resources:
