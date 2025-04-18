@@ -1,0 +1,80 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: ${USER}-job-train-${JOB_SUFFIX}
+  labels:
+    eidf/user: ${USER}
+    kueue.x-k8s.io/queue-name: ${QUEUE_NAME}
+    kueue.x-k8s.io/priority-class: batch-workload-priority
+spec:
+  completions: 1
+  parallelism: 1
+  completionMode: Indexed
+  backoffLimit: 2147483647
+  activeDeadlineSeconds: 864000
+  template:
+    metadata:
+      labels:
+        eidf/user: ${USER}
+    spec:
+      restartPolicy: OnFailure
+      # Replace nodeSelector with affinity to allow multiple GPU types.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.product
+                    operator: In
+                    values:
+                      - NVIDIA-A100
+      # Add tolerations to allow scheduling on nodes with specific taints.
+      tolerations:
+        - key: "eidf098"
+          operator: "Equal"
+          value: "True"
+          effect: "NoSchedule"
+        - key: "eidf107"
+          operator: "Equal"
+          value: "True"
+          effect: "NoSchedule"
+      containers:
+        - name: test_run1
+          image: raman07/myapp:latest  # Ensure CUDA version matches host drivers
+          workingDir: "/workspace/Benchmarking-Synthetic-Data"
+          env:
+            - name: TORCH_NCCL_ASYNC_ERROR_HANDLING
+              value: "1"
+            - name: NCCL_DEBUG
+              value: "INFO"
+            - name: NCCL_IB_DISABLE
+              value: "1"
+            - name: MAX_DELTA
+              value: "${MAX_DELTA}"
+            - name: NCCL_IB_HCA
+              value: "^mlx5"
+            - name: PYTHONPATH
+              value: "/workspace/Benchmarking-Synthetic-Data"
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              bash scripts/test_docker.sh
+          resources:
+            limits:
+              nvidia.com/gpu: "1"
+              cpu: "4"
+              memory: "32Gi"
+          volumeMounts:
+            - name: nfs-user-107
+              mountPath: /nfs-user-107
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: nfs-user-107
+          nfs:
+            server: 10.24.6.77
+            path: /user/s2198939-eidf107
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
