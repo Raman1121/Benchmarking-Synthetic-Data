@@ -60,7 +60,7 @@ RUN pip install --no-cache-dir \
     imageio-ffmpeg==0.4.3 \
     xtermcolor 
 
-# RUN pip install -U flash-attn --no-build-isolation
+RUN pip install -v flash-attn==2.1.1
 
 # Configure writable directories
 ENV TORCH_EXTENSIONS_DIR=/workspace/torch_extensions
