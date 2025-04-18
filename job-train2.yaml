@@ -40,7 +40,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: test2
-          image: raman07/my_app:latest  # Ensure CUDA version matches host drivers
+          image: raman07/myapp:latest  # Ensure CUDA version matches host drivers
           workingDir: "/workspace/kubernets"
           env:
             - name: TORCH_NCCL_ASYNC_ERROR_HANDLING
