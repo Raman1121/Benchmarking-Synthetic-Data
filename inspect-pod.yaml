@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvc-inspect
+spec:
+  containers:
+  - name: inspector
+    image: busybox
+    command: ["/bin/sh", "-c", "sleep 3600"]
+    volumeMounts:
+    - mountPath: /mnt
+      name: mimic-cxr2-volume
+  volumes:
+  - name: mimic-cxr2-volume
+    persistentVolumeClaim:
+      claimName: mimic-cxr2
