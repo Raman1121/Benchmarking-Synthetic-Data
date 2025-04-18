@@ -18,7 +18,6 @@ spec:
         eidf/user: ${USER}
     spec:
       restartPolicy: OnFailure
-      # Replace nodeSelector with affinity to allow multiple GPU types.
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -28,7 +27,6 @@ spec:
                     operator: In
                     values:
                       - NVIDIA-H200
-      # Add tolerations to allow scheduling on nodes with specific taints.
       tolerations:
         - key: "eidf098"
           operator: "Equal"
@@ -38,9 +36,16 @@ spec:
           operator: "Equal"
           value: "True"
           effect: "NoSchedule"
+      initContainers:
+        - name: init-permissions
+          image: busybox
+          command: ['sh', '-c', 'chmod +x /workspace/Benchmarking-Synthetic-Data/scripts/*.sh']
+          volumeMounts:
+            - name: nfs-user-107
+              mountPath: /workspace/Benchmarking-Synthetic-Data
       containers:
         - name: testrun1
-          image: raman07/myapp:latest  # Ensure CUDA version matches host drivers
+          image: raman07/myapp:latest
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
             - name: TORCH_NCCL_ASYNC_ERROR_HANDLING
@@ -59,9 +64,7 @@ spec:
           args:
             - |
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
-              chmod +x /workspace/Benchmarking-Synthetic-Data/scripts/test_docker.sh
-              echo pwd
-              ./workspace/Benchmarking-Synthetic-Data/scripts/test_docker.sh
+              /workspace/Benchmarking-Synthetic-Data/test_docker.sh
               sleep 10000
           resources:
             limits:
