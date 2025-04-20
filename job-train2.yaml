@@ -60,6 +60,9 @@ spec:
           args:
             - |
 
+              echo "Changing branch to eidf"
+              git checkout eidf
+              
               apt update
               apt install -y wget
               apt install -y git
