@@ -67,7 +67,7 @@ spec:
               apt install -y libgl1
               apt install -y libglib2.0-0
               apt install -y ffmpeg
-              
+
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
@@ -86,7 +86,8 @@ spec:
               conda activate sana || conda create -n sana python=3.8 -y && conda activate sana
 
               echo "Creating env for LLaVA-Rad"
-              cd Downstream_Training/LLaVA-Rad
+              cd /workspace/Downstream_Training/LLaVA-Rad
+              pip install --upgrade pip 
               pip install -e .
 
               echo "Installing flash-attn"
