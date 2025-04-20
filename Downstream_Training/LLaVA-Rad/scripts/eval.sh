@@ -16,8 +16,8 @@ prediction_file=$prediction_dir/test
 run_name="${4:-llavarad}"
 
 
-query_file=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_test_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
-image_folder=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
+query_file=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_test_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+image_folder=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
 
 loader="mimic_test_findings"
 conv_mode="v1"
@@ -42,7 +42,7 @@ NUM_CHUNKS=1
 #         --batch_size 8 \
 #         --group_by_length &
 # done
-CUDA_VISIBLE_DEVICES=7 python -m llava.eval.model_mimic_cxr \
+python -m llava.eval.model_mimic_cxr \
         --query_file ${query_file} \
         --loader ${loader} \
         --image_folder ${image_folder} \
@@ -61,9 +61,9 @@ wait
 
 cat ${prediction_file}_*.jsonl > mimic_cxr_preds.jsonl
 
-pushd llava/eval/rrg_eval
-WANDB_PROJECT="llava" WANDB_RUN_ID="llava-eval-$(date +%Y%m%d%H%M%S)" WANDB_RUN_GROUP=evaluate CUDA_VISIBLE_DEVICES=0 \
-    python run.py ../../../mimic_cxr_preds.jsonl --run_name ${run_name} --output_dir ../../../${prediction_dir}/eval
-popd
+# pushd llava/eval/rrg_eval
+# WANDB_PROJECT="llava" WANDB_RUN_ID="llava-eval-$(date +%Y%m%d%H%M%S)" WANDB_RUN_GROUP=evaluate CUDA_VISIBLE_DEVICES=0 \
+#     python run.py ../../../mimic_cxr_preds.jsonl --run_name ${run_name} --output_dir ../../../${prediction_dir}/eval
+# popd
 
-rm mimic_cxr_preds.jsonl
+# rm mimic_cxr_preds.jsonl
