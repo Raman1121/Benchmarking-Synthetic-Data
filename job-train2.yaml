@@ -40,8 +40,9 @@ spec:
           value: "True"
           effect: "NoSchedule"
       containers:
-        - name: test2
-          image: raman07/myapp:latest  # Ensure CUDA version matches host drivers
+        - name: pytorch-cuda11.7
+          # image: raman07/myapp:latest  # Ensure CUDA version matches host drivers
+          image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
             - name: TORCH_NCCL_ASYNC_ERROR_HANDLING
