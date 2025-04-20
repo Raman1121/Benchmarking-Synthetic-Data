@@ -61,6 +61,10 @@ spec:
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+
+              /pvc/miniconda/bin/conda init bash
+              source /pvc/miniconda/bin/activate
+              conda activate sana || conda create -n sana python=3.8 -y && conda activate sana
               
               echo "Creating env for LLaVA-Rad"
               cd Downstream_Training/LLaVA-Rad
