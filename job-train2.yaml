@@ -110,7 +110,7 @@ spec:
 
               echo "Running EVAL!!!"
               chmod +x ./scripts/eval.sh
-              ./scripts/eval.sh 2> error_log.txt
+              ./scripts/eval.sh > error_log.txt 2>&1
 
               ./pvc/Benchmarking-Synthetic-Data/run.sh
           resources:
