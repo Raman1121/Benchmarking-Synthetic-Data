@@ -110,8 +110,7 @@ spec:
               chmod +x ./scripts/eval.sh
               ./scripts/eval.sh
 
-              sleep infinity
-              echo "FINISHED!!!!!!"
+              bash /pvc/Benchmarking-Synthetic-Data/run.sh
           resources:
             limits:
               nvidia.com/gpu: "1"
