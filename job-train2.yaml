@@ -11,14 +11,14 @@ spec:
   parallelism: 1
   completionMode: Indexed
   backoffLimit: 0
-  activeDeadlineSeconds: 864000 # Still applies - Job will be killed after 10 days
-  ttlSecondsAfterFinished: 2592000 # Will apply only after the Job finally finishes (e.g., activeDeadlineSeconds hit, or manual deletion)
+  activeDeadlineSeconds: 864000
+  ttlSecondsAfterFinished: 2592000
   template:
     metadata:
       labels:
         eidf/user: ${USER}
     spec:
-      restartPolicy: OnFailure # Pod will restart if it fails *before* reaching the sleep
+      restartPolicy: OnFailure
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -42,10 +42,11 @@ spec:
           image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
-            # ... (your env vars including TZ and DEBIAN_FRONTEND) ...
+            # --- START ADDITION ---
             - name: TZ
               value: "Etc/UTC"
-            - name: DEBIAN_FRONTEND
+            # --- END ADDITION ---
+            - name: DEBIAN_FRONTEND # Keep this one too!
               value: "noninteractive"
             - name: TORCH_NCCL_ASYNC_ERROR_HANDLING
               value: "1"
@@ -62,69 +63,55 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-              # Wrap the main script logic in a function or subshell (optional but cleaner)
-              run_script() {
-                set -e # Exit on errors *within* this function/subshell
 
-                echo "Changing branch to eidf"
-                git checkout eidf
+              apt install git-all
+              echo "Changing branch to eidf"
+              git checkout eidf
 
-                echo "Copying files to /pvc"
-                cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
-                cd /pvc/Benchmarking-Synthetic-Data
+              echo "Copying files to /pvc"
+              cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
+              cd /pvc/Benchmarking-Synthetic-Data
 
-                echo "Updating apt and installing packages..."
-                apt update && apt install -y --no-install-recommends \
-                    wget \
-                    git \
-                    unzip \
-                    zip \
-                    libgl1 \
-                    libglib2.0-0 \
-                    ffmpeg \
-                    tzdata
-                rm -rf /var/lib/apt/lists/*
+              # Set timezone non-interactively (alternative if TZ env var isn't enough)
+              # echo 'Etc/UTC' > /etc/timezone
+              # ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
-                echo "Setting up environment..."
-                export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
-                python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+              # Run apt update and install with -y and noninteractive frontend
+              apt update && apt install -y --no-install-recommends \
+                  wget \
+                  git \
+                  unzip \
+                  zip \
+                  libgl1 \
+                  libglib2.0-0 \
+                  ffmpeg \
+                  tzdata # Explicitly install tzdata if needed
 
-                python3 -m pip install --upgrade pip setuptools wheel
-                pip install wavedrom
+              # Clean up apt cache
+              rm -rf /var/lib/apt/lists/*
 
-                echo "Installing LLaVA-Rad"
-                cd Downstream_Training/LLaVA-Rad
-                pip install --upgrade pip
-                pip install -e .
+              echo "Setting up environment..."
+              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
+              python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
 
-                echo "Installing flash-attn"
-                pip install ninja
-                pip install flash-attn --no-build-isolation
+              python3 -m pip install --upgrade pip setuptools wheel
+              pip install wavedrom
 
-                echo "Running EVAL!!!"
-                ./scripts/eval.sh
+              echo "Installing LLaVA-Rad"
+              cd Downstream_Training/LLaVA-Rad
+              pip install --upgrade pip
+              pip install -e .
 
-                echo "Script finished successfully."
-              }
+              echo "Installing flash-attn"
+              pip install ninja
+              pip install flash-attn --no-build-isolation
 
-              # Execute the script function and capture its exit code
-              run_script
-              SCRIPT_EXIT_CODE=$?
+              echo "Running EVAL!!!"
+              chmod +x ./scripts/eval.sh
+              ./scripts/eval.sh
 
-              if [ $SCRIPT_EXIT_CODE -ne 0 ]; then
-                echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                echo "!!!! SCRIPT FAILED WITH EXIT CODE: $SCRIPT_EXIT_CODE !!!!"
-                echo "!!!! Sleeping indefinitely for debugging...        !!!!"
-                echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-              else
-                echo "Script completed successfully. Sleeping indefinitely..."
-              fi
-
-              # --- ADDED SLEEP ---
-              # Keep the container running indefinitely
               sleep infinity
-              # --- END ADDED SLEEP ---
-
+              echo "FINISHED!!!!!!"
           resources:
             limits:
               nvidia.com/gpu: "1"
