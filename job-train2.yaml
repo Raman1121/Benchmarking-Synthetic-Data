@@ -105,7 +105,10 @@ spec:
               pip install flash-attn --no-build-isolation
 
               echo "Running EVAL!!!"
+              chmod +x ./scripts/eval.sh
               ./scripts/eval.sh
+
+              sleep 3600
           resources:
             limits:
               nvidia.com/gpu: "1"
