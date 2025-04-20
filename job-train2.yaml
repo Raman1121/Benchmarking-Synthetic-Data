@@ -63,8 +63,16 @@ spec:
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
 
               echo "Creating conda env"
-              /pvc/miniconda/bin/conda init bash
-              source /pvc/miniconda/bin/activate
+              cd /pvc/ 
+              mkdir -p miniconda3
+              wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3/miniconda.sh
+              chmod +x miniconda3/miniconda.sh
+              bash miniconda3/miniconda.sh -b -u -p miniconda3
+              rm miniconda3/miniconda.sh
+
+              echo "Creating conda env"
+              /pvc/miniconda3/bin/conda init bash
+              source /pvc/miniconda3/bin/activate
               conda activate sana || conda create -n sana python=3.8 -y && conda activate sana
 
               echo "Creating env for LLaVA-Rad"
