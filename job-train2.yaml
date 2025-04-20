@@ -99,8 +99,8 @@ spec:
           volumeMounts:
             - name: workspace
               mountPath: /workspace
-            - name: nfs-user-107
-              mountPath: /nfs-user-107
+            # - name: nfs-user-107
+            #   mountPath: /nfs-user-107
             - name: writeable
               mountPath: /pvc
             - name: dshm
