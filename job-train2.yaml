@@ -10,8 +10,9 @@ spec:
   completions: 1
   parallelism: 1
   completionMode: Indexed
-  backoffLimit: 2147483647
+  backoffLimit: 0
   activeDeadlineSeconds: 864000
+  ttlSecondsAfterFinished: 2592000
   template:
     metadata:
       labels:
@@ -58,23 +59,12 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-
-              apt update
-              apt install -y wget
-              apt install -y git
-              apt install -y unzip
-              apt install -y zip
-              apt install -y libgl1
-              apt install -y libglib2.0-0
-              apt install -y ffmpeg
-
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
 
               echo "Creating env for LLaVA-Rad"
-              cd /workspace/Downstream_Training/LLaVA-Rad
-              pip install --upgrade pip 
+              cd Downstream_Training/LLaVA-Rad
               pip install -e .
 
               echo "Installing flash-attn"
