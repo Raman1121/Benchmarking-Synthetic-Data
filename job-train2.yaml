@@ -71,9 +71,7 @@ spec:
               echo "Installing flash-attn"
               pip install ninja
               pip install flash-attn --no-build-isolation
-
-              sleep(10000)
-
+              
               ./scripts/eval.sh
           resources:
             limits:
