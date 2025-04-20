@@ -113,7 +113,13 @@ spec:
               chmod +x ./scripts/eval.sh
               ./scripts/eval.sh > error_log.txt 2>&1
 
-              ./pvc/Benchmarking-Synthetic-Data/run.sh
+              echo "Running EVAL done!!!"
+              mv mimic_cxr_preds.jsonl llava/eval/rr_eval/mimic_cxr_preds.jsonl
+
+              echo "Calculating Results and Metrics!"
+              cd llava/eval/rr_eval
+              python run.py mimic_cxr_preds.jsonl
+              
           resources:
             limits:
               nvidia.com/gpu: "1"

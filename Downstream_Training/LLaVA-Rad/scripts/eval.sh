@@ -51,7 +51,7 @@ python -m llava.eval.model_mimic_cxr \
         --model_base ${model_base} \
         --chunk_idx ${CHUNK_IDX} \
         --num_chunks ${NUM_CHUNKS} \
-        --batch_size 8 \
+        --batch_size 32 \
         --group_by_length &
 
 
