@@ -64,6 +64,10 @@ spec:
               echo "Changing branch to eidf"
               git checkout eidf
 
+              echo "Copying files to /pvc"
+              cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
+              cd /pvc/Benchmarking-Synthetic-Data
+
               apt update
               apt install -y wget
               apt install -y git
