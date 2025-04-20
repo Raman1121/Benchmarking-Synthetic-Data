@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source /raid/s2198939/miniconda3/bin/activate llavarad
-
 set -e
 set -o pipefail
 
