@@ -85,7 +85,8 @@ spec:
                   libgl1 \
                   libglib2.0-0 \
                   ffmpeg \
-                  tzdata # Explicitly install tzdata if needed
+                  tzdata \ # Explicitly install tzdata if needed \
+                  cmake 
 
               # Clean up apt cache
               rm -rf /var/lib/apt/lists/*
@@ -96,15 +97,16 @@ spec:
 
               python3 -m pip install --upgrade pip setuptools wheel
               pip install wavedrom
+              python3 -m pip install --user lit
 
               echo "Installing LLaVA-Rad"
               cd Downstream_Training/LLaVA-Rad
               pip install --upgrade pip
               pip install -e .
 
-              echo "Installing flash-attn"
-              pip install ninja
-              pip install flash-attn --no-build-isolation
+              # echo "Installing flash-attn"
+              # pip install ninja
+              # pip install flash-attn --no-build-isolation
 
               echo "Running EVAL!!!"
               chmod +x ./scripts/eval.sh
