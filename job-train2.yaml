@@ -84,6 +84,6 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 16Gi
-          - name: writeable
-            persistentVolumeClaim:
-              claimName: mimic-cxr2
+        - name: writeable
+          persistentVolumeClaim:
+            claimName: mimic-cxr2
