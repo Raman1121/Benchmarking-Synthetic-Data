@@ -62,10 +62,11 @@ spec:
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
 
+              echo "Creating conda env"
               /pvc/miniconda/bin/conda init bash
               source /pvc/miniconda/bin/activate
               conda activate sana || conda create -n sana python=3.8 -y && conda activate sana
-              
+
               echo "Creating env for LLaVA-Rad"
               cd Downstream_Training/LLaVA-Rad
               pip install -e .
@@ -73,6 +74,8 @@ spec:
               echo "Installing flash-attn"
               pip install ninja
               pip install flash-attn --no-build-isolation
+
+              sleep(10000)
 
               ./scripts/eval.sh
           resources:
