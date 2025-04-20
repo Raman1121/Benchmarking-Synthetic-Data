@@ -60,9 +60,10 @@ spec:
           args:
             - |
 
+
               echo "Changing branch to eidf"
               git checkout eidf
-              
+
               apt update
               apt install -y wget
               apt install -y git
@@ -77,6 +78,7 @@ spec:
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
 
               python3 -m pip install --upgrade pip setuptools wheel
+              pip install wavedrom
 
               echo "Installing LLaVA-Rad"
               cd Downstream_Training/LLaVA-Rad
@@ -95,6 +97,8 @@ spec:
               cpu: "4"
               memory: "32Gi"
           volumeMounts:
+            - name: workspace
+              mountPath: /workspace
             - name: nfs-user-107
               mountPath: /nfs-user-107
             - name: writeable
@@ -102,7 +106,7 @@ spec:
             - name: dshm
               mountPath: /dev/shm
       volumes:
-        - name: nfs-user-107
+        - name: workspace
           nfs:
             server: 10.24.6.77
             path: /user/s2198939-eidf107
