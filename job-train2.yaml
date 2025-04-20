@@ -63,6 +63,8 @@ spec:
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
 
+              apt-get install python3-setuptools
+
               echo "Creating env for LLaVA-Rad"
               cd Downstream_Training/LLaVA-Rad
               pip install --upgrade pip
@@ -71,7 +73,7 @@ spec:
               echo "Installing flash-attn"
               pip install ninja
               pip install flash-attn --no-build-isolation
-              
+
               ./scripts/eval.sh
           resources:
             limits:
