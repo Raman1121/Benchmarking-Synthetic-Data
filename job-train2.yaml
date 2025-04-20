@@ -19,7 +19,6 @@ spec:
         eidf/user: ${USER}
     spec:
       restartPolicy: OnFailure
-      # Replace nodeSelector with affinity to allow multiple GPU types.
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -29,7 +28,6 @@ spec:
                     operator: In
                     values:
                       - NVIDIA-H200
-      # Add tolerations to allow scheduling on nodes with specific taints.
       tolerations:
         - key: "eidf098"
           operator: "Equal"
@@ -41,10 +39,15 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: pytorch-cuda11-7
-          # image: raman07/myapp:latest  # Ensure CUDA version matches host drivers
           image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
+            # --- START ADDITION ---
+            - name: TZ
+              value: "Etc/UTC"
+            # --- END ADDITION ---
+            - name: DEBIAN_FRONTEND # Keep this one too!
+              value: "noninteractive"
             - name: TORCH_NCCL_ASYNC_ERROR_HANDLING
               value: "1"
             - name: NCCL_DEBUG
@@ -60,8 +63,6 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-
-
               echo "Changing branch to eidf"
               git checkout eidf
 
@@ -69,14 +70,23 @@ spec:
               cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
               cd /pvc/Benchmarking-Synthetic-Data
 
-              apt update
-              apt install -y wget
-              apt install -y git
-              apt install -y unzip
-              apt install -y zip
-              apt install -y libgl1
-              apt install -y libglib2.0-0
-              apt install -y ffmpeg
+              # Set timezone non-interactively (alternative if TZ env var isn't enough)
+              # echo 'Etc/UTC' > /etc/timezone
+              # ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
+
+              # Run apt update and install with -y and noninteractive frontend
+              apt update && apt install -y --no-install-recommends \
+                  wget \
+                  git \
+                  unzip \
+                  zip \
+                  libgl1 \
+                  libglib2.0-0 \
+                  ffmpeg \
+                  tzdata # Explicitly install tzdata if needed
+
+              # Clean up apt cache
+              rm -rf /var/lib/apt/lists/*
 
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
@@ -104,8 +114,6 @@ spec:
           volumeMounts:
             - name: workspace
               mountPath: /workspace
-            # - name: nfs-user-107
-            #   mountPath: /nfs-user-107
             - name: writeable
               mountPath: /pvc
             - name: dshm
