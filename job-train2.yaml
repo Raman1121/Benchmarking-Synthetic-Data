@@ -41,7 +41,7 @@ spec:
       containers:
         - name: test2
           image: raman07/myapp:latest  # Ensure CUDA version matches host drivers
-          workingDir: "/workspace/kubernets"
+          workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
             - name: TORCH_NCCL_ASYNC_ERROR_HANDLING
               value: "1"
@@ -61,9 +61,8 @@ spec:
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
-              pip install ninja
-              pip install flash-attn --no-build-isolation           
-              sleep 10000
+              
+              ls /pvc/MIMIC_Dataset
           resources:
             limits:
               nvidia.com/gpu: "1"
@@ -72,6 +71,8 @@ spec:
           volumeMounts:
             - name: nfs-user-107
               mountPath: /nfs-user-107
+            - name: writeable
+              mountPath: /pvc
             - name: dshm
               mountPath: /dev/shm
       volumes:
@@ -83,3 +84,6 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 16Gi
+          - name: writeable
+            persistentVolumeClaim:
+              claimName: mimic-cxr2
