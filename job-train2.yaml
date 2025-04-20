@@ -110,9 +110,9 @@ spec:
 
               echo "Running EVAL!!!"
               chmod +x ./scripts/eval.sh
-              ./scripts/eval.sh
+              ./scripts/eval.sh 2> error_log.txt
 
-              bash /pvc/Benchmarking-Synthetic-Data/run.sh
+              ./pvc/Benchmarking-Synthetic-Data/run.sh
           resources:
             limits:
               nvidia.com/gpu: "1"
