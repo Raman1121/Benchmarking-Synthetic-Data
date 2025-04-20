@@ -59,13 +59,23 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
+
+              apt update
+              apt install -y wget
+              apt install -y git
+              apt install -y unzip
+              apt install -y zip
+              apt install -y libgl1
+              apt install -y libglib2.0-0
+              apt install -y ffmpeg
+
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
 
-              apt-get install python3-setuptools
+              python3 -m pip install --upgrade pip setuptools wheel
 
-              echo "Creating env for LLaVA-Rad"
+              echo "Installing LLaVA-Rad"
               cd Downstream_Training/LLaVA-Rad
               pip install --upgrade pip
               pip install -e .
@@ -74,6 +84,7 @@ spec:
               pip install ninja
               pip install flash-attn --no-build-isolation
 
+              echo "Running EVAL!!!"
               ./scripts/eval.sh
           resources:
             limits:

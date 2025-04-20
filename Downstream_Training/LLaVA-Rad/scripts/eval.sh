@@ -57,6 +57,7 @@ python -m llava.eval.model_mimic_cxr \
 
 wait
 
+echo "All done!"
 cat ${prediction_file}_*.jsonl > mimic_cxr_preds.jsonl
 
 # pushd llava/eval/rrg_eval
