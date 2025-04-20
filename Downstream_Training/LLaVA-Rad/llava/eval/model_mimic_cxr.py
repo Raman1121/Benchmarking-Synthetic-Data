@@ -88,8 +88,6 @@ def eval_model(
     logger.info(f"Loading the model {model_name} ...")
     tokenizer, model, image_processor, context_len = load_pretrained_model(
         model_path, model_base, model_name, load_8bit, load_4bit, device=device)
-    
-    import pdb; pdb.set_trace()
 
     # load data
     all_queries = data_loaders[loader](query_file)
