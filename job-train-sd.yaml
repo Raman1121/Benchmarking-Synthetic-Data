@@ -96,6 +96,9 @@ spec:
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               pip install \
                 xtermcolor \
+                pandas \
+                matplotlib \
+                pillow \
                 diffusers \
                 accelerate \
                 tensorboard \
