@@ -119,7 +119,7 @@ spec:
 
               echo "Calculating Results and Metrics!"
               cd llava/eval/rrg_eval
-              python run.py mimic_cxr_preds.jsonl
+              python run.py mimic_cxr_preds.jsonl > eval_logs.txt 2>&1
 
           resources:
             limits:
