@@ -108,12 +108,15 @@ spec:
                 huggingface_hub>=0.21.0 \
                 datasets \
                 tensorboard \
-                torchvision==0.19.0 \
                 transformers==4.50.3 \
                 xformers
 
               echo "Installing accelerate..."
               pip install -vvv --no-cache-dir --no-deps accelerate
+              python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'Torch path: {torch.__file__}')"
+
+              echo "Installing pytorch again..."
+              pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu121
               python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'Torch path: {torch.__file__}')"
 
               echo "Running training script..."
