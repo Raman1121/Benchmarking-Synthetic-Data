@@ -31,6 +31,11 @@ class MimicCXRDataset(torch.utils.data.Dataset):
         self.img_path_key = img_path_key
         self.caption_col_key = caption_col_key
 
+        # Dropping the rows with NaN values in the self.caption_col_key
+        self.df = self.df.dropna(subset=[self.caption_col_key]).reset_index(drop=True)
+        # Dropping the rows with empty strings in the self.caption_col_key
+        self.df = self.df[self.df[self.caption_col_key] != ""].reset_index(drop=True)
+
         assert all(
             [
                 isinstance(text, str)
