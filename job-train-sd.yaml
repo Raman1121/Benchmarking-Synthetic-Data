@@ -103,7 +103,7 @@ spec:
                 datasets \
                 accelerate==1.6.0 \
                 tensorboard \
-                torchvision \
+                torchvision==0.19.0 \
                 transformers==4.50.3 \
                 xformers
 
