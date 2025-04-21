@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
 RESOLUTION=512
 BATCH_SIZE=256
 GRAD_ACC_STEPS=1
