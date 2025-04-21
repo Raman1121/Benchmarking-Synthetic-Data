@@ -381,7 +381,7 @@ def main():
         args.validation_prompts = test_csv[args.caption_column].tolist()[0:20]      # Selecting only 20 images for validation
     
     elif(args.dataset_name == 'mimic'):
-        IMG_DIR = "/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
+        IMG_DIR = args.train_data_dir
         
         try:
             train_df = pd.read_excel(args.train_csv)
@@ -745,7 +745,7 @@ def main():
         unet = unwrap_model(unet)
         if args.use_ema:
             ema_unet.copy_to(unet.parameters())
-            
+
         pipeline = StableDiffusionPipeline.from_pretrained(
             args.pretrained_model_name_or_path,
             text_encoder=text_encoder,

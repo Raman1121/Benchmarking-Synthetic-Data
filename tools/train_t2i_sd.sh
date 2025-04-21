@@ -25,6 +25,7 @@ accelerate launch --multi_gpu --main_process_port 35264 tools/train_text_to_imag
   --train_csv=$TRAIN_CSV \
   --test_csv=$TEST_CSV \
   --dataset_name=$DATASET \
+  --train_data_dir=$IMG_DIR \
   --image_column=$IMG_COL \
   --caption_column=$CAPTION_COL \
   --resolution=$RESOLUTION \
