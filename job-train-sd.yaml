@@ -1,0 +1,126 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: ${USER}-job-train-${JOB_SUFFIX}
+  labels:
+    eidf/user: ${USER}
+    kueue.x-k8s.io/queue-name: ${QUEUE_NAME}
+    kueue.x-k8s.io/priority-class: batch-workload-priority
+spec:
+  completions: 1
+  parallelism: 1
+  completionMode: Indexed
+  backoffLimit: 0
+  activeDeadlineSeconds: 864000
+  ttlSecondsAfterFinished: 2592000
+  template:
+    metadata:
+      labels:
+        eidf/user: ${USER}
+    spec:
+      restartPolicy: OnFailure
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.product
+                    operator: In
+                    values:
+                      - NVIDIA-H200
+                      # - NVIDIA-A100-SXM4-80GB
+      tolerations:
+        - key: "eidf098"
+          operator: "Equal"
+          value: "True"
+          effect: "NoSchedule"
+        - key: "eidf107"
+          operator: "Equal"
+          value: "True"
+          effect: "NoSchedule"
+      containers:
+        - name: pytorch-cuda11-7
+          image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+          workingDir: "/workspace/Benchmarking-Synthetic-Data"
+          env:
+            # --- START ADDITION ---
+            - name: TZ
+              value: "Etc/UTC"
+            # --- END ADDITION ---
+            - name: DEBIAN_FRONTEND # Keep this one too!
+              value: "noninteractive"
+            - name: TORCH_NCCL_ASYNC_ERROR_HANDLING
+              value: "1"
+            - name: NCCL_DEBUG
+              value: "INFO"
+            - name: NCCL_IB_DISABLE
+              value: "1"
+            - name: MAX_DELTA
+              value: "${MAX_DELTA}"
+            - name: NCCL_IB_HCA
+              value: "^mlx5"
+            - name: PYTHONPATH
+              value: "/workspace/Benchmarking-Synthetic-Data"
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+
+              apt install git-all
+              echo "Changing branch to eidf"
+              git checkout eidf
+
+              echo "Copying files to /pvc"
+              cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
+              cd /pvc/Benchmarking-Synthetic-Data
+
+              # Set timezone non-interactively (alternative if TZ env var isn't enough)
+              # echo 'Etc/UTC' > /etc/timezone
+              # ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
+
+              # Run apt update and install with -y and noninteractive frontend
+              apt update && apt install -y --no-install-recommends \
+                  wget \
+                  git \
+                  unzip \
+                  zip \
+                  libgl1 \
+                  libglib2.0-0 \
+                  ffmpeg \
+                  tzdata \ # Explicitly install tzdata if needed \
+                  cmake 
+
+              # Clean up apt cache
+              rm -rf /var/lib/apt/lists/*
+
+              echo "Setting up environment..."
+              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
+              pip install xtermcolor, diffusers, accelerate, tensorboard, torchvision, transformers
+
+              echo "Running training script..."
+              chmod +x tools/train_t2i_sd.sh
+              ./tools/train_t2i_sd.sh
+
+          resources:
+            limits:
+              nvidia.com/gpu: "2"
+              cpu: "4"
+              memory: "32Gi"
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: writeable
+              mountPath: /pvc
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: workspace
+          nfs:
+            server: 10.24.6.77
+            path: /user/s2198939-eidf107
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+        - name: writeable
+          persistentVolumeClaim:
+            claimName: mimic-cxr2
