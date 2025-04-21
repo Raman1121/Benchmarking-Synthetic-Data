@@ -27,8 +27,8 @@ spec:
                   - key: nvidia.com/gpu.product
                     operator: In
                     values:
-                      # - NVIDIA-H200
-                      - NVIDIA-A100-SXM4-80GB
+                      - NVIDIA-H200
+                      # - NVIDIA-A100-SXM4-80GB
       tolerations:
         - key: "eidf098"
           operator: "Equal"
@@ -111,7 +111,7 @@ spec:
                 transformers==4.50.3 \
                 xformers
 
-              pip install --no-deps accelerate==1.6.0
+              # pip install --no-deps accelerate==1.6.0
 
               echo "Running training script..."
               chmod +x tools/train_t2i_sd.sh
@@ -119,7 +119,7 @@ spec:
 
           resources:
             limits:
-              nvidia.com/gpu: "4"
+              nvidia.com/gpu: "1"
               cpu: "4"
               memory: "32Gi"
           volumeMounts:
