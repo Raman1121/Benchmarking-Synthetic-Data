@@ -104,11 +104,12 @@ spec:
                 accelerate==1.6.0 \
                 tensorboard \
                 torchvision \
-                transformers==4.50.3
+                transformers==4.50.3 \
+                xformers
 
               echo "Running training script..."
               chmod +x tools/train_t2i_sd.sh
-              ./tools/train_t2i_sd.sh
+              ./tools/train_t2i_sd.sh > t2i_train_log.txt 2>&1
 
           resources:
             limits:
