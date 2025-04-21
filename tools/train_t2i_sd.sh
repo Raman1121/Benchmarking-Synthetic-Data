@@ -21,7 +21,7 @@ OUTPUT_DIR="OUTPUT_MIMIC_SD_V1_4"
 
 CUDA_VISIBLE_DEVICES=0,1
 
-CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES accelerate launch --multi_gpu --main_process_port 35264 train_text_to_image.py \
+CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES accelerate launch --multi_gpu --main_process_port 35264 tools/train_text_to_image.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --mixed_precision="fp16" \
   --train_csv=$TRAIN_CSV \
