@@ -40,5 +40,5 @@ accelerate launch --multi_gpu --main_process_port 35264 tools/train_text_to_imag
   --lr_scheduler="constant" \
   --lr_warmup_steps=$WARMUP_STEPS \
   --output_dir=$OUTPUT_DIR \
-  --enable_xformers_memory_efficient_attention \
   --checkpoints_total_limit=1 --checkpointing_steps=1000 \
+#   --enable_xformers_memory_efficient_attention \
