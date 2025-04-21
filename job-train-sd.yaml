@@ -99,7 +99,7 @@ spec:
                 pandas \
                 matplotlib \
                 pillow \
-                diffusers==0.33.0.dev0 \
+                diffusers==0.33.0 \
                 datasets \
                 accelerate==1.6.0 \
                 tensorboard \
