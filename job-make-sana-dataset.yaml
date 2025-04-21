@@ -93,15 +93,14 @@ spec:
               rm -rf /var/lib/apt/lists/*
 
               echo "Setting up environment..."
-              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
+              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data/tools
               
-
               python3 -m pip install --upgrade pip setuptools wheel
               pip install \
                 pandas \
                 tqdm \
                             
-              python arrange_data_in_sana_format.py > eval_logs.txt 2>&1
+              python arrange_data_in_sana_format.py > make_data_logs.txt 2>&1
 
           resources:
             limits:
