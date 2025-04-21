@@ -94,11 +94,12 @@ spec:
 
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
-              python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+              
 
               python3 -m pip install --upgrade pip setuptools wheel
               pip install wavedrom
               python3 -m pip install --user lit
+              pip install xtermcolor
 
               echo "Installing LLaVA-Rad"
               cd Downstream_Training/LLaVA-Rad
@@ -119,7 +120,7 @@ spec:
               echo "Calculating Results and Metrics!"
               cd llava/eval/rr_eval
               python run.py mimic_cxr_preds.jsonl
-              
+
           resources:
             limits:
               nvidia.com/gpu: "1"

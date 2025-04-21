@@ -8,18 +8,19 @@ PROMPT_VERSION=v1
 model_base=lmsys/vicuna-7b-v1.5
 output_dir="${1:-./checkpoints}"
 
-PROJECTOR="/raid/s2198939/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/mm_projector.bin" # generated using pretrain.sh
+PROJECTOR="mm_projector.bin" # generated using pretrain.sh
 vision_tower="biomedclip_cxr_518"
 vision_tower_config="llava/model/multimodal_encoder/open_clip_encoder/model_configs/biomedclip_cxr_518.json"
 vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 ################## VICUNA ##################
 
 
-################## Data ##################
-data_path=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+################## Synthetic Data ##################
+# data_path=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+data_path=/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/chat_train_MIMIC_CXR_real_and_syn.json
 loader="mimic_train_findings"
-image_folder=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
-################## Data ##################
+image_folder=/pvc/Benchmarking-Synthetic-Data/assets/synthetic_images/
+################## Synthetic Data ##################
 
 ################## Run name ##################
 epoch="${2:-3}"
@@ -42,6 +43,7 @@ CUDA_VISIBLE_DEVICES=0,1,2
     --data_path ${data_path} \
     --loader ${loader} \
     --image_folder ${image_folder} \
+    --finetune_only_with_synthetic_data True \
     --vision_tower ${vision_tower} \
     --vision_tower_config ${vision_tower_config} \
     --vision_tower_checkpoint ${vision_tower_checkpoint} \
@@ -72,3 +74,5 @@ CUDA_VISIBLE_DEVICES=0,1,2
     --dataloader_num_workers 4 \
     --report_to tensorboard \
     --run_name ${run_name}
+
+    # NOTE: # Remove "--finetune_only_with_synthetic_data True" line to finetune on both real and synthetic data

@@ -73,8 +73,10 @@ class DataArguments:
     lazy_preprocess: bool = False
     is_multimodal: bool = False
     image_folder: Optional[str] = field(default=None)
+    syn_image_folder: Optional[str] = field(default=None)
     image_aspect_ratio: str = 'square'
     image_grid_pinpoints: Optional[str] = field(default=None)
+    finetune_only_with_synthetic_data: bool = False
 
 
 @dataclass
@@ -640,6 +642,7 @@ class LazySupervisedDataset(Dataset):
         self.tokenizer = tokenizer
         self.list_data_dict = list_data_dict
         self.data_args = data_args
+        self.finetune_only_with_synthetic_data = data_args.finetune_only_with_synthetic_data
 
     def __len__(self):
         return len(self.list_data_dict)
@@ -668,9 +671,24 @@ class LazySupervisedDataset(Dataset):
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
         if 'image' in sources[0]:
             image_file = self.list_data_dict[i]['image']
+            image_type = self.list_data_dict[i]['img_type']
             image_folder = self.data_args.image_folder
+            syn_image_folder = self.data_args.syn_image_folder
             processor = self.data_args.image_processor
-            image = open_image_with_retry(os.path.join(image_folder, image_file))
+
+            """
+            # Real and synthetic images are present in different directories
+            # Real images are in the original MIMIC folder structure
+            # Synthetic images are in 'Benchmarking-Synthetic-Data/assets/synthetic_images/'
+            """
+            if(image_type == 'real'):
+                if(not self.finetune_only_with_synthetic_data):
+                    image = open_image_with_retry(os.path.join(image_folder, image_file))
+                else:
+                    # We are finetuning on both real and synthetic data
+                    pass
+            elif(image_type == 'synthetic'):
+                image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
             if image is None:
                 logging.error("Use an empty image.")
                 image = Image.new('RGB', (224, 224), tuple(int(x*255) for x in processor.image_mean))
