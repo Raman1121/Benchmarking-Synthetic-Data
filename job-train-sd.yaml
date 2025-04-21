@@ -10,7 +10,7 @@ spec:
   completions: 1
   parallelism: 1
   completionMode: Indexed
-  backoffLimit: 0
+  backoffLimit: 6
   activeDeadlineSeconds: 864000
   ttlSecondsAfterFinished: 2592000
   template:
@@ -125,7 +125,7 @@ spec:
 
           resources:
             limits:
-              nvidia.com/gpu: "2"
+              nvidia.com/gpu: "1"
               cpu: "4"
               memory: "32Gi"
           volumeMounts:
