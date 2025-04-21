@@ -94,7 +94,13 @@ spec:
 
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
-              pip install xtermcolor, diffusers, accelerate, tensorboard, torchvision, transformers
+              pip install \
+                xtermcolor \
+                diffusers \
+                accelerate \
+                tensorboard \
+                torchvision \
+                transformers
 
               echo "Running training script..."
               chmod +x tools/train_t2i_sd.sh
