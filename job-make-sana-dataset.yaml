@@ -94,7 +94,6 @@ spec:
 
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data/tools
-              
               python3 -m pip install --upgrade pip setuptools wheel
               pip install \
                 pandas \

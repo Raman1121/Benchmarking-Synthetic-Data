@@ -8,7 +8,7 @@ def write_text_to_file(text: str, filename: str) -> None:
     with open(filename, 'w', encoding='utf-8') as file:
         file.write(text)
 
-CSV_PATH = '/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES'
+CSV_PATH = '/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/'
 IMG_DIR = "/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 
 train_csv = pd.read_csv(CSV_PATH+'LLAVARAD_ANNOTATIONS_TRAIN.csv')
