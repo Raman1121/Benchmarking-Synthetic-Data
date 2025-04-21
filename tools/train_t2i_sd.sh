@@ -19,8 +19,7 @@ CAPTION_COL="annotated_prompt"
 MODEL_NAME="CompVis/stable-diffusion-v1-4"
 OUTPUT_DIR="OUTPUT_MIMIC_SD_V1_4"
 
-# accelerate launch --multi_gpu --main_process_port 35264 tools/train_text_to_image.py \
-python tools/train_text_to_image.py \
+accelerate launch --multi_gpu --main_process_port 35264 tools/train_text_to_image.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --mixed_precision="fp16" \
   --train_csv=$TRAIN_CSV \

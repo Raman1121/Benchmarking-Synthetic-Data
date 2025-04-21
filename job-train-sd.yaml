@@ -63,8 +63,7 @@ spec:
               value: "/workspace/Benchmarking-Synthetic-Data"
           command: ["/bin/bash", "-c"]
           args:
-            - |
-
+            - |-
               apt install git-all
               echo "Changing branch to eidf"
               git checkout eidf
@@ -113,8 +112,8 @@ spec:
                 transformers==4.50.3 \
                 xformers
 
+              echo "Installing accelerate..."
               pip install -vvv --no-cache-dir --no-deps accelerate
-
               python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'Torch path: {torch.__file__}')"
 
               echo "Running training script..."
@@ -123,7 +122,7 @@ spec:
 
           resources:
             limits:
-              nvidia.com/gpu: "1"
+              nvidia.com/gpu: "2"
               cpu: "4"
               memory: "32Gi"
           volumeMounts:
