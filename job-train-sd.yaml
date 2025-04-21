@@ -106,11 +106,12 @@ spec:
                 pyyaml \
                 huggingface_hub>=0.21.0 \
                 datasets \
-                --no-cache-dir --no-deps accelerate==1.6.0 \
                 tensorboard \
                 torchvision==0.19.0 \
                 transformers==4.50.3 \
                 xformers
+
+              pip install --no-deps accelerate==1.6.0
 
               echo "Running training script..."
               chmod +x tools/train_t2i_sd.sh
