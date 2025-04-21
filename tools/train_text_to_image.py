@@ -405,7 +405,10 @@ def main():
             test_df = pd.read_excel(args.test_csv)
         except:
             test_df = pd.read_csv(args.test_csv)
+
         test_df['path'] = test_df['path'].apply(lambda x: os.path.join(IMG_DIR, x))
+        test_df = test_df.dropna(subset=[args.caption_column]).reset_index(drop=True)
+
         test_dataset = MimicCXRDataset(
             test_df,
             tokenizer=tokenizer,
