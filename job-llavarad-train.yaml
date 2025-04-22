@@ -78,8 +78,8 @@ spec:
                   cmake 
               
               apt install -y --no-install-recommends git-all
-              echo "Changing branch to eidf"
-              git checkout eidf
+              # echo "Changing branch to eidf"
+              # git checkout eidf
 
               echo "Copying files to /pvc"
               cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
@@ -89,9 +89,7 @@ spec:
               rm -rf /var/lib/apt/lists/*
 
               echo "Setting up environment..."
-              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
               
-
               python3 -m pip install --upgrade pip setuptools wheel
               pip install wavedrom
               python3 -m pip install --user lit
@@ -100,6 +98,7 @@ spec:
 
               echo "Installing LLaVA-Rad"
               cd Downstream_Training/LLaVA-Rad
+              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad
               pip install --upgrade pip
               pip install -e .
 
