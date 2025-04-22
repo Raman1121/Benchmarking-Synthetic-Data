@@ -1,12 +1,5 @@
 #!/bin/bash
 
-export TRAIN_CSV="MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv"
-export IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
-
-export MODEL="vit_base_patch16_224.orig_in21k_ft_in1k" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
-export BATCH_SIZE=512
-export EPOCHS=20
-
 python Downstream_Training/train_downstream_classification.py \
         --batch_size=$BATCH_SIZE \
         --epochs=$EPOCHS \

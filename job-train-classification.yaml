@@ -109,9 +109,8 @@ spec:
               pip install pillow
               pip install timm              
 
-              echo "Running Training..."
-              chmod +x Downstream_Training/run_training.sh
-              ./Downstream_Training/run_training.sh > logs_downstream_classification.txt 2>&1
+              chmod +x Downstream_Training/run_training_inference.sh
+              ./Downstream_Training/run_training_inference.sh
 
           resources:
             limits:
