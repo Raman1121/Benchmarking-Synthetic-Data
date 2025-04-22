@@ -128,6 +128,8 @@ spec:
               bash scripts/finetune_lora.sh > logs_llavarad_training.txt 2>&1
               echo "Training script finished."
 
+              sleep 1000
+
           resources:
             limits:
               nvidia.com/gpu: "1"
