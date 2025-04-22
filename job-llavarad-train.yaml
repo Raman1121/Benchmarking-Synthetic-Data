@@ -112,7 +112,7 @@ spec:
               pip -vvv install ninja > /pvc/ninja_install.log 2>&1
               ninja --version
               echo "Installing flash-attn with high verbosity..."
-              MAX_JOBS=4  pip install -vvv flash-attn --no-build-isolation > /pvc/flash_attn_install.log 2>&1 || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
+              MAX_JOBS=4  pip install -vvv flash-attn==2.5.8 --no-build-isolation > /pvc/flash_attn_install.log 2>&1 || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
               echo "flash-attn install command finished." # Add this to see if it gets past the line
 
               # --- START: VERSION CHECK ---
