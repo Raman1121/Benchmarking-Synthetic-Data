@@ -6,4 +6,3 @@ python Downstream_Training/train_downstream_classification.py \
         --model_name=$MODEL \
         --csv_path=$TRAIN_CSV \
         --image_dir=$IMAGE_DIR \
-        --debug
