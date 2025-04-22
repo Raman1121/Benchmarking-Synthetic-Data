@@ -110,7 +110,9 @@ spec:
 
               echo "Installing flash-attn prerequisites and flash-attn..."
               pip install ninja
-              pip install flash-attn --no-build-isolation
+              echo "Installing flash-attn with high verbosity..."
+              pip install -vvv flash-attn --no-build-isolation > /pvc/flash_attn_install.log 2>&1 || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
+              echo "flash-attn install command finished." # Add this to see if it gets past the line
 
               # --- START: VERSION CHECK ---
               echo "--- Checking Versions After Flash Attention Install ---"
