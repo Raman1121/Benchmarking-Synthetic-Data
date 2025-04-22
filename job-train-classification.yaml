@@ -100,9 +100,12 @@ spec:
               python3 -m pip install --upgrade pip setuptools wheel
               python3 -m pip install --user lit
               pip install xtermcolor
+              pip install pandas
+              pip install matplotlib
+              pip install seaborn
 
               echo "Running Training..."
-              chmod +x run_training.sh
+              chmod +x Downstream_Training/run_training.sh
               ./Downstream_Training/run_training.sh > logs_downstream_classification.txt 2>&1
 
           resources:
