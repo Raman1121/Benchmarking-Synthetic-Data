@@ -39,8 +39,8 @@ spec:
           value: "True"
           effect: "NoSchedule"
       containers:
-        - name: pytorch-cuda11-8
-          image: pytorch/pytorch:2.4.1-cuda11.8-cudnn9-devel
+        - name: pytorch-cuda11-7
+          image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
             # --- START ADDITION ---
@@ -77,7 +77,7 @@ spec:
                   tzdata \ # Explicitly install tzdata if needed \
                   cmake 
               
-              apt install git-all
+              apt install -y --no-install-recommends git-all
               echo "Changing branch to eidf"
               git checkout eidf
 
@@ -107,7 +107,9 @@ spec:
               pip install ninja
               pip install flash-attn --no-build-isolation
 
-                            
+              echo "Beginning training..."
+              chmod +x scripts/finetune_lora.sh
+              bash scripts/finetune_lora.sh > logs_llavarad_training.txt 2>&1     
 
           resources:
             limits:
