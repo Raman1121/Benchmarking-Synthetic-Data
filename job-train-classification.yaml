@@ -110,7 +110,7 @@ spec:
               pip install timm              
 
               chmod +x Downstream_Training/run_training_inference.sh
-              ./Downstream_Training/run_training_inference.sh
+              ./Downstream_Training/run_training_inference.sh > logs_ds_classification.txt 2>&1
 
           resources:
             limits:
