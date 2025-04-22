@@ -1,6 +1,7 @@
 #!/bin/bash
 
 python Downstream_Training/downstream_inference.py \
+        --model_name=$MODEL \
         --checkpoint=$CHECKPOINT \
         --test_csv=$TEST_CSV \
         --image_dir=$IMAGE_DIR \
