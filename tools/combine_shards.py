@@ -61,6 +61,15 @@ def main(args):
     combined_df = combine_shards(args)
     savename = "image_generation_metrics.csv"
     savepath = os.path.join(args.output_dir, savename)
+
+    # Read the existing CSV file if it exists
+    if os.path.exists(savepath):
+        existing_df = pd.read_csv(savepath)
+        # Append the new row to the existing DataFrame
+        combined_df = pd.concat([existing_df, combined_df], ignore_index=True)
+    else:
+        os.makedirs(args.output_dir, exist_ok=True)
+
     combined_df.to_csv(savepath, index=False)
     print("Saved to: ", savepath)
 
