@@ -12,11 +12,11 @@ export EXTRA_INFO="original_data"
 export CHECKPOINT="Downstream_Training/checkpoints/{$MODEL}_best_model.pth"
 
 echo "Training the model..."
-./run_training.sh > logs_downstream_classification.txt 2>&1
+./Downstream_Training/run_training.sh > logs_downstream_classification.txt 2>&1
 echo "Training Finished!!"
 
 echo "Running inference..."
-./run_inference.sh > logs_downstream_classification_inference.txt 2>&1
+./Downstream_Training/run_inference.sh > logs_downstream_classification_inference.txt 2>&1
 echo "Inference Finished!!"
 
 
