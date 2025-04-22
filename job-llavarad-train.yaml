@@ -39,8 +39,8 @@ spec:
           value: "True"
           effect: "NoSchedule"
       containers:
-        - name: pytorch-cuda11-7
-          image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+        - name: pytorch-cuda11-8
+          image: pytorch/pytorch:2.4.1-cuda11.8-cudnn9-devel
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
             # --- START ADDITION ---
@@ -103,26 +103,17 @@ spec:
               pip install --upgrade pip
               pip install -e .
 
-              # echo "Installing flash-attn"
-              # pip install ninja
-              # pip install flash-attn --no-build-isolation
+              echo "Installing flash-attn"
+              pip install ninja
+              pip install flash-attn --no-build-isolation
 
-              echo "Running EVAL!!!"
-              # chmod +x ./scripts/eval.sh
-              # ./scripts/eval.sh > error_log.txt 2>&1
-
-              echo "Running EVAL done!!!"
-              mv mimic_cxr_preds.jsonl llava/eval/rrg_eval/mimic_cxr_preds.jsonl
-
-              echo "Calculating Results and Metrics!"
-              cd llava/eval/rrg_eval
-              python run.py mimic_cxr_preds.jsonl > eval_logs.txt 2>&1
+                            
 
           resources:
             limits:
               nvidia.com/gpu: "1"
               cpu: "4"
-              memory: "64Gi"
+              memory: "96Gi"
           volumeMounts:
             - name: workspace
               mountPath: /workspace

@@ -8,7 +8,7 @@ PROMPT_VERSION=v1
 model_base=lmsys/vicuna-7b-v1.5
 output_dir="${1:-./checkpoints}"
 
-PROJECTOR="/raid/s2198939/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/mm_projector.bin" # generated using pretrain.sh
+PROJECTOR="/pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/mm_projector.bin" # generated using pretrain.sh
 vision_tower="biomedclip_cxr_518"
 vision_tower_config="llava/model/multimodal_encoder/open_clip_encoder/model_configs/biomedclip_cxr_518.json"
 vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
@@ -16,9 +16,9 @@ vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 
 
 ################## Data ##################
-data_path=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+data_path=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
 loader="mimic_train_findings"
-image_folder=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
+image_folder=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
 ################## Data ##################
 
 ################## Run name ##################
