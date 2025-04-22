@@ -65,18 +65,6 @@ spec:
           args:
             - |
 
-              apt install git-all
-              echo "Changing branch to eidf"
-              git checkout eidf
-
-              echo "Copying files to /pvc"
-              cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
-              cd /pvc/Benchmarking-Synthetic-Data/Downstream_Training
-
-              # Set timezone non-interactively (alternative if TZ env var isn't enough)
-              # echo 'Etc/UTC' > /etc/timezone
-              # ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
-
               # Run apt update and install with -y and noninteractive frontend
               apt update && apt install -y --no-install-recommends \
                   wget \
@@ -88,12 +76,25 @@ spec:
                   ffmpeg \
                   tzdata \ # Explicitly install tzdata if needed \
                   cmake 
+              
+              echo "Changing branch to eidf"
+              git checkout eidf
+
+              echo "Copying files to /pvc"
+              cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
+              cd /pvc/Benchmarking-Synthetic-Data/
+
+              # Set timezone non-interactively (alternative if TZ env var isn't enough)
+              # echo 'Etc/UTC' > /etc/timezone
+              # ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
+
+              
 
               # Clean up apt cache
               rm -rf /var/lib/apt/lists/*
 
               echo "Setting up environment..."
-              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data/Downstream_Training
+              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data/
               
 
               python3 -m pip install --upgrade pip setuptools wheel
@@ -102,7 +103,7 @@ spec:
 
               echo "Running Training..."
               chmod +x run_training.sh
-              ./run_training.sh > eval_logs.txt 2>&1
+              ./Downstream_Training/run_training.sh > logs_downstream_classification.txt 2>&1
 
           resources:
             limits:
