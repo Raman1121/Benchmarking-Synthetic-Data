@@ -1,6 +1,8 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
+  # NOTE: Replace ${USER}, ${JOB_SUFFIX}, and ${QUEUE_NAME} with your actual values
+  #       or ensure they are properly substituted by your deployment mechanism.
   generateName: ${USER}-job-train-${JOB_SUFFIX}
   labels:
     eidf/user: ${USER}
@@ -39,7 +41,7 @@ spec:
           value: "True"
           effect: "NoSchedule"
       containers:
-        - name: pytorch-cuda11-7
+        - name: pytorch-cuda11-7 # Consider renaming if base image changes
           image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:
@@ -55,6 +57,7 @@ spec:
               value: "INFO"
             - name: NCCL_IB_DISABLE
               value: "1"
+            # NOTE: Replace ${MAX_DELTA} if needed, or ensure it's substituted
             - name: MAX_DELTA
               value: "${MAX_DELTA}"
             - name: NCCL_IB_HCA
@@ -64,8 +67,10 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
+              set -e # Exit immediately if a command exits with a non-zero status.
+              set -x # Print commands and their arguments as they are executed.
 
-              # Run apt update and install with -y and noninteractive frontend
+              echo "Updating apt and installing base packages..."
               apt update && apt install -y --no-install-recommends \
                   wget \
                   git \
@@ -74,50 +79,68 @@ spec:
                   libgl1 \
                   libglib2.0-0 \
                   ffmpeg \
-                  tzdata \ # Explicitly install tzdata if needed \
-                  cmake 
-              
-              apt install -y --no-install-recommends git-all
-              # echo "Changing branch to eidf"
-              # git checkout eidf
+                  tzdata \
+                  cmake
 
-              echo "Copying files to /pvc"
-              cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
+              echo "Installing git-all..."
+              apt install -y --no-install-recommends git-all
+
+              echo "Copying project files to writable PVC..."
+              # Ensure target directory exists in PVC if necessary
+              mkdir -p /pvc/Benchmarking-Synthetic-Data
+              cp -r /workspace/Benchmarking-Synthetic-Data/* /pvc/Benchmarking-Synthetic-Data/
               cd /pvc/Benchmarking-Synthetic-Data
 
-              # Clean up apt cache
+              echo "Cleaning up apt cache..."
               rm -rf /var/lib/apt/lists/*
 
-              echo "Setting up environment..."
-              
+              echo "Setting up Python environment..."
               python3 -m pip install --upgrade pip setuptools wheel
+              echo "Installing environment dependencies..."
               pip install wavedrom
-              python3 -m pip install --user lit
+              python3 -m pip install --user lit # Check if --user is truly needed inside container
               pip install xtermcolor
               pip install termcolor
 
-              echo "Installing LLaVA-Rad"
+              echo "Installing LLaVA-Rad..."
               cd Downstream_Training/LLaVA-Rad
-              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad
-              pip install --upgrade pip
+              export PYTHONPATH=$PYTHONPATH:/pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/ # Corrected path
+              pip install --upgrade pip # Often good practice before installs
               pip install -e .
 
-              echo "Installing flash-attn"
+              echo "Installing flash-attn prerequisites and flash-attn..."
               pip install ninja
               pip install flash-attn --no-build-isolation
 
+              # --- START: VERSION CHECK ---
+              echo "--- Checking Versions After Flash Attention Install ---"
+              python -c "import torch; print(f'PyTorch Version: {torch.__version__}')"
+              python -c "import torch; print(f'PyTorch CUDA Version: {torch.version.cuda}')"
+              python -c "import torch; print(f'CUDA Available for PyTorch: {torch.cuda.is_available()}')"
+              nvcc --version || echo "nvcc not found in PATH" # Check system CUDA compiler version if available
+              nvidia-smi || echo "nvidia-smi not found or failed" # Check driver/GPU status
+              echo "-----------------------------------------------------"
+              # --- END: VERSION CHECK ---
+
               echo "Beginning training..."
+              # Make sure the script exists at this path inside the PVC copy
               chmod +x scripts/finetune_lora.sh
-              bash scripts/finetune_lora.sh > logs_llavarad_training.txt 2>&1     
+              bash scripts/finetune_lora.sh > logs_llavarad_training.txt 2>&1
+              echo "Training script finished."
 
           resources:
             limits:
               nvidia.com/gpu: "1"
-              cpu: "4"
-              memory: "96Gi"
+              cpu: "4" # Might need more CPU depending on data loading/preprocessing
+              memory: "96Gi" # Ensure this is sufficient
+            requests: # It's good practice to set requests too
+              nvidia.com/gpu: "1"
+              cpu: "2" # Example request
+              memory: "64Gi" # Example request
           volumeMounts:
-            - name: workspace
+            - name: workspace # Mount read-only if code isn't modified?
               mountPath: /workspace
+              # readOnly: true # Consider if source code shouldn't be changed
             - name: writeable
               mountPath: /pvc
             - name: dshm
@@ -125,12 +148,14 @@ spec:
       volumes:
         - name: workspace
           nfs:
+            # Ensure NFS server and path are correct
             server: 10.24.6.77
             path: /user/s2198939-eidf107
         - name: dshm
           emptyDir:
             medium: Memory
-            sizeLimit: 16Gi
+            sizeLimit: 16Gi # Ensure this is large enough for multiprocessing/shm needs
         - name: writeable
           persistentVolumeClaim:
-            claimName: mimic-cxr2
+            # Ensure this PVC exists and is bound in the correct namespace
+            claimName: mimic-cxr2 # Make sure this matches your PVC name
