@@ -108,10 +108,11 @@ spec:
               pip install --upgrade pip # Often good practice before installs
               pip install -e .
 
-              echo "Installing flash-attn prerequisites and flash-attn..."
-              pip install ninja
+              echo "Installing Ninja..."
+              pip -vvv install ninja > /pvc/ninja_install.log 2>&1
+              ninja --version
               echo "Installing flash-attn with high verbosity..."
-              pip install -vvv flash-attn --no-build-isolation > /pvc/flash_attn_install.log 2>&1 || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
+              MAX_JOBS=4  pip install -vvv flash-attn --no-build-isolation > /pvc/flash_attn_install.log 2>&1 || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
               echo "flash-attn install command finished." # Add this to see if it gets past the line
 
               # --- START: VERSION CHECK ---
@@ -135,12 +136,8 @@ spec:
           resources:
             limits:
               nvidia.com/gpu: "1"
-              cpu: "4" # Might need more CPU depending on data loading/preprocessing
+              cpu: "12" # Might need more CPU depending on data loading/preprocessing
               memory: "96Gi" # Ensure this is sufficient
-            requests: # It's good practice to set requests too
-              nvidia.com/gpu: "1"
-              cpu: "2" # Example request
-              memory: "64Gi" # Example request
           volumeMounts:
             - name: workspace # Mount read-only if code isn't modified?
               mountPath: /workspace
