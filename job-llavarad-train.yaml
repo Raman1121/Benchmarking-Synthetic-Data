@@ -41,7 +41,7 @@ spec:
           value: "True"
           effect: "NoSchedule"
       containers:
-        - name: pytorch-cuda11-7 # Consider renaming if base image changes
+        - name: pytorch-cuda11-7 
           image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
           workingDir: "/workspace/Benchmarking-Synthetic-Data"
           env:

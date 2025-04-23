@@ -98,18 +98,24 @@ spec:
               pip install xtermcolor
               pip install termcolor
 
-              echo "Installing LLaVA-Rad"
+              echo "Installing LLaVA-Rad..."
               cd Downstream_Training/LLaVA-Rad
-              pip install --upgrade pip
+              export PYTHONPATH=$PYTHONPATH:/pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/ # Corrected path
+              pip install --upgrade pip # Often good practice before installs
               pip install -e .
 
-              # echo "Installing flash-attn"
-              # pip install ninja
-              # pip install flash-attn --no-build-isolation
+              pip install tensorboardX
+
+              echo "Installing Ninja..."
+              pip -vvv install ninja
+              ninja --version
+              echo "Installing flash-attn with high verbosity..."
+              MAX_JOBS=4  pip install -vvv flash-attn==2.5.8 --no-build-isolation || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
+              echo "flash-attn install command finished."
 
               echo "Running EVAL!!!"
-              # chmod +x ./scripts/eval.sh
-              # ./scripts/eval.sh > error_log.txt 2>&1
+              chmod +x ./scripts/eval.sh
+              ./scripts/eval.sh > error_log.txt 2>&1
 
               echo "Running EVAL done!!!"
               mv mimic_cxr_preds.jsonl llava/eval/rrg_eval/mimic_cxr_preds.jsonl
