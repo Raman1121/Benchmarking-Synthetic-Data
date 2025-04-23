@@ -14,9 +14,6 @@ fi
 
 # 2. Read the token from the file
 # Use 'cat' and command substitution $() to capture the file content.
-# Ensure the token file *only* contains the token, ideally without a trailing newline,
-# although 'huggingface-cli' is usually tolerant of that.
-# Using double quotes around "$(cat ...)" is good practice, though less critical here.
 HF_TOKEN=$(cat "$TOKEN_FILE")
 
 # 3. Check if the token was read successfully (is not empty)
@@ -25,16 +22,17 @@ if [ -z "$HF_TOKEN" ]; then
   exit 1
 fi
 
-# 4. Log in using the token
-echo "Attempting to log in to Hugging Face CLI..."
-# Use the --token argument to provide the token non-interactively
-# The --add-to-git-credential flag is often useful to configure git credential helper
-huggingface-cli login --token "$HF_TOKEN" --add-to-git-credential
+# 4. Log in using the token non-interactively, without affecting git
+echo "Attempting to log in to Hugging Face CLI using token..."
+# Provide the token directly via --token
+# Crucially, DO NOT include --add-to-git-credential
+huggingface-cli login --token "$HF_TOKEN"
 
 # 5. Check the exit status of the login command
 LOGIN_STATUS=$? # Capture the exit code of the last command
 if [ $LOGIN_STATUS -eq 0 ]; then
   echo "Hugging Face CLI login successful."
+  echo "NOTE: Token was used for login but *not* saved as a Git credential."
 else
   echo "Error: Hugging Face CLI login failed (Exit code: $LOGIN_STATUS)." >&2
   echo "Please check your token and network connection." >&2
@@ -42,7 +40,8 @@ else
 fi
 
 # --- Optional: Add other commands that require login ---
+# The login state is typically cached temporarily by the CLI
 # echo "Running command that requires authentication..."
-# hf-transfer download ...
+# huggingface-cli whoami # Example command
 
 exit 0 # Exit successfully
