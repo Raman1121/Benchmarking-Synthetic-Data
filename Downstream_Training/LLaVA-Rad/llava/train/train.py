@@ -683,11 +683,11 @@ class LazySupervisedDataset(Dataset):
             """
             if(image_type == 'real'):
                 if(not self.finetune_only_with_synthetic_data):
+                    # We are finetuning on both real and synthetic data, hence, read the real image
                     image = open_image_with_retry(os.path.join(image_folder, image_file))
                 else:
-                    # We are finetuning on both real and synthetic data
                     pass
-            elif(image_type == 'synthetic'):
+            if(image_type == 'synthetic'):
                 image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
             if image is None:
                 logging.error("Use an empty image.")
