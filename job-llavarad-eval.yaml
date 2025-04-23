@@ -65,6 +65,9 @@ spec:
           args:
             - |
 
+              set -e # Exit immediately if a command exits with a non-zero status.
+              set -x # Print commands and their arguments as they are executed.
+
               # Run apt update and install with -y and noninteractive frontend
               apt update && apt install -y --no-install-recommends \
                   wget \
@@ -74,25 +77,23 @@ spec:
                   libgl1 \
                   libglib2.0-0 \
                   ffmpeg \
-                  tzdata \ # Explicitly install tzdata if needed \
-                  cmake 
+                  tzdata \
+                  cmake
               
-              apt install git-all
-              echo "Changing branch to eidf"
-              git checkout eidf
-
-              echo "Copying files to /pvc"
-              cp -r /workspace/Benchmarking-Synthetic-Data /pvc/
+              apt install -y --no-install-recommends git-all
+              
+              echo "Copying project files to writable PVC..."
+              # Ensure target directory exists in PVC if necessary
+              mkdir -p /pvc/Benchmarking-Synthetic-Data
+              cp -r /workspace/Benchmarking-Synthetic-Data/* /pvc/Benchmarking-Synthetic-Data/
               cd /pvc/Benchmarking-Synthetic-Data
 
               # Clean up apt cache
               rm -rf /var/lib/apt/lists/*
 
-              echo "Setting up environment..."
-              export PYTHONPATH=$PYTHONPATH:/workspace/Benchmarking-Synthetic-Data
-              
-
+              echo "Setting up Python environment..."
               python3 -m pip install --upgrade pip setuptools wheel
+              echo "Installing environment dependencies..."
               pip install wavedrom
               python3 -m pip install --user lit
               pip install xtermcolor
