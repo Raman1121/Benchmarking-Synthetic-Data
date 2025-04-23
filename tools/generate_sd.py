@@ -52,12 +52,12 @@ def main(args):
 
     prompt_info_df = pd.DataFrame()
 
-    if("v1_4" in args.model_path):
-        args.savedir = os.path.join(args.savedir, "SD_v1_4")
-    elif("v1_5" in args.model_path):
-        args.savedir = os.path.join(args.savedir, "SD_v1_5")
-    elif("v2" in args.model_path):
-        args.savedir = os.path.join(args.savedir, "SD_v2")
+    if("V1-4" in args.model_path):
+        args.savedir = os.path.join(args.savedir, "SD_V1-4")
+    elif("V1-4" in args.model_path):
+        args.savedir = os.path.join(args.savedir, "SD_V1-4")
+    elif("V2" in args.model_path):
+        args.savedir = os.path.join(args.savedir, "SD_V2")
 
     if(args.extra_info is not None):
         args.savedir = args.savedir + "_" + args.extra_info
