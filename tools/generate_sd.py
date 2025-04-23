@@ -25,7 +25,7 @@ def load_pipeline(model_path, device):
         model_path,
         safety_checker=None,
     )
-    pipe.enable_xformers_memory_efficient_attention()
+    # pipe.enable_xformers_memory_efficient_attention()
     pipe.to(device)
 
     return pipe
@@ -53,17 +53,17 @@ def main(args):
     prompt_info_df = pd.DataFrame()
 
     if("v1_4" in args.model_path):
-        args.save_dir = os.path.join(args.save_dir, "SD_v1_4")
+        args.savedir = os.path.join(args.savedir, "SD_v1_4")
     elif("v1_5" in args.model_path):
-        args.save_dir = os.path.join(args.save_dir, "SD_v1_5")
+        args.savedir = os.path.join(args.savedir, "SD_v1_5")
     elif("v2" in args.model_path):
-        args.save_dir = os.path.join(args.save_dir, "SD_v2")
+        args.savedir = os.path.join(args.savedir, "SD_v2")
 
     if(args.extra_info is not None):
-        args.save_dir = args.save_dir + "_" + args.extra_info
+        args.savedir = args.savedir + "_" + args.extra_info
 
-    os.makedirs(args.save_dir, exist_ok=True)
-    print("Saving images to {}".format(args.save_dir))
+    os.makedirs(args.savedir, exist_ok=True)
+    print("Saving images to {}".format(args.savedir))
 
     seed_everything(seed=42)
 
