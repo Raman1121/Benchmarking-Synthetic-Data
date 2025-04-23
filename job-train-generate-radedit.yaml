@@ -114,12 +114,14 @@ spec:
               pip install -vvv --no-cache-dir --no-deps accelerate
               python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'Torch path: {torch.__file__}')"
 
+              apt install git
+              apt install git-all
               pip install -U "huggingface_hub[cli]"
               echo "Logging in to Hugging Face..."
               chmod 600 /pvc/hf_token.txt
               chmod +x scripts/hf-login.sh
               ./scripts/hf-login.sh
-              
+
               echo "Generating data..."
               chmod +x scripts/generate_data_radedit.sh
               ./scripts/generate_data_radedit.sh > logs_gen_train_data_radedit.txt 2>&1
