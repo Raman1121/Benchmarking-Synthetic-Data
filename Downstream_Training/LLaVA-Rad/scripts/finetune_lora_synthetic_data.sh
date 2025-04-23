@@ -28,7 +28,7 @@ image_folder=/pvc/SYNTHETIC_IMAGES/Sana/ckpt20/
 # epoch="${2:-3}"
 # bsz="${3:-16}"
 epoch=5
-bsz=16
+bsz=48
 
 
 lr="1e-4"
