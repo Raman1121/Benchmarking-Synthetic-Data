@@ -120,7 +120,7 @@ spec:
               python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'Torch path: {torch.__file__}')"
 
               echo "Generating data..."
-              chmod +x tools/generate_data_sd.sh
+              chmod +x scripts/generate_data_sd.sh
               ./scripts/generate_data_sd.sh > logs_gen_train_data.txt 2>&1
 
           resources:
