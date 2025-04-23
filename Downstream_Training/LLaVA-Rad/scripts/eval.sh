@@ -4,8 +4,8 @@ set -e
 set -o pipefail
 
 model_base=lmsys/vicuna-7b-v1.5
-# model_path=microsoft/llava-rad
-model_path=checkpoints/biomedclip_cxr_518-lora-5e-1e-4-20250423024541
+model_path=microsoft/llava-rad
+# model_path=checkpoints/biomedclip_cxr_518-lora-5e-1e-4-20250423024541
 
 model_base="${1:-$model_base}"
 model_path="${2:-$model_path}"
