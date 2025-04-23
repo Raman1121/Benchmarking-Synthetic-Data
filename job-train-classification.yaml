@@ -108,7 +108,8 @@ spec:
               pip install tqdm
               pip install pillow
               pip install timm              
-
+              
+              echo "Training the model..."
               chmod +x Downstream_Training/run_training_inference.sh
               ./Downstream_Training/run_training_inference.sh > logs_ds_classification.txt 2>&1
 
