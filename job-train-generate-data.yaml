@@ -121,7 +121,7 @@ spec:
 
               echo "Generating data..."
               chmod +x tools/generate_data_sd.sh
-              ./tools/generate_data_sd.sh > logs_gen_train_data.txt 2>&1
+              ./scripts/generate_data_sd.sh > logs_gen_train_data.txt 2>&1
 
           resources:
             limits:
