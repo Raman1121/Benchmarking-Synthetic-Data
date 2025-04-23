@@ -695,7 +695,7 @@ class LazySupervisedDataset(Dataset):
             #     image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
 
             # FIXME: Currently, hardcoding the logic to finetune only on synthetic data
-            image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
+            image = open_image_with_retry(os.path.join(image_folder, image_file))
 
             if image is None:
                 logging.error("Use an empty image.")
