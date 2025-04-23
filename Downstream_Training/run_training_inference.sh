@@ -6,7 +6,7 @@ export IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 
 export MODEL="vit_base_patch16_224.orig_in21k_ft_in1k" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
 export BATCH_SIZE=512
-export EPOCHS=20
+export EPOCHS=7
 
 export EXTRA_INFO="original_data"
 export CHECKPOINT="Downstream_Training/checkpoints/{$MODEL}_best_model.pth"
