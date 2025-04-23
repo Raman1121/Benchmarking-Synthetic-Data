@@ -121,7 +121,7 @@ spec:
 
               echo "Running training script..."
               chmod +x tools/train_t2i_sd.sh
-              ./tools/train_t2i_sd.sh > t2i_log_sdv1_4_impression.txt 2>&1
+              ./tools/train_t2i_sd.sh > t2i_log_sdv2_1_impression.txt 2>&1
 
           resources:
             limits:

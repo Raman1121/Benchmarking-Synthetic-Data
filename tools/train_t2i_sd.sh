@@ -17,11 +17,11 @@ TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-
 TEST_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/LLAVARAD_ANNOTATIONS_TEST.csv"
 IMG_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 IMG_COL="path"
-# CAPTION_COL="annotated_prompt"
-CAPTION_COL="impression"
+CAPTION_COL="annotated_prompt"
+# CAPTION_COL="impression"
 
-MODEL_NAME="CompVis/stable-diffusion-v1-4"
-OUTPUT_DIR="OUTPUT_MIMIC_SD_V1_4_impression"
+MODEL_NAME="stabilityai/stable-diffusion-2-1"
+OUTPUT_DIR="OUTPUT_MIMIC_SD_V2_1"
 
 accelerate launch --main_process_port 12345 tools/train_text_to_image.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
