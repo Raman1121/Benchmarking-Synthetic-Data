@@ -54,8 +54,8 @@ def main(args):
 
     if("V1-4" in args.model_path):
         args.savedir = os.path.join(args.savedir, "SD_V1-4")
-    elif("V1-4" in args.model_path):
-        args.savedir = os.path.join(args.savedir, "SD_V1-4")
+    elif("V1-5" in args.model_path):
+        args.savedir = os.path.join(args.savedir, "SD_V1-5")
     elif("V2" in args.model_path):
         args.savedir = os.path.join(args.savedir, "SD_V2")
 
