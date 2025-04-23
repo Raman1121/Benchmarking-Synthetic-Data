@@ -111,7 +111,7 @@ spec:
               
               echo "Training the model..."
               chmod +x Downstream_Training/run_training_inference.sh
-              ./Downstream_Training/run_training_inference.sh > logs_ds_classification.txt 2>&1
+              ./Downstream_Training/run_training_inference.sh > logs_ds_classification_resnet.txt 2>&1
 
           resources:
             limits:
