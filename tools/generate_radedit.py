@@ -122,18 +122,16 @@ def main(args):
         
         COUNT += args.batch_size
 
-    try:
-        prompt_info_df['prompt'] = ALL_PROMPTS
-        prompt_info_df['img_savename'] = ALL_FILENAMES
-        prompt_info_df.to_csv(os.path.join(args.savedir, "promtp_INFO_RadEdit.csv"), index=False)
-    except:
-        import pdb; pdb.set_trace()
+    prompt_info_df['prompt'] = ALL_PROMPTS
+    prompt_info_df['img_savename'] = ALL_FILENAMES
+    prompt_info_df.to_csv(os.path.join(args.savedir, "promtp_INFO_RadEdit.csv"), index=False)
+    
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="diffusion memorization")
-    parser.add_argument("--test_prompts_path", default="/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_test_prompts.txt")
-    parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--savedir", default="/raid/s2198939/diffusion_memorization/RadEdit_Generations_MIMIC")
+    parser = argparse.ArgumentParser(description="Generation of synthetic images using RadEdit")
+    parser.add_argument("--test_prompts_path", default="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_train_prompts_20K.txt")
+    parser.add_argument("--batch_size", type=int, default=64)
+    parser.add_argument("--savedir", default="/pvc/SYNTHETIC_IMAGES/")
     parser.add_argument(
         "--debug",
         action="store_true",
