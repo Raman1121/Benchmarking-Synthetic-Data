@@ -26,17 +26,20 @@ image_folder=/pvc/SYNTHETIC_IMAGES/Sana/ckpt20/
 ################## Run name ##################
 epoch="${2:-3}"
 bsz="${3:-16}"
+
 lr="1e-4"
 schedule="lora-${epoch}e"
 export run_name="${vision_tower}-${schedule}-${lr}-$(date +%Y%m%d%H%M%S)"
 echo $run_name > run_name
+echo "Epoch: $epoch"
+echo "Batch size: $bsz"
+echo "Learning rate: $lr"
 ################## Run name ##################
 
 
 # Batch size is set for 4-GPU machines.
-CUDA_VISIBLE_DEVICES=0,1,2
     deepspeed llava/train/train_mem.py \
-    --deepspeed ./scripts/zero2.json \
+    --deepspeed /pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/scripts/zero2.json \
     --lora_enable True \
     --lora_alpha 128 \
     --model_name_or_path ${model_base} \

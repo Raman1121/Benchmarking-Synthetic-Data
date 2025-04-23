@@ -127,7 +127,7 @@ spec:
 
               echo "Beginning training..."
               # Make sure the script exists at this path inside the PVC copy
-              chmod +x scripts/finetune_lora.sh
+              chmod +x scripts/finetune_lora.sh 5 16
               bash scripts/finetune_lora.sh > logs_llavarad_training.txt 2>&1
               echo "Training script finished."
 
