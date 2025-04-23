@@ -108,6 +108,8 @@ spec:
               pip install --upgrade pip # Often good practice before installs
               pip install -e .
 
+              pip install tensorboardX
+
               echo "Installing Ninja..."
               pip -vvv install ninja > /pvc/ninja_install.log 2>&1
               ninja --version
