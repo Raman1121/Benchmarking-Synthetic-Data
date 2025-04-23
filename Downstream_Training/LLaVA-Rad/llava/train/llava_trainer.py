@@ -134,6 +134,8 @@ class LLaVATrainer(Trainer):
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
         if self.train_dataset is None or not has_length(self.train_dataset):
             return None
+        else:
+            print("Dataset Length", len(self.train_dataset))
 
         if self.args.group_by_modality_length:
             lengths = self.train_dataset.modality_lengths

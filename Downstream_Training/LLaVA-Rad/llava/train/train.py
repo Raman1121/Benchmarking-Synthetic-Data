@@ -644,6 +644,10 @@ class LazySupervisedDataset(Dataset):
         self.data_args = data_args
         self.finetune_only_with_synthetic_data = data_args.finetune_only_with_synthetic_data
 
+        print("LazySupervisedDataset: ", len(self.list_data_dict))
+        if len(self.list_data_dict) == 0:
+            raise ValueError(f"Dataset {data_path} is empty.")
+
     def __len__(self):
         return len(self.list_data_dict)
 
@@ -692,7 +696,7 @@ class LazySupervisedDataset(Dataset):
 
             # FIXME: Currently, hardcoding the logic to finetune only on synthetic data
             image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
-            
+
             if image is None:
                 logging.error("Use an empty image.")
                 image = Image.new('RGB', (224, 224), tuple(int(x*255) for x in processor.image_mean))
