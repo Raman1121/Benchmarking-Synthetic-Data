@@ -98,7 +98,7 @@ spec:
               python3 -m pip install --upgrade pip setuptools wheel
               echo "Installing environment dependencies..."
               pip install wavedrom
-              python3 -m pip install --user lit # Check if --user is truly needed inside container
+              python3 -m pip install --user lit
               pip install xtermcolor
               pip install termcolor
 
@@ -113,21 +113,11 @@ spec:
               ninja --version
               echo "Installing flash-attn with high verbosity..."
               MAX_JOBS=4  pip install -vvv flash-attn==2.5.8 --no-build-isolation > /pvc/flash_attn_install.log 2>&1 || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
-              echo "flash-attn install command finished." # Add this to see if it gets past the line
-
-              # --- START: VERSION CHECK ---
-              echo "--- Checking Versions After Flash Attention Install ---"
-              python -c "import torch; print(f'PyTorch Version: {torch.__version__}')"
-              python -c "import torch; print(f'PyTorch CUDA Version: {torch.version.cuda}')"
-              python -c "import torch; print(f'CUDA Available for PyTorch: {torch.cuda.is_available()}')"
-              nvcc --version || echo "nvcc not found in PATH" # Check system CUDA compiler version if available
-              nvidia-smi || echo "nvidia-smi not found or failed" # Check driver/GPU status
-              echo "-----------------------------------------------------"
-              # --- END: VERSION CHECK ---
+              echo "flash-attn install command finished." 
 
               echo "Beginning training..."
               # Make sure the script exists at this path inside the PVC copy
-              chmod +x scripts/finetune_lora_synthetic_data.sh 5 16
+              chmod +x scripts/finetune_lora_synthetic_data.sh
               bash scripts/finetune_lora_synthetic_data.sh > logs_llavarad_training.txt 2>&1
               echo "Training script finished."
 

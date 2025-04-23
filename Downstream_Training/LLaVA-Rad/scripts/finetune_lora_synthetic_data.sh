@@ -24,8 +24,11 @@ image_folder=/pvc/SYNTHETIC_IMAGES/Sana/ckpt20/
 ################## Synthetic Data ##################
 
 ################## Run name ##################
-epoch="${2:-3}"
-bsz="${3:-16}"
+# epoch="${2:-3}"
+# bsz="${3:-16}"
+epoch=5
+bsz=16
+
 
 lr="1e-4"
 schedule="lora-${epoch}e"
