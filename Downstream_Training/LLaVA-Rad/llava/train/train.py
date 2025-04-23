@@ -681,14 +681,18 @@ class LazySupervisedDataset(Dataset):
             # Real images are in the original MIMIC folder structure
             # Synthetic images are in 'Benchmarking-Synthetic-Data/assets/synthetic_images/'
             """
-            if(image_type == 'real'):
-                if(not self.finetune_only_with_synthetic_data):
-                    # We are finetuning on both real and synthetic data, hence, read the real image
-                    image = open_image_with_retry(os.path.join(image_folder, image_file))
-                else:
-                    pass
-            if(image_type == 'synthetic'):
-                image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
+            # if(image_type == 'real'):
+            #     if(not self.finetune_only_with_synthetic_data):
+            #         # We are finetuning on both real and synthetic data, hence, read the real image
+            #         image = open_image_with_retry(os.path.join(image_folder, image_file))
+            #     else:
+            #         pass
+            # if(image_type == 'synthetic'):
+            #     image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
+
+            # FIXME: Currently, hardcoding the logic to finetune only on synthetic data
+            image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
+            
             if image is None:
                 logging.error("Use an empty image.")
                 image = Image.new('RGB', (224, 224), tuple(int(x*255) for x in processor.image_mean))
