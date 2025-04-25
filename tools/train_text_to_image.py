@@ -122,6 +122,7 @@ def main():
         "CompVis/stable-diffusion-v1-4": "SD-V1-4",
         "sd-legacy/stable-diffusion-v1-5": "SD-V1-5",
         "stabilityai/stable-diffusion-2": "SD-V2",
+        "stabilityai/stable-diffusion-2-1": "SD-V2-1",
     }
 
     if args.report_to == "wandb" and args.hub_token is not None:
@@ -758,7 +759,10 @@ def main():
             variant=args.variant,
         )
         model_name = MODEL_NAME_MAPPING_DICT[args.pretrained_model_name_or_path] + "_" + args.training_setting + "_" + str(args.resolution)
-        pipeline.save_pretrained(os.path.join(args.output_dir, model_name))
+        try:
+            pipeline.save_pretrained(os.path.join(args.output_dir, model_name))
+        except:
+            pipeline.save_pretrained(os.path.join(args.output_dir, "SD-V2-1"))
 
         # Run a final round of inference.
         images = []
