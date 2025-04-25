@@ -109,7 +109,8 @@ spec:
                 datasets \
                 tensorboard \
                 transformers==4.50.3 \
-                peft==0.15.1
+                peft==0.15.1 \
+                sentencepiece
 
               echo "Installing accelerate..."
               pip install -vvv --no-cache-dir --no-deps accelerate
@@ -126,9 +127,8 @@ spec:
               # ./scripts/generate_data_sd.sh > logs_gen_train_data_sdv1_5.txt 2>&1
 
               ######## FOR STABLE DIFFUSION 3.X
-              pip install sentencepiece
               echo "Generating data..."
-              python tools/generate_data_sd_3-5_lora.py --batch_size 64 --savedir /pvc/ai-toolkit/output/sd3-5_medium_lora/generated_images/ > logs_gen_train_data_sdv3_5.txt 2>&1
+              python tools/generate_data_sd_3-5_lora.py --batch_size 32 --savedir /pvc/ai-toolkit/output/sd3-5_medium_lora/generated_images/ > logs_gen_train_data_sdv3_5.txt 2>&1
 
           resources:
             limits:
