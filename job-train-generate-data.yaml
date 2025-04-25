@@ -114,17 +114,18 @@ spec:
               pip install -vvv --no-cache-dir --no-deps accelerate
               python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'Torch path: {torch.__file__}')"
 
+              echo "Logging into Huggingface"
+              chmod 600 /pvc/hf_token.txt
+              chmod +x scripts/hf-login.sh
+              ./scripts/hf-login.sh
+              
               ######## FOR REGULAR STABLE DIFFUSION 1.X/ 2.X
               # echo "Generating data..."
               # chmod +x scripts/generate_data_sd.sh
               # ./scripts/generate_data_sd.sh > logs_gen_train_data_sdv1_5.txt 2>&1
 
-              echo "Logging into Huggingface"
-              chmod 600 /pvc/hf_token.txt
-              chmod +x scripts/hf-login.sh
-              ./scripts/hf-login.sh
-
               ######## FOR STABLE DIFFUSION 3.X
+              pip install sentencepiece
               echo "Generating data..."
               python tools/generate_data_sd_3-5_lora.py --batch_size 64 --savedir /pvc/ai-toolkit/output/sd3-5_medium_lora/generated_images/ > logs_gen_train_data_sdv3_5.txt 2>&1
 
