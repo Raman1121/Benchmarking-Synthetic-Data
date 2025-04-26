@@ -11,4 +11,5 @@ BATCH_SIZE=32
 accelerate launch tools/generate_sd.py --model_path $MODEL_PATH \
                                         --savedir $SAVE_DIR \
                                         --batch_size $BATCH_SIZE \
-                                        --test_prompts_path $TEST_PROMPTS_PATH
+                                        --test_prompts_path $TEST_PROMPTS_PATH \
+                                        --extra_info $EXTRA_INFO \
