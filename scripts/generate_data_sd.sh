@@ -6,7 +6,7 @@ SAVE_DIR="/pvc/SYNTHETIC_IMAGES/"
 
 TEST_PROMPTS_PATH="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_train_prompts_20K.txt"
 
-BATCH_SIZE=64
+BATCH_SIZE=48
 
 accelerate launch tools/generate_sd.py --model_path $MODEL_PATH \
                                         --savedir $SAVE_DIR \
