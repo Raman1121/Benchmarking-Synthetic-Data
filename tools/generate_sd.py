@@ -58,6 +58,10 @@ def main(args):
         args.savedir = os.path.join(args.savedir, "SD_V1-5")
     elif("V2" in args.model_path):
         args.savedir = os.path.join(args.savedir, "SD_V2")
+    elif("V2-1" in args.model_path):
+        args.savedir = os.path.join(args.savedir, "SD_V2-1")
+    else:
+        raise ValueError("Model path not recognized. Please check the model path.")
 
     if(args.extra_info is not None):
         args.savedir = args.savedir + "_" + args.extra_info
