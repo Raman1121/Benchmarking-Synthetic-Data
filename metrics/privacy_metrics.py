@@ -279,14 +279,14 @@ def load_pipeline(model_name, model_path):
     # SD V1/ V2.x Models
     # elif ("V1" in model_path) or ("V2" in model_path):
     elif((model_name == "SD-V1-4") or (model_name == "SD-V1-5") or (model_name == "SD-V2") or (model_name == "SD-V2-1")):
-        pipe, pipeline_constants = load_sd_pipeline(model_path)
+        pipe = load_sd_pipeline(model_path)
         pipe = pipe.to(device)
 
     # SD 3.5 Medium with LoRA
     elif(model_name == "SD-V3-5"):
         pipe, pipeline_constants = load_sd35_lora_pipeline(model_path, device)
 
-    return pipe, pipeline_constants
+    return pipe
 
 
 def generate_synthetic_images(pipe, pipeline_constants, prompt, seed=42):
@@ -334,6 +334,41 @@ def main(args):
 
     if args.num_shards > 0:
         assert args.shard is not None
+
+    PIPELINE_CONSTANTS = {
+        
+        "radedit":{
+            "num_inference_steps": 100,
+            "guidance_scale": 7.5,
+            "num_images_per_prompt": 1,
+        },
+        "SD-V1-4":{
+            "num_inference_steps": 50,
+            "guidance_scale": 7.5,
+            "num_images_per_prompt": 1,
+        },
+        "SD-V1-5":{
+            "num_inference_steps": 50,
+            "guidance_scale": 7.5,
+            "num_images_per_prompt": 1,
+        },
+        "SD-V2":{
+            "num_inference_steps": 50,
+            "guidance_scale": 7.5,
+            "num_images_per_prompt": 1,
+        },
+        "SD-V2-1":{
+            "num_inference_steps": 50,
+            "guidance_scale": 7.5,
+            "num_images_per_prompt": 1,
+        },
+        "SD-V3-5": {
+            "num_inference_steps": 40,
+            "guidance_scale": 4.5,
+            "num_images_per_prompt": 1,
+            "max_sequence_length": 512,
+        }
+    }
 
     model = SiameseNetwork(
                 network="ResNet-50", 
@@ -394,7 +429,7 @@ def main(args):
 
     # LOAD SD Pipeline (RadEdit)
     print("Loading SD Pipeline")
-    pipe, pipeline_constants = load_pipeline(args.model_name, args.model_path)
+    pipe = load_pipeline(args.model_name, args.model_path)
     print("Done!")
 
     print("Loading Encoding Model")
@@ -419,73 +454,74 @@ def main(args):
         # There can be several real images corresponding to a prompt
         # Select 1
 
-        try:
-            real_img_path = _PATH
-            real_image = Image.open(real_img_path).resize((512, 512)).convert("RGB")
+        # try:
+        real_img_path = _PATH
+        real_image = Image.open(real_img_path).resize((512, 512)).convert("RGB")
 
-            print("Prompt: ", _PROMPT)
-            # Generate images using this prompt
-            for _seed in SEEDS:
-                print("Generating with seed: ", _seed)
-                gen_image = generate_synthetic_images(
-                    pipe, pipeline_constants, _PROMPT, 1, _seed
-                )
-                gen_image = gen_image.convert("RGB")
-                generated_images.append(gen_image)                
+        print("Prompt: ", _PROMPT)
+        # Generate images using this prompt
+        for _seed in SEEDS:
+            print("Generating with seed: ", _seed)
+            
+            gen_image = generate_synthetic_images(
+                pipe, PIPELINE_CONSTANTS[args.model_name], _PROMPT, _seed
+            )
+            gen_image = gen_image.convert("RGB")
+            generated_images.append(gen_image)                
 
-            # Calculate Re-id score between the real and the generated images
-            print("Calculating Re-ID Scores!")
-            for i, gen_img in enumerate(generated_images):
+        # Calculate Re-id score between the real and the generated images
+        print("Calculating Re-ID Scores!")
+        for i, gen_img in enumerate(generated_images):
 
-                # Save the generated image
-                gen_img.save(
-                    os.path.join(GEN_SAVE_DIR, filename + "_gen_{}.jpg".format(i))
-                )
-
-                # Re-Identification Score
-                reid_score = round(
-                    get_reidentification_score(model, real_image, gen_img, transform), 4
-                )
-                reid_scores.append(reid_score)
-
-                # Pixel-Wise Distance
-                pixel_dist = round(pixelwise_distance(real_image, gen_image), 4)
-                pixel_distances.append(pixel_dist)
-
-                # Latent Distance
-                real_img_encoded = encode_image(encoding_model, processor, real_image)
-                syn_img_encoded = encode_image(encoding_model, processor, gen_img)
-                latent_dist = round(
-                    latent_vector_distance(real_img_encoded, syn_img_encoded), 4
-                )
-                latent_distances.append(latent_dist)
+            # Save the generated image
+            gen_img.save(
+                os.path.join(GEN_SAVE_DIR, filename + "_gen_{}.jpg".format(i))
+            )
 
             # Re-Identification Score
-            _max_reid_score = max(reid_scores)
-            _mean_reid_score = sum(reid_scores) / len(reid_scores)
-            ALL_MEAN_REID_SCORES.append(_mean_reid_score)
-            ALL_MAX_REID_SCORES.append(_max_reid_score)
+            reid_score = round(
+                get_reidentification_score(model, real_image, gen_img, transform), 4
+            )
+            reid_scores.append(reid_score)
 
-            # Distance in Pixel-Space
-            _min_pixel_dist = min(pixel_distances)
-            _mean_pixel_dist = sum(pixel_distances) / len(pixel_distances)
-            ALL_MEAN_PIXEL_DISTANCES.append(_mean_pixel_dist)
-            ALL_MIN_PIXEL_DISTANCES.append(_min_pixel_dist)
+            # Pixel-Wise Distance
+            pixel_dist = round(pixelwise_distance(real_image, gen_image), 4)
+            pixel_distances.append(pixel_dist)
 
-            # Distance in Latent Space
-            _min_latent_dist = min(latent_distances)
-            _mean_latent_dist = sum(latent_distances) / len(latent_distances)
-            ALL_MEAN_LATENT_DISTANCES.append(_mean_latent_dist)
-            ALL_MIN_LATENT_DISTANCES.append(_min_latent_dist)
+            # Latent Distance
+            real_img_encoded = encode_image(encoding_model, processor, real_image)
+            syn_img_encoded = encode_image(encoding_model, processor, gen_img)
+            latent_dist = round(
+                latent_vector_distance(real_img_encoded, syn_img_encoded), 4
+            )
+            latent_distances.append(latent_dist)
 
-            ALL_REAL_IMAGES_PATHS.append(real_img_path)
-            ALL_PROMPTS.append(_PROMPT)
-            print("\n")
+        # Re-Identification Score
+        _max_reid_score = max(reid_scores)
+        _mean_reid_score = sum(reid_scores) / len(reid_scores)
+        ALL_MEAN_REID_SCORES.append(_mean_reid_score)
+        ALL_MAX_REID_SCORES.append(_max_reid_score)
 
-        except:
-            print("No file was found for the prompt: ", _PROMPT)
-            ERROR_PROMPTS.append(_PROMPT)
-            continue
+        # Distance in Pixel-Space
+        _min_pixel_dist = min(pixel_distances)
+        _mean_pixel_dist = sum(pixel_distances) / len(pixel_distances)
+        ALL_MEAN_PIXEL_DISTANCES.append(_mean_pixel_dist)
+        ALL_MIN_PIXEL_DISTANCES.append(_min_pixel_dist)
+
+        # Distance in Latent Space
+        _min_latent_dist = min(latent_distances)
+        _mean_latent_dist = sum(latent_distances) / len(latent_distances)
+        ALL_MEAN_LATENT_DISTANCES.append(_mean_latent_dist)
+        ALL_MIN_LATENT_DISTANCES.append(_min_latent_dist)
+
+        ALL_REAL_IMAGES_PATHS.append(real_img_path)
+        ALL_PROMPTS.append(_PROMPT)
+        print("\n")
+
+        # except:
+        #     print("No file was found for the prompt: ", _PROMPT)
+        #     ERROR_PROMPTS.append(_PROMPT)
+        #     import pdb; pdb.set_trace()
 
     # Create a dataframe of results of all scores
 
