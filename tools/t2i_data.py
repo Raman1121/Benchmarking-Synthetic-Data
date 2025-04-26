@@ -69,12 +69,15 @@ class MimicCXRDataset(torch.utils.data.Dataset):
             im = Image.open(img_path).convert("RGB")
         except:
             print("ERROR IN LOADING THE IMAGE {}".format(img_path))
+            # Return a dummy image if the image cannot be loaded
+            im = Image.new("RGB", (1024, 1024), (255, 255, 255))
         if self.transform:
             im = self.transform(im)
         
         sample = {
             "pixel_values": im,
-            "text": self.df[self.caption_col_key].iloc[idx],
+            # "text": self.df[self.caption_col_key].iloc[idx],
+            "prompts": self.df[self.caption_col_key].iloc[idx],
         }
 
         if self.tokenizer is not None:
