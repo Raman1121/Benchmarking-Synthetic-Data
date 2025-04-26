@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODEL_PATH="/pvc/Benchmarking-Synthetic-Data/OUTPUT_MIMIC_SD_V1_5/IID/512/SD-V1-5_IID_512"
+MODEL_PATH="/data/Benchmarking-Synthetic-Data/OUTPUT_MIMIC_SD_V2_1/IID/512/SD-V2-1_IID_512"
 SAVE_DIR="/pvc/SYNTHETIC_IMAGES/"
 # EXTRA_INFO=""
 

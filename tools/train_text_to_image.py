@@ -759,10 +759,8 @@ def main():
             variant=args.variant,
         )
         model_name = MODEL_NAME_MAPPING_DICT[args.pretrained_model_name_or_path] + "_" + args.training_setting + "_" + str(args.resolution)
-        try:
-            pipeline.save_pretrained(os.path.join(args.output_dir, model_name))
-        except:
-            pipeline.save_pretrained(os.path.join(args.output_dir, "SD-V2-1"))
+        
+        pipeline.save_pretrained(os.path.join(args.output_dir, model_name))
 
         # Run a final round of inference.
         images = []

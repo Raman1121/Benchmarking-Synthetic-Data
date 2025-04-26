@@ -122,13 +122,13 @@ spec:
               ./scripts/hf-login.sh
               
               ######## FOR REGULAR STABLE DIFFUSION 1.X/ 2.X
-              # echo "Generating data..."
-              # chmod +x scripts/generate_data_sd.sh
-              # ./scripts/generate_data_sd.sh > logs_gen_train_data_sdv1_5.txt 2>&1
+              echo "Generating data..."
+              chmod +x scripts/generate_data_sd.sh
+              ./scripts/generate_data_sd.sh > logs_gen_train_data_sdv2_1.txt 2>&1
 
               ######## FOR STABLE DIFFUSION 3.X
-              echo "Generating data..."
-              python tools/generate_data_sd_3-5_lora.py --batch_size 32 --savedir /pvc/ai-toolkit/output/sd3-5_medium_lora/generated_images/ > logs_gen_train_data_sdv3_5.txt 2>&1
+              # echo "Generating data..."
+              # python tools/generate_data_sd_3-5_lora.py --batch_size 32 --savedir /pvc/ai-toolkit/output/sd3-5_medium_lora/generated_images/ > logs_gen_train_data_sdv3_5.txt 2>&1
 
           resources:
             limits:
