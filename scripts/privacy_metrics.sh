@@ -17,9 +17,9 @@ export SUBSET=20
 python metrics/privacy_metrics.py \
     --model_name=$MODEL_NAME \
     --model_path=$MODEL_PATH \
-    --subset=$SUBSET \
     --reid_ckpt=$REID_CKPT \
     --real_csv=$REAL_CSV \
     --real_img_dir=$REAL_IMG_DIR \
     --gen_savedir=$GEN_SAVEDIR \
-    --results_savedir=$RESULTS_SAVEDIR
+    --results_savedir=$RESULTS_SAVEDIR \
+    --subset=$SUBSET

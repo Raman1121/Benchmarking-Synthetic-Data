@@ -34,7 +34,7 @@ def parse_args():
     )
     parser.add_argument(
         "--reid_ckpt",
-        type=int,
+        type=str,
         default=None,
         help="Checkpoint path for the trained re-id model",
     )
