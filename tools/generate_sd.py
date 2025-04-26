@@ -52,19 +52,20 @@ def main(args):
 
     prompt_info_df = pd.DataFrame()
 
-    if("V1-4" in args.model_path):
-        args.savedir = os.path.join(args.savedir, "SD_V1-4")
-    elif("V1-5" in args.model_path):
-        args.savedir = os.path.join(args.savedir, "SD_V1-5")
-    elif("V2" in args.model_path):
-        args.savedir = os.path.join(args.savedir, "SD_V2")
-    elif("V2-1" in args.model_path):
-        args.savedir = os.path.join(args.savedir, "SD_V2-1")
-    else:
-        raise ValueError("Model path not recognized. Please check the model path.")
+    # if("V1-4" in args.model_path):
+    #     args.savedir = os.path.join(args.savedir, "SD_V1-4")
+    # elif("V1-5" in args.model_path):
+    #     args.savedir = os.path.join(args.savedir, "SD_V1-5")
+    # elif("V2" in args.model_path):
+    #     args.savedir = os.path.join(args.savedir, "SD_V2")
+    # elif("V2-1" in args.model_path):
+    #     args.savedir = os.path.join(args.savedir, "SD_V2-1")
+    # else:
+    #     raise ValueError("Model path not recognized. Please check the model path.")
 
     if(args.extra_info is not None):
-        args.savedir = args.savedir + "_" + args.extra_info
+        # args.savedir = args.savedir + "_" + args.extra_info
+        args.savedir = os.path.join(args.savedir, args.extra_info)
 
     os.makedirs(args.savedir, exist_ok=True)
     print("Saving images to {}".format(args.savedir))
