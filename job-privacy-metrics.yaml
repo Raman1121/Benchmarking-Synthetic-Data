@@ -119,7 +119,7 @@ spec:
               
               echo "Running Experiment"
               chmod +x scripts/privacy_metrics.sh
-              ./privacy_metrics.sh > logs_privacy_metrics.txt 2>&1
+              ./scripts/privacy_metrics.sh > logs_privacy_metrics.txt 2>&1
 
           resources:
             limits:
