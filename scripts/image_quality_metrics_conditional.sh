@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source /raid/s2198939/miniconda3/bin/activate sana
-
 export SYNTHETIC_CSV="assets/CSV/prompt_INFO_Pixart_sigma_ckpt20.csv"
 export SYNTHETIC_IMG_DIR="/raid/s2198939/PixArt-sigma/MIMIC_TRAINING1/vis/2025-04-13_custom_epoch20_step51916_scale4.5_step20_size512_bs2_sampdpm-solver_seed0"
 
