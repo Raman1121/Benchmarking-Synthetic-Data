@@ -146,7 +146,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="diffusion inference")
-    parser.add_argument("--test_prompts_path", default="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_test_prompts.txt")
+    # parser.add_argument("--test_prompts_path", default="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_test_prompts.txt")
+    parser.add_argument("--test_prompts_path", default="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_train_prompts_20K.txt")
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--savedir", default="/pvc/ai-toolkit/output/sd3-5_medium_lora/generated_images/")
     parser.add_argument(
