@@ -268,6 +268,15 @@ def load_sd35_lora_pipeline(model_path, device):
     return pipe, pipeline_constants
 
 
+def load_sana_pipeline(model_path):
+    from diffusers import SanaPipeline
+    pipe = SanaPipeline.from_pretrained(
+        model_path,
+        torch_dtype=torch.float16,
+    )
+
+    return pipe
+
 def load_pipeline(model_name, model_path):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -286,6 +295,10 @@ def load_pipeline(model_name, model_path):
     elif(model_name == "SD-V3-5"):
         pipe, pipeline_constants = load_sd35_lora_pipeline(model_path, device)
 
+    elif(model_name == "sana"):
+        pipe = load_sana_pipeline(model_path)
+        pipe = pipe.to(device)
+
     return pipe
 
 
@@ -296,6 +309,8 @@ def generate_synthetic_images(pipe, pipeline_constants, prompt, seed=42):
     image = pipe(
         prompt,
         generator=generator,
+        height=512,
+        width=512,
         **pipeline_constants,
     ).images[0]
 
@@ -308,6 +323,7 @@ def pixelwise_distance(image1: Image.Image, image2: Image.Image) -> float:
     arr1 = np.array(image1)
     arr2 = np.array(image2)
     if arr1.shape != arr2.shape:
+        import pdb; pdb.set_trace()
         raise ValueError("Images must have the same shape.")
 
     distance = np.linalg.norm(arr1 - arr2)
@@ -330,7 +346,8 @@ def main(args):
 
     seed_everything(42)
     assert args.model_name is not None
-    assert args.model_path is not None
+    if(args.model_name != "radedit"):
+        assert args.model_path is not None  # RadEdit is directly fetched from HF!
 
     if args.num_shards > 0:
         assert args.shard is not None
@@ -367,6 +384,10 @@ def main(args):
             "guidance_scale": 4.5,
             "num_images_per_prompt": 1,
             "max_sequence_length": 512,
+        },
+        "sana": {
+            "num_inference_steps": 20,
+            "guidance_scale": 4.5,
         }
     }
 
@@ -431,6 +452,9 @@ def main(args):
     print("Loading SD Pipeline")
     pipe = load_pipeline(args.model_name, args.model_path)
     print("Done!")
+
+    print(f"Constants set for the {args.model_name} pipeline: ")
+    print(PIPELINE_CONSTANTS[args.model_name])
 
     print("Loading Encoding Model")
     encoding_model, processor = load_image_encoder()
