@@ -54,12 +54,13 @@ class MIMICCXRDataset(Dataset):
         img_path = self.dataframe.iloc[idx][self.image_col]
             
         # Load and convert image
-        try:
-            image = Image.open(img_path).convert('RGB')
-        except Exception as e:
-            print(f"Error loading image {img_path}: {e}")
-            # Return a placeholder image in case of error
-            image = Image.new('RGB', (224, 224), color='black')
+        # try:
+        print(img_path)
+        image = Image.open(img_path).convert('RGB')
+        # except Exception as e:
+        #     print(f"Error loading image {img_path}: {e}")
+        #     # Return a placeholder image in case of error
+        #     image = Image.new('RGB', (224, 224), color='black')
         
         # Apply transformations
         if self.transform:
@@ -260,6 +261,7 @@ def main(args):
     # df[args.image_col] = df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
     
     ##### Adding base image directory for real images
+    assert 'img_type' in df.columns, "Column 'img_type' not found in DataFrame"
     try:
         df[args.image_col] = df[df['img_type']=='real'][args.img_col].apply(lambda x: os.path.join(args.real_image_dir, x))
     except:
