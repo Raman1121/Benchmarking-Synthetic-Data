@@ -391,7 +391,7 @@ def main(args):
 
     # Wriwte the best metrics to a CSV file
     results_df = pd.DataFrame([best_metrics])
-    results_df.to_csv(f"{script_dir}/training_results/{args.model_name}_best_metrics.csv", index=False)
+    results_df.to_csv(f"{script_dir}/training_results/{args.model_name}_{args.extra_info}.csv", index=False)
 
 
 if __name__ == "__main__":
@@ -414,6 +414,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--debug", action="store_true", help="Run in debug mode with a small subset of data")
     parser.add_argument("--debug_samples", type=int, default=500, help="Number of samples to use in debug mode")
+
+    parser.add_argument("--extra_info", type=str, default=None, help="Extra info about an experiment") # Examples: real, mix, synthetic
     
     args = parser.parse_args()
     main(args)
