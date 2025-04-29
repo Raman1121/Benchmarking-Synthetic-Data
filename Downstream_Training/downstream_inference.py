@@ -315,8 +315,6 @@ def main(args):
 
     test_df[args.image_col] = test_df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
 
-    print(test_df['img_type'].value_counts())
-
     test_df['chexpert_labels'] = test_df['chexpert_labels'].apply(get_labels_dict_from_string)
     print(colored(f"Loaded test data from {args.test_csv}...", "green"))
     print("\n")
