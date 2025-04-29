@@ -313,20 +313,10 @@ def main(args):
     # Load test data
     test_df = pd.read_csv(args.test_csv)
 
-    # Prepare this separately for real and synthetic images
-    # test_df[args.image_col] = test_df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
-    try:
-        test_df[args.image_col] = test_df[test_df['img_type']=='real'][args.img_col].apply(lambda x: os.path.join(args.real_image_dir, x))
-    except:
-        print("No real images found in the dataset")
-
-    try:
-        test_df[args.image_col] = test_df[test_df['img_type']=='synthetic'][args.img_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
-    except:
-        print("No synthetic images found in the dataset.")
+    test_df[args.image_col] = test_df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
 
     print(test_df['img_type'].value_counts())
-    
+
     test_df['chexpert_labels'] = test_df['chexpert_labels'].apply(get_labels_dict_from_string)
     print(colored(f"Loaded test data from {args.test_csv}...", "green"))
     print("\n")
