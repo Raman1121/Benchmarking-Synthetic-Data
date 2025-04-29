@@ -267,11 +267,15 @@ def main(args):
     num_real_images = len(df[df['img_type']=='real'])
     num_synthetic_images = len(df[df['img_type']=='synthetic'])
 
+    print("Num Real Images: ", num_real_images)
+    print("Num Synthetic Images: ", num_synthetic_images)
+
     if(num_real_images > 0):
         ##### Adding base image directory for real images
         df[args.image_col] = df[df['img_type']=='real'][args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
     if(num_synthetic_images > 0):
         ##### Adding base image directory for synthetic images
+        print("Synthetic image dir: ", args.synthetic_image_dir)
         df[args.image_col] = df[df['img_type']=='synthetic'][args.image_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
 
     print(df['img_type'].value_counts())
