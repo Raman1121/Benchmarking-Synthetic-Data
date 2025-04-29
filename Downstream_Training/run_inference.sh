@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Loading from checkpoint: $CHECKPOINT"
+
 python Downstream_Training/downstream_inference.py \
         --model_name=$MODEL \
         --checkpoint=$CHECKPOINT \

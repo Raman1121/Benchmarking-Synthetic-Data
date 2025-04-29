@@ -4,7 +4,7 @@
 export TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/training_data_15K_real.csv"
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/Pixart_Sigma"
-export EXTRA_INFO="original_data_Pixart_Sigma"
+export EXTRA_INFO="original_data"
 
 ## 2. Training on 15K Synthetic samples
 # export TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/training_data_15K_synthetic.csv"
@@ -25,7 +25,7 @@ export BATCH_SIZE=512
 export EPOCHS=10
 
 
-export CHECKPOINT="Downstream_Training/checkpoints/{$MODEL}_{$EXTRA_INFO}.pth"
+export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}.pth"
 
 # echo "Training the model..."
 # ./Downstream_Training/run_training.sh > logs_ds_training.txt 2>&1
