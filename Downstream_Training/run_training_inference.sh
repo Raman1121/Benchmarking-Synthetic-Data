@@ -12,7 +12,13 @@ export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/Pixart_Sigma"
 export EXTRA_INFO="syn_data_Pixart_Sigma"
 
-## 3. Training on 30K Real + Synthetic samples
+## 3. Training on 15K Real + Synthetic samples
+# export TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/training_data_15K_mixed.csv"
+# export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
+# export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/Pixart_Sigma"
+# export EXTRA_INFO="mixed_data_Pixart_Sigma"
+
+## 4. Training on 30K Real + Synthetic samples
 # export TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/training_data_30K_augmented.csv"
 # export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 # export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/Pixart_Sigma"
