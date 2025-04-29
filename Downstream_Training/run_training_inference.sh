@@ -1,16 +1,16 @@
 #!/bin/bash
 
 ## 1. Training on 15K REAL samples (baseline)
-# export TRAIN_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/training_data_15K_real.csv"
-# export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
-# export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/RadEdit"
-# export EXTRA_INFO="original_data"
-
-## 2. Training on 15K Synthetic samples
-export TRAIN_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/training_data_15K_synthetic.csv"
+export TRAIN_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/training_data_15K_real.csv"
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/RadEdit"
-export EXTRA_INFO="syn_data_RadEdit"
+export EXTRA_INFO="original_data"
+
+## 2. Training on 15K Synthetic samples
+# export TRAIN_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/training_data_15K_synthetic.csv"
+# export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
+# export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/RadEdit"
+# export EXTRA_INFO="syn_data_RadEdit"
 
 ## 3. Training on 15K Real + Synthetic samples
 # export TRAIN_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/training_data_15K_mixed.csv"
