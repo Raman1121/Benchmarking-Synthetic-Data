@@ -262,16 +262,17 @@ def main(args):
     
     ##### Adding base image directory for real images
     assert 'img_type' in df.columns, "Column 'img_type' not found in DataFrame"
-    try:
-        df[args.image_col] = df[df['img_type']=='real'][args.img_col].apply(lambda x: os.path.join(args.real_image_dir, x))
-    except:
-        print("No real images found in the dataset")
 
-    ##### Adding base image directory for synthetic images
-    try:
-        df[args.image_col] = df[df['img_type']=='synthetic'][args.img_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
-    except:
-        print("No synthetic images found in the dataset.")
+    # Check number of real and synthetic images
+    num_real_images = len(df[df['img_type']=='real'])
+    num_synthetic_images = len(df[df['img_type']=='synthetic'])
+
+    if(num_real_images > 0):
+        ##### Adding base image directory for real images
+        df[args.image_col] = df[df['img_type']=='real'][args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+    if(num_synthetic_images > 0):
+        ##### Adding base image directory for synthetic images
+        df[args.image_col] = df[df['img_type']=='synthetic'][args.image_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
 
     print(df['img_type'].value_counts())
 
