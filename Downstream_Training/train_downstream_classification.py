@@ -375,7 +375,7 @@ def main(args):
                 'optimizer_state_dict': optimizer.state_dict(),
                 'val_loss': val_loss,
                 'metrics': {k: v for k, v in metrics.items() if k != 'auc_per_class'},
-            }, f"{script_dir}/checkpoints/{args.model_name}_best_model.pth")
+            }, f"{script_dir}/checkpoints/{args.model_name}_{args.extra_info}.pth")
             print("Saved best model")
         
         # Update scheduler
