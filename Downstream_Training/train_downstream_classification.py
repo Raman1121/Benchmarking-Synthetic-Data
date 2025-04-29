@@ -276,6 +276,7 @@ def main(args):
     if(num_synthetic_images > 0):
         ##### Adding base image directory for synthetic images
         print("Synthetic image dir: ", args.synthetic_image_dir)
+        print(df[df['img_type']=='synthetic'][args.image_col])
         df[args.image_col] = df[df['img_type']=='synthetic'][args.image_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
 
     print(df['img_type'].value_counts())
