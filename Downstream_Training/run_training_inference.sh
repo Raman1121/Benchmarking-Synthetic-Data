@@ -1,14 +1,22 @@
 #!/bin/bash
 
-## 1. Training on 20K REAL samples (baseline)
+## 1. Training on 15K REAL samples (baseline)
 export TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/training_data_15K_real.csv"
-export IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0" # Directory where the real images are located => original MIMIC dataset
-export EXTRA_INFO="original_data"
+export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
+export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/Pixart_Sigma"
+export EXTRA_INFO="syn_data_Pixart_Sigma"
 
-## 2. Training on 20K Synthetic samples
-# export TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/"
-# export IMAGE_DIR="/pvc/SYNTHETIC_IMAGES/Pixart_Sigma" # Directory where the synthetic images are located
+## 2. Training on 15K Synthetic samples
+# export TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/training_data_15K_synthetic.csv"
+# export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
+# export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/Pixart_Sigma"
 # export EXTRA_INFO="syn_data_Pixart_Sigma"
+
+## 3. Training on 30K Real + Synthetic samples
+# export TRAIN_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/training_data_30K_augmented.csv"
+# export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
+# export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES/Pixart_Sigma"
+# export EXTRA_INFO="augmented_data_Pixart_Sigma"
 
 export TEST_CSV="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/LLAVARAD_ANNOTATIONS_TEST.csv"
 

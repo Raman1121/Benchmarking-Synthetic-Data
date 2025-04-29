@@ -4,6 +4,7 @@ python Downstream_Training/downstream_inference.py \
         --model_name=$MODEL \
         --checkpoint=$CHECKPOINT \
         --test_csv=$TEST_CSV \
-        --image_dir=$IMAGE_DIR \
+        --real_image_dir=$REAL_IMAGE_DIR \
+        --synthetic_image_dir=$SYNTHETIC_IMG_DIR \
         --save_predictions \
         --extra_info=$EXTRA_INFO

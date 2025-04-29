@@ -257,7 +257,22 @@ def main(args):
     
     # Load the dataframe containing paths and 14 labels
     df = pd.read_csv(args.csv_path)
-    df[args.image_col] = df[args.image_col].apply(lambda x: os.path.join(args.image_dir, x))
+    # df[args.image_col] = df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+    
+    ##### Adding base image directory for real images
+    try:
+        df[args.image_col] = df[df['img_type']=='real'][args.img_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+    except:
+        print("No real images found in the dataset")
+
+    ##### Adding base image directory for synthetic images
+    try:
+        df[args.image_col] = df[df['img_type']=='synthetic'][args.img_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
+    except:
+        print("No synthetic images found in the dataset.")
+
+    print(df['img_type'].value_counts())
+
     df['chexpert_labels'] = df['chexpert_labels'].apply(get_labels_dict_from_string)
 
     label_cols = list(df['chexpert_labels'].iloc[0].keys())
@@ -406,7 +421,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--csv_path", type=str, required=True, help="Path to CSV with image paths and labels")
     parser.add_argument("--image_col", type=str, default="path", help="Column name in CSV that contains image paths")
-    parser.add_argument("--image_dir", type=str, default=None, help="Base Directory containing images")
+    parser.add_argument("--real_image_dir", type=str, default=None, help="Base Directory containing images")
+    parser.add_argument("--synthetic_image_dir", type=str, default=None, help="Base Directory containing synthetic images")
 
     parser.add_argument("--threshold", type=float, default=0.5, help="Threshold for binary classification")
     parser.add_argument("--num_workers", type=int, default=4, help="Number of workers for data loading")

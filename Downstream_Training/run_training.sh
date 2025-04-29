@@ -5,5 +5,6 @@ python Downstream_Training/train_downstream_classification.py \
         --epochs=$EPOCHS \
         --model_name=$MODEL \
         --csv_path=$TRAIN_CSV \
-        --image_dir=$IMAGE_DIR \
+        --real_image_dir=$REAL_IMAGE_DIR \
+        --synthetic_image_dir=$SYNTHETIC_IMG_DIR \
         --extra_info=$EXTRA_INFO \
