@@ -108,6 +108,7 @@ if __name__ == "__main__":
     # parser.add_argument("--test_prompts_path", default="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_test_prompts.txt")
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--savedir", default=None)
+    parser.add_argument("--extra_info", type=str, default=None)
     parser.add_argument(
         "--debug",
         action="store_true",
