@@ -28,6 +28,15 @@ def seed_everything(seed=42):
 def get_labels_dict_from_string(x):
     return ast.literal_eval(x)
 
+def fix_state_dict(state_dict):
+    new_state_dict = {}
+
+    for k,v in state_dict.items():
+        new_key = k.replace("module.", "", 1)
+        new_state_dict[new_key] = v
+
+    return new_state_dict
+
 class MIMICCXRDataset(Dataset):
     def __init__(self, dataframe, image_col='path', label_cols='chexpert_labels', transform=None):
         
@@ -35,12 +44,6 @@ class MIMICCXRDataset(Dataset):
         self.image_col = image_col
         self.transform = transform
         self.label_cols = label_cols
-        
-        # Get all columns except the image path column - these are the 14 label columns
-        # self.label_cols = [col for col in dataframe.columns if col != image_col]
-        # assert len(self.label_cols) == 14, f"Expected 14 label columns, got {len(self.label_cols)}"
-        
-        # print(f"Dataset created with {len(dataframe)} samples and labels: {self.label_cols}")
 
     def __len__(self):
         return len(self.dataframe)
@@ -50,12 +53,7 @@ class MIMICCXRDataset(Dataset):
         img_path = self.dataframe.iloc[idx][self.image_col]
             
         # Load and convert image
-        try:
-            image = Image.open(img_path).convert('RGB')
-        except Exception as e:
-            print(f"Error loading image {img_path}: {e}")
-            # Return a placeholder image in case of error
-            image = Image.new('RGB', (224, 224), color='black')
+        image = Image.open(img_path).convert('RGB')
         
         # Apply transformations
         if self.transform:
@@ -329,10 +327,6 @@ def main(args):
     print(colored(f"Num Test Samples: {len(test_df)}", "cyan"))
     print("\n")
     
-    # Get label column names
-    # label_cols = [col for col in test_df.columns if col != args.image_col]
-    # assert len(label_cols) == 14, f"Expected 14 label columns, got {len(label_cols)}"
-    
     # Create dataset
     test_dataset = MIMICCXRDataset(test_df, image_col=args.image_col, transform=test_transform)
     
@@ -356,7 +350,12 @@ def main(args):
     
     # Handle different checkpoint formats
     if 'model_state_dict' in checkpoint:
-        model.load_state_dict(checkpoint['model_state_dict'])
+        try:
+            model.load_state_dict(checkpoint['model_state_dict'])
+        except:
+            # Might have to replace "module." from every key
+            fixed_state_dict = fix_state_dict(dict(checkpoint['model_state_dict']))
+            model.load_state_dict(fixed_state_dict)
     else:
         model.load_state_dict(checkpoint)
     

@@ -1,4 +1,5 @@
 import os
+import ast
 import argparse
 import numpy as np
 import pandas as pd
@@ -35,32 +36,23 @@ def format_elapsed_time(elapsed_time):
 
     print(f"Time Taken: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
 
-
+def get_labels_dict_from_string(x):
+    return ast.literal_eval(x)
 
 class MIMICCXRDataset(Dataset):
-    def __init__(self, dataframe, image_col='path', label_cols='chexpert_labels', transform=None):
-        self.dataframe = dataframe
-        self.image_col = image_col
+    def __init__(self, image_path_list, labels_list, transform=None):
+        self.image_path_list = image_path_list
+        self.labels_list = labels_list
         self.transform = transform
-        self.label_cols = label_cols
         
-        # assert len(self.label_cols) == 14, f"Expected 14 label columns, got {len(self.label_cols)}"
-
     def __len__(self):
-        return len(self.dataframe)
+        return len(self.image_path_list)
 
     def __getitem__(self, idx):
         # Get image path
-        img_path = self.dataframe.iloc[idx][self.image_col]
+        img_path = self.image_path_list[idx]
             
-        # Load and convert image
-        # try:
-        print(img_path)
         image = Image.open(img_path).convert('RGB')
-        # except Exception as e:
-        #     print(f"Error loading image {img_path}: {e}")
-        #     # Return a placeholder image in case of error
-        #     image = Image.new('RGB', (224, 224), color='black')
         
         # Apply transformations
         if self.transform:
@@ -68,7 +60,7 @@ class MIMICCXRDataset(Dataset):
         
         # Get labels (all 14 of them)
         # labels = self.dataframe.iloc[idx][self.label_cols].values.astype(np.float32)
-        label_vals = np.array(list(self.dataframe.iloc[idx][self.label_cols].values()))
+        label_vals = np.array(list(self.labels_list[idx].values()))
         labels = label_vals.astype(np.float32)
         labels = np.nan_to_num(labels)
 
@@ -231,6 +223,80 @@ def variable_size_collate_fn(batch):
     
     return batched_images, batched_labels
 
+def create_data_from_train_setting(args, df, train_setting):
+
+    """
+    Returns a list of image paths and corresponding labels
+    """
+
+    ALL_TRAINING_SETTINGS = ['all_original', 'all_synthetic', 'mixed', 'augmented']
+    assert train_setting in ALL_TRAINING_SETTINGS
+
+    ####### All original #######
+    if(train_setting == 'all_original'):
+        image_col = 'path'
+        df[image_col] = df[image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+        image_path_list = df[image_col].to_list()
+        labels_list = df[args.labels_col].to_list()
+        return image_path_list, labels_list
+
+    ####### All synthetic #######
+    elif(train_setting == 'all_synthetic'):
+        image_col = 'synthetic_filename'
+        df[image_col] = df[image_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
+        image_path_list = df[image_col].to_list()
+        labels_list = df[args.labels_col].to_list()
+        return image_path_list, labels_list
+
+    elif(train_setting == 'mixed'):
+        real_image_col = 'path'
+        synthetic_image_col = 'synthetic_filename'
+
+        df[real_image_col] = df[real_image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+        df[synthetic_image_col] = df[synthetic_image_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
+
+        # Replace 50% of the real data with synthetic data
+        random.seed(42)
+        all_ids = df['id'].to_list()
+        ids_to_remove = random.sample(all_ids, k=int(0.5*len(df)))
+
+        # Select real images not having these ids
+        real_image_path_list = df[~df['id'].isin(ids_to_remove)][real_image_col].to_list()
+        real_labels_list = df[~df['id'].isin(ids_to_remove)][args.labels_col].to_list()
+
+        # Select synthetic images having the 'removed' ids
+        synthetic_image_path_list = df[df['id'].isin(ids_to_remove)][synthetic_image_col].to_list()
+        synthetic_labels_list = df[df['id'].isin(ids_to_remove)][args.labels_col].to_list()
+
+        image_path_list = real_image_path_list + synthetic_image_path_list
+        labels_list = real_labels_list + synthetic_labels_list
+
+        return image_path_list, labels_list
+
+    ####### Real Data fully augmented with synthetic data #######
+    elif(train_setting == 'augmented'):
+        real_image_col = 'path'
+        synthetic_image_col = 'synthetic_filename'
+
+        df[real_image_col] = df[real_image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+        df[synthetic_image_col] = df[synthetic_image_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
+
+        # Image Paths
+        real_image_path_list = df[real_image_col].to_list()
+        synthetic_image_path_list = df[synthetic_image_col].to_list()
+
+        # Labels
+        real_labels_list = df[args.labels_col].to_list()
+        synthetic_labels_list = df[args.labels_col].to_list()
+
+        image_path_list = real_image_path_list + synthetic_image_path_list
+        labels_list = real_labels_list + synthetic_labels_list
+
+        return image_path_list, labels_list
+    
+    else:
+        raise ValueError(f"Invalid training setting. Got {args.training_setting} but args.training_setting should be in {ALL_TRAINING_SETTINGS}")
+
 def main(args):
     seed_everything(42)
 
@@ -257,61 +323,49 @@ def main(args):
     print("Loading MIMIC-CXR data...")
     
     # Load the dataframe containing paths and 14 labels
-    df = pd.read_csv(args.csv_path)
+    df = pd.read_csv(args.train_csv)
+    df[args.labels_col] = df[args.labels_col].apply(lambda x: get_labels_dict_from_string(x))
     # df[args.image_col] = df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+    # TODO:
     
-    ##### Adding base image directory for real images
-    assert 'img_type' in df.columns, "Column 'img_type' not found in DataFrame"
-
-    # Check number of real and synthetic images
-    num_real_images = len(df[df['img_type']=='real'])
-    num_synthetic_images = len(df[df['img_type']=='synthetic'])
-
-    print("Num Real Images: ", num_real_images)
-    print("Num Synthetic Images: ", num_synthetic_images)
-
-    if(num_real_images > 0):
-        ##### Adding base image directory for real images
-        df.loc[df['img_type'] == 'real', args.image_col] = df.loc[df['img_type'] == 'real', args.image_col].apply(
-            lambda x: os.path.join(args.real_image_dir, x)
-        )
-    if(num_synthetic_images > 0):
-        ##### Adding base image directory for synthetic images
-        df.loc[df['img_type'] == 'synthetic', args.image_col] = df.loc[df['img_type'] == 'synthetic', args.image_col].apply(
-            lambda x: os.path.join(args.synthetic_image_dir, x)
-        )
-
-    print(df['img_type'].value_counts())
-
-    df['chexpert_labels'] = df['chexpert_labels'].apply(get_labels_dict_from_string)
+    # NOTE: Preprocessing step: The labels are dictionaries but enclosed within strings in the CSV.
+    try:
+        df['chexpert_labels'] = df['chexpert_labels'].apply(get_labels_dict_from_string)
+    except:
+        pass
+    
+    """
+    Prepare training data according to the training setting
+    """
+    image_paths_list, labels_list = create_data_from_train_setting(args, df, args.training_setting)
 
     label_cols = list(df['chexpert_labels'].iloc[0].keys())
 
     # import pdb; pdb.set_trace()
 
     if(args.debug):
+        print("DEBUGGING!!!")
+        print(f"Creating a subset of {args.debug_samples} samples")
         df = df.sample(n=args.debug_samples, random_state=42).reset_index(drop=True)
     
-    # Verify that the dataframe has the expected structure
-    # expected_cols = 15  # 1 path column + 14 label columns
-    # assert len(df.columns) == expected_cols, f"Expected {expected_cols} columns in dataframe, got {len(df.columns)}"
-    
-    # Print label distribution
-    # print("Label distribution:")
-    # label_cols = [col for col in df.columns if col != args.image_col]
-    # for col in label_cols:
-    #     positive_count = df[col].sum()
-    #     print(f"  {col}: {positive_count} positive out of {len(df)} ({positive_count/len(df)*100:.2f}%)")
     
     # Split the data
-    train_df, val_df = train_test_split(df, test_size=0.05, random_state=42, stratify=df[label_cols[0]] if args.stratify else None)
+    # train_df, val_df = train_test_split(df, test_size=0.05, random_state=42, stratify=None)
+    image_paths_list_train, image_paths_list_train_val, labels_list_train, labels_list_train_val = train_test_split(
+                    image_paths_list,
+                    labels_list,
+                    test_size=0.05,     
+                    random_state=42 
+                )
     
-    print(f"Training set size: {len(train_df)}")
-    print(f"Validation set size: {len(val_df)}")
+    print(f"Training set size: {len(image_paths_list_train)}")
+    print(f"Validation set size: {len(image_paths_list_train_val)}")
     
     # Create datasets
-    train_dataset = MIMICCXRDataset(train_df, image_col=args.image_col, transform=train_transform)
-    val_dataset = MIMICCXRDataset(val_df, image_col=args.image_col, transform=val_transform)
+    # train_dataset = MIMICCXRDataset(train_df, image_col=args.image_col, transform=train_transform)
+    # val_dataset = MIMICCXRDataset(val_df, image_col=args.image_col, transform=val_transform)
+    train_dataset = MIMICCXRDataset(image_paths_list_train, labels_list_train, transform=train_transform)
+    val_dataset = MIMICCXRDataset(image_paths_list_train_val, labels_list_train_val, transform=val_transform)
 
     print("Train dataset size:", len(train_dataset))
     print("Validation dataset size:", len(val_dataset))
@@ -429,8 +483,9 @@ if __name__ == "__main__":
     parser.add_argument("--weight_decay", type=float, default=1e-5, help="Weight decay for regularization")
     parser.add_argument("--run", type=str, default="training", choices=['training', 'inference'], help="Run either training or inference.")
 
-    parser.add_argument("--csv_path", type=str, required=True, help="Path to CSV with image paths and labels")
+    parser.add_argument("--train_csv", type=str, required=True, help="Path to CSV with image paths and labels")
     parser.add_argument("--image_col", type=str, default="path", help="Column name in CSV that contains image paths")
+    parser.add_argument("--labels_col", type=str, default="chexpert_labels", help="Column name in CSV that contains the labels")
     parser.add_argument("--real_image_dir", type=str, default=None, help="Base Directory containing images")
     parser.add_argument("--synthetic_image_dir", type=str, default=None, help="Base Directory containing synthetic images")
 
@@ -441,7 +496,9 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true", help="Run in debug mode with a small subset of data")
     parser.add_argument("--debug_samples", type=int, default=500, help="Number of samples to use in debug mode")
 
-    parser.add_argument("--extra_info", type=str, default=None, help="Extra info about an experiment") # Examples: real, mix, synthetic
+    parser.add_argument("--extra_info", type=str, default=None, help="Extra info about an experiment")
+
+    parser.add_argument("--training_setting", type=str, default=None, help="Training setting") 
     
     args = parser.parse_args()
     main(args)
