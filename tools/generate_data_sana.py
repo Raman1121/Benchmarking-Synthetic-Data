@@ -45,14 +45,27 @@ class DummyDataset(Dataset):
     
 def main(args):
 
-    prompt_info_df = pd.DataFrame()
-    seed_everything(seed=42)
+    assert args.model_path is not None
 
     COUNT=0
     ALL_FILENAMES = []
     ALL_PROMPTS = []
 
+    prompt_info_df = pd.DataFrame()
+
+    if(args.extra_info is not None):
+        # args.savedir = args.savedir + "_" + args.extra_info
+        args.savedir = os.path.join(args.savedir, args.extra_info)
+
+    os.makedirs(args.savedir, exist_ok=True)
+    print("Saving images to {}".format(args.savedir))
+
+    seed_everything(seed=42)
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    pipe = load_sana_pipeline(args.model_path, device)
+
+    accelerator = Accelerator()
 
     assert args.test_prompts_path is not None
     MIMIC_TEST_PROMPTS_PATH = args.test_prompts_path
@@ -72,15 +85,19 @@ def main(args):
 
     os.makedirs(args.savedir, exist_ok=True)
 
-    generator = torch.Generator(device=device).manual_seed(42)
-
-    pipeline = load_sana_pipeline(args.model_path, device)
-
+    print("Generating Images...")
     for batch in tqdm(dataloader):
-        outputs = pipeline(
-            num_inference_steps = 20,
-            guidance_scale = 4.5,
-            generator=generator
+        if torch.backends.mps.is_available():
+            autocast_ctx = nullcontext()
+        else:
+            autocast_ctx = torch.autocast(accelerator.device.type)
+        
+        with autocast_ctx:
+            outputs = pipe(
+                batch,
+                num_inference_steps=20,
+                guidance_scale=4.5,
+                num_images_per_prompt=1,
             )
         ALL_PROMPTS.extend(batch)
 
@@ -94,12 +111,13 @@ def main(args):
             ALL_FILENAMES.append(filename)
         
         COUNT += args.batch_size
-    
+
     prompt_info_df['prompt'] = ALL_PROMPTS
     prompt_info_df['img_savename'] = ALL_FILENAMES
     filename = "prompt_INFO.csv"
-    prompt_info_df.to_csv(os.path.join(args.savedir, filename), index=False)
     
+    prompt_info_df.to_csv(os.path.join(args.savedir, filename), index=False)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="sana inference")
