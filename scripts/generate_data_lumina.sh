@@ -7,12 +7,11 @@ MODEL_PATH="/pvc/ai-toolkit/output/lumina2_lora"
 SAVE_DIR=${MODEL_PATH}/generated_images
 mkdir -p $SAVE_DIR
 
-BATCH_SIZE=1
-CUDA_VISIBLE_DEVICES=2 
-
-CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES accelerate launch tools/generate_data_lumina.py \
-                                                                --ckpt_dir $MODEL_PATH \
-                                                                --ckpt_name $CKPT_NAME \
-                                                                --savedir $SAVE_DIR \
-                                                                --batch_size $BATCH_SIZE \
-                                                                --test_prompts_path $TEST_PROMPTS_PATH
+BATCH_SIZE=128
+ 
+accelerate launch tools/generate_data_lumina.py \
+                        --ckpt_dir $MODEL_PATH \
+                        --ckpt_name $CKPT_NAME \
+                        --savedir $SAVE_DIR \
+                        --batch_size $BATCH_SIZE \
+                        --test_prompts_path $TEST_PROMPTS_PATH
