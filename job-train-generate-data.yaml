@@ -134,7 +134,7 @@ spec:
               ######## FOR LUMINA2.0
               echo "Generating data..."
               chmod +x scripts/generate_data_lumina.sh
-              ./scripts/generate_data_lumina.sh > logs_gen_lumina.txt 2>&1
+              ./scripts/generate_data_lumina.sh > logs_gen_train_data_lumina.txt 2>&1
 
           resources:
             limits:
