@@ -265,7 +265,33 @@ def load_sd35_lora_pipeline(model_path, device):
     )
     print("LoRA weights loaded successfully.")
 
-    return pipe, pipeline_constants
+    return pipe
+
+def load_lumina_pipeline(model_path, device):
+    print("!! Loading Lumina 2.0 with LoRA Pipeline")
+    base_model_id = "Alpha-VLLM/Lumina-Image-2.0"
+    lora_weights_filename = "lumina2_lora.safetensors"
+    dtype = torch.bfloat16
+
+    lora_weights_path = os.path.join(model_path, lora_weights_filename)
+
+    print(f"Loading base pipeline: {base_model_id}")
+    pipe = AutoPipelineForText2Image.from_pretrained(
+        base_model_id, 
+        torch_dtype=dtype).to(device)
+
+    print("Base pipeline loaded.")
+
+    print(f"Loading LoRA weights from: {lora_weights_path}")
+
+    pipe.load_lora_weights(
+        model_path,              # Directory path
+        weight_name=lora_weights_filename, # Specific filename
+        adapter_name="lumina2_medium_finetune_MIMIC" # Optional: Give your LoRA adapter a name
+    )
+    print("LoRA weights loaded successfully.")
+
+    return pipe
 
 
 def load_sana_pipeline(model_path):
@@ -293,10 +319,15 @@ def load_pipeline(model_name, model_path):
 
     # SD 3.5 Medium with LoRA
     elif(model_name == "SD-V3-5"):
-        pipe, pipeline_constants = load_sd35_lora_pipeline(model_path, device)
+        pipe = load_sd35_lora_pipeline(model_path, device)
 
+    # Sana Model
     elif(model_name == "sana"):
         pipe = load_sana_pipeline(model_path)
+        pipe = pipe.to(device)
+
+    elif(model_name == "lumina"):
+        pipe = load_lumina_pipeline(model_path, device)
         pipe = pipe.to(device)
 
     return pipe
@@ -388,6 +419,13 @@ def main(args):
         "sana": {
             "num_inference_steps": 20,
             "guidance_scale": 4.5,
+        },
+        "lumina": {
+            "num_inference_steps": 50,
+            "guidance_scale": 4,
+            "num_images_per_prompt": 1,
+            "cfg_trunc_ratio": 0.25,
+            "cfg_normalization": True,
         }
     }
 
