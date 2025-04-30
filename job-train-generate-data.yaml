@@ -27,8 +27,8 @@ spec:
                   - key: nvidia.com/gpu.product
                     operator: In
                     values:
-                      # - NVIDIA-H200
-                      - NVIDIA-A100-SXM4-80GB
+                      - NVIDIA-H200
+                      # - NVIDIA-A100-SXM4-80GB
       tolerations:
         - key: "eidf098"
           operator: "Equal"
