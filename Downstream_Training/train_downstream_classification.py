@@ -384,7 +384,7 @@ def main(args):
 
     model = model.to(device)
 
-    print(colored(f"{model}", "green"))
+    # print(colored(f"{model}", "green"))
     
     # Define loss function and optimizer
     criterion = nn.BCEWithLogitsLoss()
@@ -479,7 +479,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
     parser.add_argument("--epochs", type=int, default=10, help="Number of epochs")
     parser.add_argument("--va_epochs", type=int, default=10, help="Number of epochs for validation")
-    parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate")
+    parser.add_argument("--learning_rate", type=float, default=0.0001, help="Learning rate")
     parser.add_argument("--weight_decay", type=float, default=1e-5, help="Weight decay for regularization")
     parser.add_argument("--run", type=str, default="training", choices=['training', 'inference'], help="Run either training or inference.")
 
