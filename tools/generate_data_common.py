@@ -224,7 +224,7 @@ def load_pipeline(model_name, model_path):
 
     # SD 3.5 Medium with LoRA
     elif(model_name == "SD-V3-5"):
-        pipe = load_sd35_lora_pipeline(model_path, device)
+        pipe = load_sd35_lora_pipeline(model_path)
         pipe = pipe.to(device)
 
     # Sana Model
@@ -239,7 +239,7 @@ def load_pipeline(model_name, model_path):
 
     # Lumina2.0
     elif(model_name == "lumina"):
-        pipe = load_lumina_pipeline(model_path, device)
+        pipe = load_lumina_pipeline(model_path)
         pipe = pipe.to(device)
 
     return pipe
