@@ -8,8 +8,8 @@ TEST_PROMPTS_PATH="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LL
 
 BATCH_SIZE=128
 
-accelerate launch tools/generate_sd.py --model_path $MODEL_PATH \
-                                        --savedir $SAVE_DIR \
-                                        --batch_size $BATCH_SIZE \
-                                        --test_prompts_path $TEST_PROMPTS_PATH \
-                                        --extra_info $EXTRA_INFO \
+accelerate launch tools/generate_data_sana.py --model_path $MODEL_PATH \
+                                                --savedir $SAVE_DIR \
+                                                --batch_size $BATCH_SIZE \
+                                                --test_prompts_path $TEST_PROMPTS_PATH \
+                                                --extra_info $EXTRA_INFO \
