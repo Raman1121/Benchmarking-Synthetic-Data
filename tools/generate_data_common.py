@@ -233,7 +233,7 @@ def generate_synthetic_images(pipe, pipeline_constants, prompt, seed=42):
     image = pipe(
         prompt,
         **pipeline_constants,
-    ).images[0]
+    )
 
     return image
 
@@ -347,6 +347,7 @@ def main(args):
                 pipeline_constants=PIPELINE_CONSTANTS[args.model_name], 
                 prompt=PROMPTS
             )
+        outputs = outputs.images
 
         for id, image in zip(ALL_ID, outputs):
             filename = "SyntheticImg_{}.png".format(id)
