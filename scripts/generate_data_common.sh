@@ -44,7 +44,7 @@
 # export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
 # export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
-# export BATCH_SIZE=128
+# export BATCH_SIZE=96
 
 # python tools/generate_data_common.py \
 #     --model_path=$MODEL_PATH \
@@ -62,7 +62,7 @@
 # export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
 # export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
-# export BATCH_SIZE=128
+# export BATCH_SIZE=96
 
 # python tools/generate_data_common.py \
 #     --model_path=$MODEL_PATH \
@@ -80,7 +80,7 @@
 # export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
 # export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
-# export BATCH_SIZE=128
+# export BATCH_SIZE=96
 
 # python tools/generate_data_common.py \
 #     --model_path=$MODEL_PATH \
@@ -98,7 +98,7 @@
 # export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
 # export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
-# export BATCH_SIZE=128
+# export BATCH_SIZE=96
 
 # python tools/generate_data_common.py \
 #     --model_path=$MODEL_PATH \
@@ -134,7 +134,7 @@ export EXTRA_INFO="SD-V3-5"
 export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
 export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
-export BATCH_SIZE=128
+export BATCH_SIZE=96
 
 python tools/generate_data_common.py \
     --model_path=$MODEL_PATH \
