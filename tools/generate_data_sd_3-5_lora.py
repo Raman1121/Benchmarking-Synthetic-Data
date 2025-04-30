@@ -74,7 +74,8 @@ def main(args):
 
     # 4. Device selection
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    dtype = torch.float16 if torch.cuda.is_available() else torch.float32 # Use float16 for efficiency on GPU
+    # dtype = torch.float16 if torch.cuda.is_available() else torch.float32 # Use float16 for efficiency on GPU
+    dtype=torch.bfloat
 
     # --- Check if LoRA file exists ---
     lora_weights_path = os.path.join(lora_weights_dir, lora_weights_filename)
@@ -85,7 +86,7 @@ def main(args):
     print(f"Loading base pipeline: {base_model_id}")
     pipeline = AutoPipelineForText2Image.from_pretrained(
         base_model_id, 
-        torch_dtype=torch.float16).to(device)
+        torch_dtype=dtype).to(device)
 
     print("Base pipeline loaded.")
 

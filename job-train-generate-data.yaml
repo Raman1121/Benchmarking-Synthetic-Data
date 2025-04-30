@@ -128,14 +128,14 @@ spec:
 
               ######## FOR STABLE DIFFUSION 3.X
               # echo "Generating data..."
-              # python tools/generate_data_sd_3-5_lora.py --batch_size 32 --savedir /pvc/ai-toolkit/output/sd3-5_medium_lora/generated_images/ > logs_gen_test_data_sdv3_5.txt 2>&1
+              python tools/generate_data_sd_3-5_lora.py --batch_size 32 --savedir /pvc/ai-toolkit/output/sd3-5_medium_lora/generated_images/ > logs_gen_test_data_sdv3_5.txt 2>&1
               # python tools/generate_data_sd_3-5_lora.py --batch_size 32 --savedir /pvc/SYNTHETIC_IMAGES/SDV3_5 > logs_gen_train_data_sdv3_5.txt 2>&1
 
               ######## FOR LUMINA2.0
-              echo "Generating data..."
-              chmod +x scripts/generate_data_lumina.sh
+              # echo "Generating data..."
+              # chmod +x scripts/generate_data_lumina.sh
               # ./scripts/generate_data_lumina.sh > logs_gen_test_data_lumina.txt 2>&1
-              ./scripts/generate_data_lumina.sh > logs_gen_train_data_lumina.txt 2>&1
+              # ./scripts/generate_data_lumina.sh > logs_gen_train_data_lumina.txt 2>&1
 
           resources:
             limits:
