@@ -20,7 +20,8 @@ from diffusers import (
     StableDiffusionPipeline,
     AutoencoderKL,
     AutoPipelineForText2Image,
-    SanaPipeline
+    SanaPipeline,
+    PixArtSigmaPipeline
 )
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
 
@@ -191,6 +192,18 @@ def load_sana_pipeline(model_path):
 
     return pipe
 
+
+####################################
+# Pixart Sigma
+def load_pixart_pipeline(model_path):
+    pipe = PixArtSigmaPipeline.from_pretrained(
+            model_path,
+            torch_dtype=torch.float16,
+            use_safetensors=True,
+    )
+
+    return pipe
+
 """
 General Purpose Function to load the pipeline
 """
@@ -217,6 +230,11 @@ def load_pipeline(model_name, model_path):
     # Sana Model
     elif(model_name == "sana"):
         pipe = load_sana_pipeline(model_path)
+        pipe = pipe.to(device)
+
+    # Pixart Sigma Model
+    elif(model_name == "pixart_sigma"):
+        pipe = load_pixart_pipeline(model_path)
         pipe = pipe.to(device)
 
     # Lumina2.0
@@ -303,6 +321,10 @@ def main(args):
             "max_sequence_length": 512,
         },
         "sana": {
+            "num_inference_steps": 20,
+            "guidance_scale": 4.5,
+        },
+        "pixart_sigma": {
             "num_inference_steps": 20,
             "guidance_scale": 4.5,
         },

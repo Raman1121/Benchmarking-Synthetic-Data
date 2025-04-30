@@ -19,6 +19,8 @@ from diffusers import (
     StableDiffusionPipeline,
     AutoencoderKL,
     AutoPipelineForText2Image,
+    SanaPipeline,
+    PixArtSigmaPipeline
 )
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
 
@@ -170,12 +172,6 @@ def encode_image(model, processor, image):
 
 def load_radedit_pipeline():
 
-    pipeline_constants = {
-        "num_inference_steps": 100,
-        "guidance_scale": 7.5,
-        "num_images_per_prompt": 1,
-    }
-
     print("!! Loading RadEdit Pipeline")
     # 1. UNet
     unet = UNet2DConditionModel.from_pretrained("microsoft/radedit", subfolder="unet")
@@ -214,7 +210,7 @@ def load_radedit_pipeline():
         feature_extractor=None,
     )
 
-    return pipe, pipeline_constants
+    return pipe
 
 
 def load_sd_pipeline(model_path):
@@ -295,10 +291,20 @@ def load_lumina_pipeline(model_path, device):
 
 
 def load_sana_pipeline(model_path):
-    from diffusers import SanaPipeline
     pipe = SanaPipeline.from_pretrained(
         model_path,
         torch_dtype=torch.float16,
+    )
+
+    return pipe
+
+def load_pixart_pipeline(model_path):
+    weight_dtype = torch.float16
+
+    pipe = PixArtSigmaPipeline.from_pretrained(
+        model_path,
+        torch_dtype=weight_dtype,
+        use_safetensors=True,
     )
 
     return pipe
@@ -308,7 +314,7 @@ def load_pipeline(model_name, model_path):
 
     # RadEdit Model
     if model_name == "radedit":
-        pipe, pipeline_constants = load_radedit_pipeline()
+        pipe = load_radedit_pipeline()
         pipe = pipe.to(device)
 
     # SD V1/ V2.x Models
@@ -324,6 +330,11 @@ def load_pipeline(model_name, model_path):
     # Sana Model
     elif(model_name == "sana"):
         pipe = load_sana_pipeline(model_path)
+        pipe = pipe.to(device)
+
+    # Pixart Sigma
+    elif(model_name == "pixart_sigma"):
+        pipe = load_pixart_pipeline(model_path)
         pipe = pipe.to(device)
 
     elif(model_name == "lumina"):
@@ -417,6 +428,10 @@ def main(args):
             "max_sequence_length": 512,
         },
         "sana": {
+            "num_inference_steps": 20,
+            "guidance_scale": 4.5,
+        },
+        "pixart_sigma": {
             "num_inference_steps": 20,
             "guidance_scale": 4.5,
         },

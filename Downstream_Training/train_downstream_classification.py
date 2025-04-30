@@ -360,10 +360,9 @@ def main(args):
     
     print(f"Training set size: {len(image_paths_list_train)}")
     print(f"Validation set size: {len(image_paths_list_train_val)}")
+    print(f"Learning Rate: {args.learning_rate}")
     
     # Create datasets
-    # train_dataset = MIMICCXRDataset(train_df, image_col=args.image_col, transform=train_transform)
-    # val_dataset = MIMICCXRDataset(val_df, image_col=args.image_col, transform=val_transform)
     train_dataset = MIMICCXRDataset(image_paths_list_train, labels_list_train, transform=train_transform)
     val_dataset = MIMICCXRDataset(image_paths_list_train_val, labels_list_train_val, transform=val_transform)
 
@@ -377,6 +376,7 @@ def main(args):
     # Create model
     num_classes = 14  # Fixed for MIMIC-CXR dataset
     model = MultiLabelClassifier(args.model_name, num_classes, pretrained=True)
+    
     # Enable multi-GPU if available
     if torch.cuda.device_count() > 1:
         print(f"Using {torch.cuda.device_count()} GPUs with DataParallel")
@@ -400,11 +400,11 @@ def main(args):
     val_losses = []
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    os.makedirs(f"{script_dir}/checkpoints/{args.model_name}", exist_ok=True)
+    # os.makedirs(f"{script_dir}/checkpoints/{args.model_name}", exist_ok=True)
     os.makedirs(f"{script_dir}/training_results", exist_ok=True)
     
     print(f"Starting training for {args.epochs} epochs...")
-    # for epoch in tqdm(range(args.epochs), desc="Training Progress"):
+    
     for epoch in range(args.epochs):
         # Train
         start_time = time()
@@ -490,7 +490,7 @@ if __name__ == "__main__":
     parser.add_argument("--synthetic_image_dir", type=str, default=None, help="Base Directory containing synthetic images")
 
     parser.add_argument("--threshold", type=float, default=0.5, help="Threshold for binary classification")
-    parser.add_argument("--num_workers", type=int, default=4, help="Number of workers for data loading")
+    parser.add_argument("--num_workers", type=int, default=6, help="Number of workers for data loading")
     parser.add_argument("--stratify", action="store_true", help="Whether to stratify the train/val split")
 
     parser.add_argument("--debug", action="store_true", help="Run in debug mode with a small subset of data")
