@@ -52,17 +52,6 @@ def main(args):
 
     prompt_info_df = pd.DataFrame()
 
-    # if("V1-4" in args.model_path):
-    #     args.savedir = os.path.join(args.savedir, "SD_V1-4")
-    # elif("V1-5" in args.model_path):
-    #     args.savedir = os.path.join(args.savedir, "SD_V1-5")
-    # elif("V2" in args.model_path):
-    #     args.savedir = os.path.join(args.savedir, "SD_V2")
-    # elif("V2-1" in args.model_path):
-    #     args.savedir = os.path.join(args.savedir, "SD_V2-1")
-    # else:
-    #     raise ValueError("Model path not recognized. Please check the model path.")
-
     if(args.extra_info is not None):
         # args.savedir = args.savedir + "_" + args.extra_info
         args.savedir = os.path.join(args.savedir, args.extra_info)
@@ -132,9 +121,9 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="diffusion inference")
     parser.add_argument("--model_path", type=str, default=None)
-    parser.add_argument("--test_prompts_path", default="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_train_prompts_20K.txt")
+    parser.add_argument("--test_prompts_path", default="/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/ANNOTATED_CSV_FILES/mimic_test_prompts.txt")
     parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--savedir", type=str, default="/pvc/SYNTHETIC_IMAGES/")
+    parser.add_argument("--savedir", type=str, default=None)
     parser.add_argument("--extra_info", type=str, default=None)
     parser.add_argument(
         "--debug",
