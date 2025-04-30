@@ -9,7 +9,7 @@ export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
 export SUBSET=300
 
-export BATCH_SIZE=128
+export BATCH_SIZE=64
 
 python tools/generate_data_common.py \
     --model_path=$MODEL_PATH \
