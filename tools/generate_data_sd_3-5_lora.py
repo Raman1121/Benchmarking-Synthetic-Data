@@ -75,7 +75,7 @@ def main(args):
     # 4. Device selection
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # dtype = torch.float16 if torch.cuda.is_available() else torch.float32 # Use float16 for efficiency on GPU
-    dtype=torch.bfloat
+    dtype = torch.bfloat16
 
     # --- Check if LoRA file exists ---
     lora_weights_path = os.path.join(lora_weights_dir, lora_weights_filename)
