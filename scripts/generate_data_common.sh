@@ -44,7 +44,7 @@
 # export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
 # export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
-# export BATCH_SIZE=80
+# export BATCH_SIZE=64
 
 # python tools/generate_data_common.py \
 #     --model_path=$MODEL_PATH \
@@ -55,14 +55,14 @@
 #     --batch_size=$BATCH_SIZE \
 
 #################### SD-V1-5 ####################
-export MODEL_PATH="/data/Benchmarking-Synthetic-Data/OUTPUT_MIMIC_SD_V1_5/IID/512/SD-V1-5_IID_512"
+export MODEL_PATH="/pvc/Benchmarking-Synthetic-Data/OUTPUT_MIMIC_SD_V1_5/IID/512/SD-V1-5_IID_512"
 export MODEL_NAME="SD-V1-5"
 export EXTRA_INFO="SD-V1-5"
 
 export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
 export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
-export BATCH_SIZE=80
+export BATCH_SIZE=64
 
 python tools/generate_data_common.py \
     --model_path=$MODEL_PATH \
