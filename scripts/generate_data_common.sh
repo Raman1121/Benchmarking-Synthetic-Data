@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export MODEL_PATH="/pvc/Sana/output/Sana_Diffusers/"
-export MODEL_NAME="Sana"
-export EXTRA_INFO="Sana"
+export MODEL_NAME="sana"
+export EXTRA_INFO="sana"
 
 export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
 export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
