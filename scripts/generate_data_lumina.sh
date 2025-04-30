@@ -7,7 +7,7 @@ MODEL_PATH="/pvc/ai-toolkit/output/lumina2_lora"
 SAVE_DIR=${MODEL_PATH}/generated_images
 mkdir -p $SAVE_DIR
 
-BATCH_SIZE=64
+BATCH_SIZE=32
  
 accelerate launch tools/generate_data_lumina.py \
                         --ckpt_dir $MODEL_PATH \
