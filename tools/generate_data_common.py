@@ -247,7 +247,12 @@ class DummyDataset(Dataset):
 
     def __getitem__(self, idx):
         
-        return self.df.iloc[idx]
+        sample = {
+                'id': self.df.iloc[idx]['id'],
+                'prompt': self.df.iloc[idx]['annotated_prompt']
+                }
+        
+        return sample
 
 def main(args):
 
@@ -335,7 +340,7 @@ def main(args):
     print("Generating Images...")
     for batch in tqdm(dataloader):
         ALL_ID = batch['id']     
-        PROMPTS = batch["annotated_prompt"]
+        PROMPTS = batch["prompt"]
 
         outputs = generate_synthetic_images(
                 pipe=pipe, 
