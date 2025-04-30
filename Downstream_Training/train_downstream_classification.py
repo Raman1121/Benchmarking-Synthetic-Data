@@ -333,6 +333,11 @@ def main(args):
         df['chexpert_labels'] = df['chexpert_labels'].apply(get_labels_dict_from_string)
     except:
         pass
+
+    if(args.debug):
+        print("DEBUGGING!!!")
+        print(f"Creating a subset of {args.debug_samples} samples")
+        df = df.sample(n=args.debug_samples, random_state=42).reset_index(drop=True)
     
     """
     Prepare training data according to the training setting
@@ -342,11 +347,6 @@ def main(args):
     label_cols = list(df['chexpert_labels'].iloc[0].keys())
 
     # import pdb; pdb.set_trace()
-
-    if(args.debug):
-        print("DEBUGGING!!!")
-        print(f"Creating a subset of {args.debug_samples} samples")
-        df = df.sample(n=args.debug_samples, random_state=42).reset_index(drop=True)
     
     
     # Split the data
