@@ -9,4 +9,5 @@ python Downstream_Training/downstream_inference.py \
         --real_image_dir=$REAL_IMAGE_DIR \
         --synthetic_image_dir=$SYNTHETIC_IMG_DIR \
         --save_predictions \
-        --extra_info=$EXTRA_INFO
+        --extra_info=$EXTRA_INFO \
+        --t2i_model=$T2I_MODEL

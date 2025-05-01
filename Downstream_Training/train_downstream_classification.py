@@ -402,7 +402,9 @@ def main(args):
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # os.makedirs(f"{script_dir}/checkpoints/{args.model_name}", exist_ok=True)
-    os.makedirs(f"{script_dir}/training_results", exist_ok=True)
+    args.output_dir = os.path.join(script_dir, "training_results", args.t2i_model)
+    os.makedirs(args.output_dir, exist_ok=True)
+    # os.makedirs(f"{script_dir}/training_results/{args.t2i_model}", exist_ok=True)
     
     print(f"Starting training for {args.epochs} epochs...")
     
@@ -440,7 +442,7 @@ def main(args):
                 'optimizer_state_dict': optimizer.state_dict(),
                 'val_loss': val_loss,
                 'metrics': {k: v for k, v in metrics.items() if k != 'auc_per_class'},
-            }, f"{script_dir}/checkpoints/{args.model_name}_{args.extra_info}.pth")
+            }, f"{script_dir}/checkpoints/{args.model_name}_{args.extra_info}_{args.t2i_model}.pth")
             print("Saved best model")
         
         # Update scheduler
@@ -454,7 +456,9 @@ def main(args):
     plt.ylabel('Loss')
     plt.title('Training and Validation Loss')
     plt.legend()
-    plt.savefig(f"{script_dir}/training_results/{args.model_name}_loss_curves.png")
+    filename = f"{args.model_name}_loss_curves.png"
+    plt.savefig(os.path.join(args.output_dir, filename))
+    # plt.savefig(f"{script_dir}/training_results/{args.model_name}_loss_curves.png")
     
     # Print final best metrics
     print("\nBest Validation Performance:")
@@ -471,7 +475,9 @@ def main(args):
 
     # Wriwte the best metrics to a CSV file
     results_df = pd.DataFrame([best_metrics])
-    results_df.to_csv(f"{script_dir}/training_results/{args.model_name}_{args.extra_info}.csv", index=False)
+    filename = f"{args.model_name}_{args.extra_info}.csv"
+    results_df.to_csv(os.path.join(args.output_dir, filename), index=False)
+    # results_df.to_csv(f"{script_dir}/training_results/{args.model_name}_{args.extra_info}.csv", index=False)
 
 
 if __name__ == "__main__":
@@ -500,6 +506,7 @@ if __name__ == "__main__":
     parser.add_argument("--extra_info", type=str, default=None, help="Extra info about an experiment")
 
     parser.add_argument("--training_setting", type=str, default=None, help="Training setting") 
+    parser.add_argument("--t2i_model", type=str, default=None, help="Evaluation using the synthetic data from which T2I model.")
     
     args = parser.parse_args()
     main(args)

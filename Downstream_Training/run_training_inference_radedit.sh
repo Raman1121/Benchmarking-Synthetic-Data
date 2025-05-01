@@ -39,7 +39,7 @@ export export EXTRA_INFO=$TRAINING_SETTING
 
 export EPOCHS=10
 
-export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}.pth"
+export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}_${T2I_MODEL}.pth"
 
 echo "Training the model..."
 chmod +x Downstream_Training/run_training.sh
@@ -65,7 +65,7 @@ export EXTRA_INFO=$TRAINING_SETTING
 
 export EPOCHS=10
 
-export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}.pth"
+export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}_${T2I_MODEL}.pth"
 
 echo "Training the model..."
 chmod +x Downstream_Training/run_training.sh
@@ -92,7 +92,7 @@ export EXTRA_INFO=$TRAINING_SETTING
 export EPOCHS=20
 
 
-export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}.pth"
+export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}_${T2I_MODEL}.pth"
 
 echo "Training the model..."
 chmod +x Downstream_Training/run_training.sh

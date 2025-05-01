@@ -365,7 +365,7 @@ def main(args):
     
     # Create output directory if it doesn't exist
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    args.output_dir = os.path.join(current_dir, args.output_dir, args.extra_info, args.model_name) if args.extra_info else os.path.join(current_dir, args.output_dir, args.model_name)
+    args.output_dir = os.path.join(current_dir, args.output_dir, args.extra_info, args.model_name) if args.extra_info else os.path.join(current_dir, args.output_dir, args.model_name, args.t2i_model)
     os.makedirs(args.output_dir, exist_ok=True)
 
     print(colored(f"Created Results Directory at {args.output_dir}", "green"))
@@ -378,7 +378,7 @@ def main(args):
     
     # Save metrics to output directory
     metrics_df = pd.DataFrame([metrics])
-    metrics_df.to_csv(os.path.join(args.output_dir, 'metrics.csv'), index=False)
+    metrics_df.to_csv(os.path.join(args.output_dir, f'metrics.csv_{args.t2i_model}'), index=False)
     
     # Create per-class metrics dataframe
     per_class_df = pd.DataFrame({
@@ -388,7 +388,7 @@ def main(args):
         'f1': per_class_metrics['f1'],
         'auc': per_class_metrics['auc']
     })
-    per_class_df.to_csv(os.path.join(args.output_dir, 'per_class_metrics.csv'), index=False)
+    per_class_df.to_csv(os.path.join(args.output_dir, f'per_class_metrics_{args.t2i_model}.csv'), index=False)
     
     # Print metrics
     print(colored("\nTest Metrics:", "cyan"))
@@ -412,7 +412,7 @@ def main(args):
         labels, 
         predictions, 
         label_cols, 
-        os.path.join(args.output_dir, 'confusion_matrices.png')
+        os.path.join(args.output_dir, f'confusion_matrices_{args.t2i_model}.png')
     )
     
     # Plot ROC curves
@@ -420,7 +420,7 @@ def main(args):
         labels, 
         outputs, 
         label_cols, 
-        os.path.join(args.output_dir, 'roc_curves.png')
+        os.path.join(args.output_dir, f'roc_curves_{args.t2i_model}.png')
     )
     
     # Save predictions if requested
@@ -434,8 +434,8 @@ def main(args):
             pred_df[f'{col}_pred'] = predictions[:, i]
         
         # Save to CSV
-        pred_df.to_csv(os.path.join(args.output_dir, 'predictions.csv'), index=False)
-        print(colored(f"Predictions saved to {os.path.join(args.output_dir, 'predictions.csv')}", "green"))
+        pred_df.to_csv(os.path.join(args.output_dir, f'predictions_{args.t2i_model}.csv'), index=False)
+        print(colored(f"Predictions saved to {os.path.join(args.output_dir, f'predictions_{args.t2i_model}.csv')}", "green"))
     
     print(colored(f"All results saved to {args.output_dir}", "green"))
 
@@ -462,6 +462,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug_samples", type=int, default=500, help="Number of samples to use in debug mode")
 
     parser.add_argument("--extra_info", type=str, default=None, help="Extra info about an experiment")
+    parser.add_argument("--t2i_model", type=str, default=None, help="Evaluation using the synthetic data from which T2I model.")
     
     args = parser.parse_args()
     main(args)
