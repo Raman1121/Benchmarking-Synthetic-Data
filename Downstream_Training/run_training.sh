@@ -9,3 +9,4 @@ python Downstream_Training/train_downstream_classification.py \
         --synthetic_image_dir=$SYNTHETIC_IMG_DIR \
         --extra_info=$EXTRA_INFO \
         --training_setting=$TRAINING_SETTING \
+        --debug
