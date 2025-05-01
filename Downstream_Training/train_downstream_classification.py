@@ -401,7 +401,8 @@ def main(args):
     val_losses = []
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    # os.makedirs(f"{script_dir}/checkpoints/{args.model_name}", exist_ok=True)
+    
+    os.makedirs(f"{script_dir}/checkpoints/", exist_ok=True)
     args.output_dir = os.path.join(script_dir, "training_results", args.t2i_model)
     os.makedirs(args.output_dir, exist_ok=True)
     # os.makedirs(f"{script_dir}/training_results/{args.t2i_model}", exist_ok=True)
