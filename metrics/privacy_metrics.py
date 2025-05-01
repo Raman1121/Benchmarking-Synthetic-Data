@@ -19,8 +19,6 @@ from diffusers import (
     StableDiffusionPipeline,
     AutoencoderKL,
     AutoPipelineForText2Image,
-    SanaPipeline,
-    PixArtSigmaPipeline
 )
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
 
@@ -56,6 +54,9 @@ def parse_args():
     )
     parser.add_argument(
         "--results_savedir", type=str, default="/pvc/PatientReIdentification", help="Directory where results would be saved."
+    )
+    parser.add_argument(
+        "--extra_info", type=str, default=None, help="Extra info to save with the results."
     )
     return parser.parse_args()
 
@@ -238,14 +239,6 @@ def load_sd35_lora_pipeline(model_path, device):
     lora_weights_filename = "sd3-5_medium_lora.safetensors"
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-    #### Pipeline specific constants
-    pipeline_constants = {
-        "num_inference_steps": 40,
-        "guidance_scale": 4.5,
-        "num_images_per_prompt": 1,
-        "max_sequence_length": 512,
-    }
-
     lora_weights_path = os.path.join(model_path, lora_weights_filename)
 
     print(f"Loading base pipeline: {base_model_id}")
@@ -260,6 +253,28 @@ def load_sd35_lora_pipeline(model_path, device):
         adapter_name="sd3_medium_finetune_MIMIC",  # Optional: Give your LoRA adapter a name
     )
     print("LoRA weights loaded successfully.")
+
+    return pipe
+
+
+def load_sana_pipeline(model_path):
+    from diffusers import SanaPipeline
+    pipe = SanaPipeline.from_pretrained(
+        model_path,
+        torch_dtype=torch.float16,
+    )
+
+    return pipe
+
+def load_pixart_pipeline(model_path):
+    from diffusers import PixArtSigmaPipeline
+    weight_dtype = torch.float16
+
+    pipe = PixArtSigmaPipeline.from_pretrained(
+        model_path,
+        torch_dtype=weight_dtype,
+        use_safetensors=True,
+    )
 
     return pipe
 
@@ -289,26 +304,6 @@ def load_lumina_pipeline(model_path, device):
 
     return pipe
 
-
-def load_sana_pipeline(model_path):
-    pipe = SanaPipeline.from_pretrained(
-        model_path,
-        torch_dtype=torch.float16,
-    )
-
-    return pipe
-
-def load_pixart_pipeline(model_path):
-    weight_dtype = torch.float16
-
-    pipe = PixArtSigmaPipeline.from_pretrained(
-        model_path,
-        torch_dtype=weight_dtype,
-        use_safetensors=True,
-    )
-
-    return pipe
-
 def load_pipeline(model_name, model_path):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -327,7 +322,7 @@ def load_pipeline(model_name, model_path):
     elif(model_name == "SD-V3-5"):
         pipe = load_sd35_lora_pipeline(model_path, device)
 
-    # Sana Model
+    # Sana 0.6B (512)
     elif(model_name == "sana"):
         pipe = load_sana_pipeline(model_path)
         pipe = pipe.to(device)
@@ -434,13 +429,6 @@ def main(args):
         "pixart_sigma": {
             "num_inference_steps": 20,
             "guidance_scale": 4.5,
-        },
-        "lumina": {
-            "num_inference_steps": 50,
-            "guidance_scale": 4,
-            "num_images_per_prompt": 1,
-            "cfg_trunc_ratio": 0.25,
-            "cfg_normalization": True,
         }
     }
 
@@ -502,7 +490,7 @@ def main(args):
     ALL_MIN_LATENT_DISTANCES = []
 
     # LOAD SD Pipeline (RadEdit)
-    print("Loading SD Pipeline")
+    print(f"Loading {args.model_name} Pipeline")
     pipe = load_pipeline(args.model_name, args.model_path)
     print("Done!")
 
@@ -595,11 +583,6 @@ def main(args):
         ALL_PROMPTS.append(_PROMPT)
         print("\n")
 
-        # except:
-        #     print("No file was found for the prompt: ", _PROMPT)
-        #     ERROR_PROMPTS.append(_PROMPT)
-        #     import pdb; pdb.set_trace()
-
     # Create a dataframe of results of all scores
 
     results_df = pd.DataFrame()
@@ -617,12 +600,16 @@ def main(args):
     os.makedirs(args.results_savedir, exist_ok=True)
 
     try:
-        ## Saving results in a CSV file
-        results_name = (
-            f"privacy_metrics_{args.model_name}.csv"
-            if args.num_shards == 0
-            else f"reid_scores_shard_{args.shard}.csv"
-        )
+        results_name = f"privacy_metrics_{args.model_name}.csv"
+
+        # If shards used
+        if(args.num_shards == 0):
+            results_name = f"privacy_metrics_{args.model_name}_shard_{args.shard}.csv"
+
+        # If given extra info
+        if(args.extra_info):
+            results_name = f"privacy_metrics_{args.model_name}_{args.extra_info}.csv"
+        
         errors_name = (
             f"error.csv" if args.num_shards == 0 else f"error_shard_{args.shard}.csv"
         )
