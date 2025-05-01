@@ -15,10 +15,11 @@ import rrg_eval.f1radgraph
 from rrg_eval.f1radgraph import F1RadGraphv2
 from rrg_eval.factuality_utils import CONDITIONS
 
-try:
-    import wandb
-except ImportError:
-    wandb = None
+# try:
+#     import wandb
+# except ImportError:
+#     wandb = None
+wandb = None
 
 
 random.seed(3)

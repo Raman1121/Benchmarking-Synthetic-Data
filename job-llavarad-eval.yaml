@@ -114,16 +114,16 @@ spec:
               MAX_JOBS=4  pip install -vvv flash-attn==2.5.8 --no-build-isolation || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
               echo "flash-attn install command finished."
 
-              echo "Running EVAL!!!"
-              chmod +x ./scripts/eval.sh
-              ./scripts/eval.sh > log_llavarad_eval.txt 2>&1
+              # echo "Running EVAL!!!"
+              # chmod +x ./scripts/eval.sh
+              # ./scripts/eval.sh > log_llavarad_eval.txt 2>&1
 
-              echo "Running EVAL done!!!"
-              mv mimic_cxr_preds.jsonl llava/eval/rrg_eval/mimic_cxr_preds.jsonl
+              # echo "Running EVAL done!!!"
+              # mv mimic_cxr_preds.jsonl llava/eval/rrg_eval/mimic_cxr_preds.jsonl
 
               echo "Calculating Results and Metrics!"
               cd llava/eval/rrg_eval
-              python run.py mimic_cxr_preds.jsonl > log_llavarad_metrics.txt 2>&1
+              python run.py mimic_cxr_preds.jsonl > log_llavarad_metrics2.txt 2>&1
 
           resources:
             limits:
