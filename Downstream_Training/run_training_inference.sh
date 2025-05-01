@@ -5,7 +5,7 @@ echo "RUNNING EXPERIMENT: ALL REAL DATA"
 export MODEL="resnet50" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
 export T2I_MODEL="Sana"
 export BATCH_SIZE=758
-export TRAIN_CSV="/data/SYNTHETIC_IMAGES_NEW/sana/"
+export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/Sana/generations_with_metadata.csv"
 export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv"
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/Sana/generations_with_metadata.csv"
