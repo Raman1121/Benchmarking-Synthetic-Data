@@ -655,7 +655,8 @@ class LazySupervisedDataset(Dataset):
     def lengths(self):
         length_list = []
         for sample in self.list_data_dict:
-            img_tokens = 128 if 'image' in sample else 0
+            # img_tokens = 128 if 'image' in sample else 0
+            img_tokens = 128 if 'image' in sample.columns or 'synthetic_filename' in sample.columns else 0
             length_list.append(sum(len(conv['value'].split()) for conv in sample['conversations']) + img_tokens)
         return length_list
 
@@ -664,7 +665,9 @@ class LazySupervisedDataset(Dataset):
         length_list = []
         for sample in self.list_data_dict:
             cur_len = sum(len(conv['value'].split()) for conv in sample['conversations'])
-            cur_len = cur_len if 'image' in sample else -cur_len
+            # cur_len = cur_len if 'image' in sample else -cur_len
+            cur_len = cur_len if 'image' in sample or 'synthetic_filename' in sample else -cur_len
+            
             length_list.append(cur_len)
         return length_list
 
@@ -673,26 +676,15 @@ class LazySupervisedDataset(Dataset):
         if isinstance(i, int):
             sources = [sources]
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
-        if 'image' in sources[0]:
-            image_file = self.list_data_dict[i]['image']
+        if 'image' in sources[0] or 'synthetic_filename' in sources[0]:
+            try:
+                image_file = self.list_data_dict[i]['image']
+            except:
+                image_file = self.list_data_dict[i]['synthetic_filename']
             # image_type = self.list_data_dict[i]['img_type']
             image_folder = self.data_args.image_folder
             # syn_image_folder = self.data_args.syn_image_folder
             processor = self.data_args.image_processor
-
-            """
-            # Real and synthetic images are present in different directories
-            # Real images are in the original MIMIC folder structure
-            # Synthetic images are in 'Benchmarking-Synthetic-Data/assets/synthetic_images/'
-            """
-            # if(image_type == 'real'):
-            #     if(not self.finetune_only_with_synthetic_data):
-            #         # We are finetuning on both real and synthetic data, hence, read the real image
-            #         image = open_image_with_retry(os.path.join(image_folder, image_file))
-            #     else:
-            #         pass
-            # if(image_type == 'synthetic'):
-            #     image = open_image_with_retry(os.path.join(syn_image_folder, image_file))
 
             # FIXME: Currently, hardcoding the logic to finetune only on synthetic data
             image = open_image_with_retry(os.path.join(image_folder, image_file))
@@ -725,13 +717,13 @@ class LazySupervisedDataset(Dataset):
         data_dict = preprocess(
             sources,
             self.tokenizer,
-            has_image=('image' in self.list_data_dict[i]))
+            has_image=('image' in self.list_data_dict[i] or 'synthetic_filename' in self.list_data_dict[i]))
         if isinstance(i, int):
             data_dict = dict(input_ids=data_dict["input_ids"][0],
                              labels=data_dict["labels"][0])
 
         # image exist in the data
-        if 'image' in self.list_data_dict[i]:
+        if 'image' in self.list_data_dict[i] or 'synthetic_filename' in self.list_data_dict[i]:
             data_dict['image'] = image
         elif self.data_args.is_multimodal:
             # image does not exist in the data, but the model is multimodal

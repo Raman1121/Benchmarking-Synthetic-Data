@@ -101,6 +101,7 @@ spec:
               python3 -m pip install --user lit
               pip install xtermcolor
               pip install termcolor
+              pip install pandas
 
               echo "Installing LLaVA-Rad..."
               cd Downstream_Training/LLaVA-Rad
@@ -117,16 +118,17 @@ spec:
               MAX_JOBS=4  pip install -vvv flash-attn==2.5.8 --no-build-isolation > /pvc/flash_attn_install.log 2>&1 || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
               echo "flash-attn install command finished." 
 
-              ############# Pre-Training Step (Alignment)
+              ############# Pre-Training Step (Alignment) #############
               # echo "Beginning pre-training..."
-              chmod +x scripts/pretrain.sh
-              bash scripts/pretrain.sh > logs_llavarad_pretraining.txt 2>&1
+              # chmod +x scripts/pretrain.sh
+              # bash scripts/pretrain.sh > logs_llavarad_pretraining.txt 2>&1
 
-              # echo "Beginning training..."
+              ############# LoRA Fine-Tuning Step #############
+              echo "Beginning training..."
               # Make sure the script exists at this path inside the PVC copy
-              # chmod +x scripts/finetune_lora_synthetic_data.sh
-              # bash scripts/finetune_lora_synthetic_data.sh > logs_llavarad_training.txt 2>&1
-              # echo "Training script finished."
+              chmod +x scripts/finetune_lora_synthetic_data.sh
+              bash scripts/finetune_lora_synthetic_data.sh > logs_llavarad_training.txt 2>&1
+              echo "Training script finished."
 
               # echo "Running EVAL!!!"
               # chmod +x ./scripts/eval.sh

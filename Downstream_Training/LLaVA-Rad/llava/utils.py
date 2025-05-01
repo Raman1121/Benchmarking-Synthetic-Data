@@ -2,6 +2,7 @@ import datetime
 import logging
 import logging.handlers
 import os
+import pandas as pd
 import sys
 import json
 
@@ -129,7 +130,14 @@ def pretty_print_semaphore(semaphore):
 
 def data_loader_default(data_path):
     logging.info("using the default loader.")
-    dataset = json.load(open(data_path, "r"))
+    if(data_path.endswith(".json")):
+        dataset = json.load(open(data_path, "r"))
+    elif(data_path.endswith(".csv")):
+        dataset = pd.read_csv(data_path)
+        dataset = dataset.to_dict(orient='records')
+    else:
+        raise NotImplementedError("Data loading logic only implemented for '.json' and '.csv' files.")
+
     logging.info(f"loaded {len(dataset)} samples.")
     return dataset
 
@@ -167,6 +175,15 @@ def data_loader_mimic_cxr_all_views_findings(data_path):
 
 def data_loader_mimic_reason_findings(data_path, split):
     logging.info(f"using the MIMIC-CXR loader: MIMIC {split}.")
+
+    ## TODO: Add support for .csv files as well
+    # if(data_path.endswith('.json')):
+    #     with open(data_path) as f:
+    #         dataset = json.load(f)
+    # elif(data_path.endswith('.csv')):
+    #     data = pd.read_csv(data_path)
+    #     dataset = data.to_dict(orient='records')
+
     with open(data_path) as f:
         dataset = json.load(f)
     ret = []
