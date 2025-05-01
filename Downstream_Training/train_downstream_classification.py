@@ -337,6 +337,7 @@ def main(args):
     if(args.debug):
         print("DEBUGGING!!!")
         print(f"Creating a subset of {args.debug_samples} samples")
+        args.epochs = 3
         df = df.sample(n=args.debug_samples, random_state=42).reset_index(drop=True)
     
     """
