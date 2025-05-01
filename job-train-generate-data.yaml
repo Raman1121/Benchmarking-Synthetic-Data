@@ -27,8 +27,8 @@ spec:
                   - key: nvidia.com/gpu.product
                     operator: In
                     values:
-                      # - NVIDIA-H200
-                      - NVIDIA-A100-SXM4-80GB
+                      - NVIDIA-H200
+                      # - NVIDIA-A100-SXM4-80GB
       tolerations:
         - key: "eidf098"
           operator: "Equal"
@@ -124,7 +124,7 @@ spec:
               ######## COMMON GENERATION PIPELINE
               echo "Generating data ..."
               chmod +x scripts/generate_data_common.sh
-              ./scripts/generate_data_common.sh > logs_gen_train_sdv2.txt 2>&1
+              ./scripts/generate_data_common.sh > logs_gen_train_lumina.txt 2>&1
 
           resources:
             limits:
