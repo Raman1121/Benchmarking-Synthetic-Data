@@ -10,4 +10,3 @@ python Downstream_Training/train_downstream_classification.py \
         --extra_info=$EXTRA_INFO \
         --training_setting=$TRAINING_SETTING \
         --t2i_model=$T2I_MODEL \
-        --debug

@@ -121,6 +121,10 @@ spec:
               chmod +x Downstream_Training/run_training_inference_radedit.sh
               ./Downstream_Training/run_training_inference_radedit.sh
 
+              echo "Training the model... (SDV-1-4)"
+              chmod +x Downstream_Training/run_training_inference_sdv14.sh
+              ./Downstream_Training/run_training_inference_sdv14.sh
+
           resources:
             limits:
               nvidia.com/gpu: "1"
