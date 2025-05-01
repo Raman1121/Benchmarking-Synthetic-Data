@@ -145,8 +145,8 @@ spec:
 
           resources:
             limits:
-              nvidia.com/gpu: "2"
-              cpu: "12" # Might need more CPU depending on data loading/preprocessing
+              nvidia.com/gpu: "1"
+              cpu: "8" # Might need more CPU depending on data loading/preprocessing
               memory: "96Gi" # Ensure this is sufficient
           volumeMounts:
             - name: workspace # Mount read-only if code isn't modified?

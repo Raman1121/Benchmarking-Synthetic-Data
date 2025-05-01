@@ -6,7 +6,7 @@
 PROMPT_VERSION=v1
 
 model_base=lmsys/vicuna-7b-v1.5
-output_dir="${1:-./checkpoints_synthetic_radedit}"
+output_dir="${1:-./checkpoints_test}"
 
 PROJECTOR="/pvc/mm_projector.bin" # generated using pretrain.sh
 vision_tower="biomedclip_cxr_518"
@@ -17,11 +17,11 @@ vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 
 ################## Synthetic Data ##################
 # data_path=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
-data_path=/pvc/SYNTHETIC_IMAGES_NEW/radedit/generations_with_metadata.csv
+data_path=/pvc/MIMIC_SPLITS/chat_train_MIMIC_CXR_syn.json
 # loader="mimic_train_findings"
 loader="default"
 # image_folder=/pvc/Benchmarking-Synthetic-Data/assets/synthetic_images/
-image_folder=/pvc/SYNTHETIC_IMAGES_NEW/radedit/
+image_folder=/pvc/SYNTHETIC_IMAGES/Sana/ckpt20/
 
 ################## Synthetic Data ##################
 

@@ -315,6 +315,9 @@ def preprocess_multimodal(
 
     for source in sources:
         for sentence in source:
+            print("SENTENCE!!!!")
+            print(sentence)
+            print(sentence['value'])
             if DEFAULT_IMAGE_TOKEN in sentence['value']:
                 sentence['value'] = sentence['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
                 sentence['value'] = DEFAULT_IMAGE_TOKEN + '\n' + sentence['value']
