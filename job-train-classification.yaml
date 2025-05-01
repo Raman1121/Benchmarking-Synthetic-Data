@@ -113,6 +113,14 @@ spec:
               chmod +x Downstream_Training/run_training_inference.sh
               ./Downstream_Training/run_training_inference.sh > logs_ds_classification.txt 2>&1
 
+              echo "Training the model... (Pixart)"
+              chmod +x Downstream_Training/run_training_inference_pixart.sh
+              ./Downstream_Training/run_training_inference_pixart.sh
+
+              echo "Training the model... (RadEdit)"
+              chmod +x Downstream_Training/run_training_inference_radedit.sh
+              ./Downstream_Training/run_training_inference_radedit.sh
+
           resources:
             limits:
               nvidia.com/gpu: "1"
