@@ -3,12 +3,12 @@
 ########################################### 1. Training on 20K REAL samples (baseline) ###########################################
 echo "RUNNING EXPERIMENT: ALL REAL DATA"
 export MODEL="resnet50" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
-export T2I_MODEL="Sana"
+export T2I_MODEL="sana"
 export BATCH_SIZE=758
-export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/Sana/generations_with_metadata.csv"
+export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/sana/generations_with_metadata.csv"
 export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv"
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
-export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/Sana/generations_with_metadata.csv"
+export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana/generations_with_metadata.csv"
 export TRAINING_SETTING="all_original"
 export EXTRA_INFO=$TRAINING_SETTING
 export EPOCHS=10
@@ -28,12 +28,12 @@ echo "Inference Finished!!"
 ########################################### 2. Training on 20K Synthetic samples ###########################################
 echo "RUNNING EXPERIMENT: ALL SYNTHETIC DATA"
 export MODEL="resnet50" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
-export T2I_MODEL="Sana"
+export T2I_MODEL="sana"
 export BATCH_SIZE=758
-export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/Sana/generations_with_metadata.csv"
+export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/sana/generations_with_metadata.csv"
 export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv"
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
-export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/Sana"
+export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana"
 export TRAINING_SETTING="all_synthetic"
 export export EXTRA_INFO=$TRAINING_SETTING
 
@@ -54,12 +54,12 @@ echo "Inference Finished!!"
 ########################################### 3. Training on 20K Real + Synthetic samples ###########################################
 echo "RUNNING EXPERIMENT: MIXED DATA"
 export MODEL="resnet50" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
-export T2I_MODEL="Sana"
+export T2I_MODEL="sana"
 export BATCH_SIZE=758
-export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/Sana/generations_with_metadata.csv"
+export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/sana/generations_with_metadata.csv"
 export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv"
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
-export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/Sana"
+export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana"
 export TRAINING_SETTING="mixed"
 export EXTRA_INFO=$TRAINING_SETTING
 
@@ -80,12 +80,12 @@ echo "Inference Finished!!"
 ########################################### 4. Training on 40K Real + Synthetic samples ###########################################
 echo "RUNNING EXPERIMENT: AUGMENTED DATA"
 export MODEL="resnet50" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
-export T2I_MODEL="Sana"
+export T2I_MODEL="sana"
 export BATCH_SIZE=758
-export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/Sana/generations_with_metadata.csv"
+export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/sana/generations_with_metadata.csv"
 export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv"
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
-export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/Sana"
+export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana"
 export TRAINING_SETTING="augmented"
 export EXTRA_INFO=$TRAINING_SETTING
 
