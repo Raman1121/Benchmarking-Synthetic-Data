@@ -15,11 +15,11 @@ prediction_file=$prediction_dir/test
 run_name="${4:-llavarad}"
 
 
-query_file=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_test_MIMIC_CXR_all_gpt4extract_rulebased_v1_SUBSET.json
+query_file=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_test_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
 image_folder=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
 
-# loader="mimic_test_findings"
-loader="default"
+loader="mimic_test_findings"
+# loader="default"
 conv_mode="v1"
 
 CHUNKS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
