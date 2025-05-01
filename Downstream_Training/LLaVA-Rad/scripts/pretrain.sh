@@ -3,13 +3,13 @@
 # Uncomment and set the following variables correspondingly to run this script:
 
 model_base=lmsys/vicuna-7b-v1.5
-output_dir="${1:-./checkpoints}"
+output_dir="${1:-./checkpoints_new}"
 
-# data_path=/PATH_TO/physionet.org/files/llava-rad-mimic-cxr-annotation/1.0.0/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+data_path=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
 
 loader="mimic_train_findings"
 
-# image_folder=/PATH_TO/physionet.org/files/mimic-cxr-jpg/2.0.0/files
+image_folder=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
 
 
 ################## Run name ##################
@@ -28,7 +28,7 @@ echo $run_name > run_name
 
 # Global batch size should be 256
 
-WANDB_RUN_ID="llava-pt-$(date +%Y%m%d%H%M%S)" WANDB_PROJECT="llava" WANDB_RUN_GROUP=pre-train \
+# WANDB_RUN_ID="llava-pt-$(date +%Y%m%d%H%M%S)" WANDB_PROJECT="llava" WANDB_RUN_GROUP=pre-train \
     deepspeed llava/train/train_mem.py \
     --deepspeed ./scripts/zero2.json \
     --model_name_or_path ${model_base} \
@@ -64,5 +64,5 @@ WANDB_RUN_ID="llava-pt-$(date +%Y%m%d%H%M%S)" WANDB_PROJECT="llava" WANDB_RUN_GR
     --gradient_checkpointing True \
     --dataloader_num_workers 4 \
     --lazy_preprocess True \
-    --report_to wandb \
+    --report_to tensorboard \
     --run_name ${run_name}
