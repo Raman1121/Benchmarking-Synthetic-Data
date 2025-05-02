@@ -10,7 +10,7 @@ mkdir -p $SAVE_DIR
 
 BATCH_SIZE=64
  
-accelerate launch tools/generate_data_lumina.py \
+accelerate launch tools/generate_data_flux.py \
                         --ckpt_dir $MODEL_PATH \
                         --ckpt_name $CKPT_NAME \
                         --savedir $SAVE_DIR \
