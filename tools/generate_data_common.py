@@ -273,7 +273,7 @@ def load_pipeline(model_name, model_path):
     
     # Flux
     elif(model_name == "flux"):
-        pipe = load_flux_pipeline(model_path, device)
+        pipe = load_flux_pipeline(model_path)
         pipe = pipe.to(device)
 
     else:
