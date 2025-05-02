@@ -5,7 +5,7 @@ set -o pipefail
 
 model_base=lmsys/vicuna-7b-v1.5
 # model_path=microsoft/llava-rad
-model_path=checkpoints_test/biomedclip_cxr_518-lora-3e-1e-4-20250502011814
+model_path=checkpoints_test/llavarad_lora_synthetic_sana
 
 model_base="${1:-$model_base}"
 model_path="${2:-$model_path}"
