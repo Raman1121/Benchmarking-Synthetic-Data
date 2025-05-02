@@ -21,7 +21,8 @@ from diffusers import (
     AutoencoderKL,
     AutoPipelineForText2Image,
     SanaPipeline,
-    PixArtSigmaPipeline
+    PixArtSigmaPipeline,
+    FluxPipeline
 )
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
 
@@ -204,6 +205,16 @@ def load_pixart_pipeline(model_path):
 
     return pipe
 
+####################################
+# Flux-Dev
+def load_flux_pipeline(model_path):
+    print("!! Loading Flux Pipeline")
+    pipe = FluxPipeline.from_pretrained(model_path, torch_dtype=torch.bfloat16)
+    pipe.enable_model_cpu_offload() 
+
+    return pipe
+
+
 """
 General Purpose Function to load the pipeline
 """
@@ -241,6 +252,14 @@ def load_pipeline(model_name, model_path):
     elif(model_name == "lumina"):
         pipe = load_lumina_pipeline(model_path)
         pipe = pipe.to(device)
+    
+    # Flux
+    elif(model_name == "flux"):
+        pipe = load_flux_pipeline(model_path)
+        pipe = pipe.to(device)
+
+    else:
+        raise NotImplementedError("Support for pipeline not implemented")
 
     return pipe
 
@@ -334,6 +353,12 @@ def main(args):
             "num_images_per_prompt": 1,
             "cfg_trunc_ratio": 0.25,
             "cfg_normalization": True,
+        },
+        "flux":{
+            "num_inference_steps": 50,
+            "guidance_scale": 3.5,
+            "height": 1024,
+            "width": 1024
         }
     }
 

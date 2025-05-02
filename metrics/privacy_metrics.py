@@ -19,9 +19,9 @@ from diffusers import (
     StableDiffusionPipeline,
     AutoencoderKL,
     AutoPipelineForText2Image,
+    FluxPipeline
 )
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Calculate privacy metrics.")
@@ -54,6 +54,9 @@ def parse_args():
     )
     parser.add_argument(
         "--results_savedir", type=str, default="/pvc/PatientReIdentification", help="Directory where results would be saved."
+    )
+    parser.add_argument(
+        "--extra_info", type=str, default=None, help="Extra info to save with the results."
     )
     parser.add_argument(
         "--extra_info", type=str, default=None, help="Extra info to save with the results."
@@ -304,6 +307,14 @@ def load_lumina_pipeline(model_path, device):
 
     return pipe
 
+
+def load_flux_pipeline(model_path):
+    print("!! Loading Flux Pipeline")
+    pipe = FluxPipeline.from_pretrained(model_path, torch_dtype=torch.bfloat16)
+    pipe.enable_model_cpu_offload() 
+
+    return pipe
+
 def load_pipeline(model_name, model_path):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -335,6 +346,13 @@ def load_pipeline(model_name, model_path):
     elif(model_name == "lumina"):
         pipe = load_lumina_pipeline(model_path, device)
         pipe = pipe.to(device)
+
+    elif(model_name == "flux"):
+        pipe = load_flux_pipeline(model_path)
+        pipe = pipe.to(device)
+
+    else:
+        raise NotImplementedError("Support for pipeline not implemented")
 
     return pipe
 
@@ -429,6 +447,12 @@ def main(args):
         "pixart_sigma": {
             "num_inference_steps": 20,
             "guidance_scale": 4.5,
+        },
+        "flux":{
+            "num_inference_steps": 50,
+            "guidance_scale": 3.5,
+            "height": 512,
+            "width": 512
         }
     }
 
@@ -453,7 +477,12 @@ def main(args):
     df_combined = df_train
 
     # Selecting only unique prompts
-    _df = df_combined.drop_duplicates(subset=["annotated_prompt"]).reset_index(
+    _df = df_combined.drop_duplicates(subset=[args.prompt_col]).reset_index(
+        drop=True
+    )
+
+    # Removing prompts with nans
+    _df = _df.dropna(subset=[args.prompt_col]).reset_index(
         drop=True
     )
 
@@ -509,7 +538,7 @@ def main(args):
 
     for i in tqdm(range(len(_df))):
         _PATH = _df["path"][i]
-        _PROMPT = _df["annotated_prompt"][i]
+        _PROMPT = _df[args.prompt_col][i]
         generated_images = []
         reid_scores = []
         pixel_distances = []
