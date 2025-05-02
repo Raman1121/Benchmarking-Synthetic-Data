@@ -50,6 +50,9 @@ def parse_args():
         "--real_img_dir", type=str, help="Directory containing real images."
     )
     parser.add_argument(
+        "--prompt_col", type=str, default="annotated_prompt", help="Column denoting prompts in the CSV."
+    )
+    parser.add_argument(
         "--gen_savedir", type=str, default="/pvc/PatientReIdentification", help="Directory where generations would be saved."
     )
     parser.add_argument(
