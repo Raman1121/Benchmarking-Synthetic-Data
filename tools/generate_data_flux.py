@@ -104,10 +104,8 @@ def main(args):
         outputs = pipeline(
                 batch,
                 num_inference_steps=50,
-                guidance_scale=4,
+                guidance_scale=3.5,
                 num_images_per_prompt=1,
-                cfg_trunc_ratio=0.25,
-                cfg_normalization=True,
             )
         ALL_PROMPTS.extend(batch)
 
