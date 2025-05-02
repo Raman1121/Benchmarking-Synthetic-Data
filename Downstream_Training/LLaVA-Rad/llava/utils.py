@@ -164,6 +164,7 @@ def data_loader_default(data_path):
 
         # 'Conversations column might be enclosed in strings'
         if(type(dataset[0]['conversations'][0]) == str):
+            print("!!! Cleaning the dataset")
             clean_conversations_inplace(dataset)
     else:
         raise NotImplementedError("Data loading logic only implemented for '.json' and '.csv' files.")
