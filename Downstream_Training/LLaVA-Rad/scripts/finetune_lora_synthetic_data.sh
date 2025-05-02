@@ -43,8 +43,9 @@ echo "Learning rate: $lr"
 
 
 # Batch size is set for 4-GPU machines.
-    deepspeed llava/train/train_mem.py \
-    --deepspeed /pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/scripts/zero2.json \
+    # deepspeed llava/train/train_mem.py \
+    # --deepspeed /pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/scripts/zero2.json \
+    python -m llava/train/train_mem.py \
     --lora_enable True \
     --lora_alpha 128 \
     --model_name_or_path ${model_base} \
