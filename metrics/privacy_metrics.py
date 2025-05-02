@@ -502,6 +502,8 @@ def main(args):
     print("Done!")
 
     GEN_SAVE_DIR = os.path.join(args.gen_savedir, args.model_name)
+    if(args.extra_info):
+        GEN_SAVE_DIR = os.path.join(args.gen_savedir, args.model_name + "_" + args.extra_info)
     os.makedirs(GEN_SAVE_DIR, exist_ok=True)
     print("Generations across multiple prompts and seeds would be saved at: ", GEN_SAVE_DIR)
 
