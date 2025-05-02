@@ -4,13 +4,15 @@ set -e
 set -o pipefail
 
 model_base=lmsys/vicuna-7b-v1.5
-model_path=microsoft/llava-rad
-# model_path=checkpoints/biomedclip_cxr_518-lora-5e-1e-4-20250423024541
+# model_path=microsoft/llava-rad
+model_path=checkpoints_test/biomedclip_cxr_518-lora-3e-1e-4-20250502011814
 
 model_base="${1:-$model_base}"
 model_path="${2:-$model_path}"
 prediction_dir="${3:-results/llavarad}"
 prediction_file=$prediction_dir/test
+
+extra_info="sana"
 
 run_name="${4:-llavarad}"
 
@@ -60,7 +62,7 @@ python -m llava.eval.model_mimic_cxr \
 wait
 
 echo "All done!"
-cat ${prediction_file}_*.jsonl > mimic_cxr_preds.jsonl
+cat ${prediction_file}_*.jsonl > mimic_cxr_preds_${extra_info}.jsonl
 
 # pushd llava/eval/rrg_eval
 # WANDB_PROJECT="llava" WANDB_RUN_ID="llava-eval-$(date +%Y%m%d%H%M%S)" WANDB_RUN_GROUP=evaluate CUDA_VISIBLE_DEVICES=0 \
