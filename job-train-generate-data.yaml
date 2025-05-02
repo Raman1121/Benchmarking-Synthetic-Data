@@ -122,9 +122,14 @@ spec:
               ./scripts/hf-login.sh
 
               ######## COMMON GENERATION PIPELINE
+              # echo "Generating data ..."
+              # chmod +x scripts/generate_data_common.sh
+              # ./scripts/generate_data_common.sh > logs_gen_train_flux.txt 2>&1
+
+              ##### FLUX
               echo "Generating data ..."
-              chmod +x scripts/generate_data_common.sh
-              ./scripts/generate_data_common.sh > logs_gen_train_flux.txt 2>&1
+              chmod +x scripts/generate_data_flux.sh
+              ./scripts/generate_data_flux.sh > logs_gen_test_flux.txt 2>&1
 
           resources:
             limits:
