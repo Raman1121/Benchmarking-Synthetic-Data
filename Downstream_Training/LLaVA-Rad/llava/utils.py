@@ -5,7 +5,7 @@ import os
 import pandas as pd
 import sys
 import json
-
+import ast
 import requests
 
 from llava.constants import LOGDIR
@@ -127,6 +127,32 @@ def pretty_print_semaphore(semaphore):
         return "None"
     return f"Semaphore(value={semaphore._value}, locked={semaphore.locked()})"
 
+def clean_conversations_inplace(dataset):
+    if not isinstance(dataset, list):
+        print("Error: Input must be a list of dictionaries.")
+        return
+
+    for index, item in enumerate(dataset):
+        # Check if the item is a dictionary and has the key
+        if isinstance(item, dict) and 'conversations' in item:
+            conversation_data = item['conversations']
+
+            # Check if it's actually a string that needs parsing
+            if isinstance(conversation_data, str):
+                try:
+                    parsed_value = ast.literal_eval(conversation_data)
+
+                    if isinstance(parsed_value, list):
+                         
+                         item['conversations'] = parsed_value
+                    else:
+                        print(f"Warning: Parsed 'conversations' string at index {index} did not result in a list. Type was {type(parsed_value)}. Keeping original string.")
+                except (ValueError, SyntaxError, TypeError) as e:
+                    print(f"Warning: Could not parse 'conversations' string at index {index} due to {type(e).__name__}: {e}. Keeping original string.")
+
+        elif not isinstance(item, dict):
+             print(f"Warning: Item at index {index} is not a dictionary. Skipping.")
+
 
 def data_loader_default(data_path):
     logging.info("using the default loader.")
@@ -135,6 +161,10 @@ def data_loader_default(data_path):
     elif(data_path.endswith(".csv")):
         dataset = pd.read_csv(data_path)
         dataset = dataset.to_dict(orient='records')
+
+        # 'Conversations column might be enclosed in strings'
+        if(type(dataset[0]['conversations'][0]) == str):
+            clean_conversations_inplace(dataset)
     else:
         raise NotImplementedError("Data loading logic only implemented for '.json' and '.csv' files.")
 
