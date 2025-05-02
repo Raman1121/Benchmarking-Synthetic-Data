@@ -58,9 +58,6 @@ def parse_args():
     parser.add_argument(
         "--extra_info", type=str, default=None, help="Extra info to save with the results."
     )
-    parser.add_argument(
-        "--extra_info", type=str, default=None, help="Extra info to save with the results."
-    )
     return parser.parse_args()
 
 
