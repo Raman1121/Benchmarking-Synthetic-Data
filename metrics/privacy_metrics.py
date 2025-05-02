@@ -235,7 +235,7 @@ def load_sd_pipeline(model_path):
     return pipe
 
 
-def load_sd35_lora_pipeline(model_path, device):
+def load_sd35_lora_pipeline(model_path):
 
     print("!! Loading Stable Diffusion 3.5 Medium with LoRA Pipeline")
     base_model_id = "stabilityai/stable-diffusion-3.5-medium"
@@ -247,7 +247,7 @@ def load_sd35_lora_pipeline(model_path, device):
     print(f"Loading base pipeline: {base_model_id}")
     pipe = AutoPipelineForText2Image.from_pretrained(
         base_model_id, torch_dtype=torch.float16
-    ).to(device)
+    )
 
     print(f"Loading LoRA weights from: {lora_weights_path}")
     pipe.load_lora_weights(
@@ -281,7 +281,7 @@ def load_pixart_pipeline(model_path):
 
     return pipe
 
-def load_lumina_pipeline(model_path, device):
+def load_lumina_pipeline(model_path):
     print("!! Loading Lumina 2.0 with LoRA Pipeline")
     base_model_id = "Alpha-VLLM/Lumina-Image-2.0"
     lora_weights_filename = "lumina2_lora.safetensors"
@@ -292,7 +292,7 @@ def load_lumina_pipeline(model_path, device):
     print(f"Loading base pipeline: {base_model_id}")
     pipe = AutoPipelineForText2Image.from_pretrained(
         base_model_id, 
-        torch_dtype=dtype).to(device)
+        torch_dtype=dtype)
 
     print("Base pipeline loaded.")
 
@@ -310,8 +310,27 @@ def load_lumina_pipeline(model_path, device):
 
 def load_flux_pipeline(model_path):
     print("!! Loading Flux Pipeline")
-    pipe = FluxPipeline.from_pretrained(model_path, torch_dtype=torch.bfloat16)
-    pipe.enable_model_cpu_offload() 
+    base_model_id = "black-forest-labs/FLUX.1-dev"
+    lora_weights_filename = "flux_lora.safetensors"
+    dtype=torch.bfloat16
+
+    lora_weights_path = os.path.join(model_path, lora_weights_filename)
+
+    print(f"Loading base pipeline: {base_model_id}")
+    pipe = AutoPipelineForText2Image.from_pretrained(
+        base_model_id, 
+        torch_dtype=dtype)
+
+    print("Base pipeline loaded.")
+
+    print(f"Loading LoRA weights from: {lora_weights_path}")
+
+    pipe.load_lora_weights(
+        model_path,              # Directory path
+        weight_name=lora_weights_filename, # Specific filename
+        adapter_name="lumina2_medium_finetune_MIMIC" # Optional: Give your LoRA adapter a name
+    )
+    print("LoRA weights loaded successfully.")
 
     return pipe
 
@@ -332,6 +351,7 @@ def load_pipeline(model_name, model_path):
     # SD 3.5 Medium with LoRA
     elif(model_name == "SD-V3-5"):
         pipe = load_sd35_lora_pipeline(model_path, device)
+        pipe = pipe.to(device)
 
     # Sana 0.6B (512)
     elif(model_name == "sana"):
@@ -344,7 +364,7 @@ def load_pipeline(model_name, model_path):
         pipe = pipe.to(device)
 
     elif(model_name == "lumina"):
-        pipe = load_lumina_pipeline(model_path, device)
+        pipe = load_lumina_pipeline(model_path)
         pipe = pipe.to(device)
 
     elif(model_name == "flux"):

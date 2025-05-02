@@ -209,11 +209,29 @@ def load_pixart_pipeline(model_path):
 # Flux-Dev
 def load_flux_pipeline(model_path):
     print("!! Loading Flux Pipeline")
-    pipe = FluxPipeline.from_pretrained(model_path, torch_dtype=torch.bfloat16)
-    pipe.enable_model_cpu_offload() 
+    base_model_id = "black-forest-labs/FLUX.1-dev"
+    lora_weights_filename = "flux_lora.safetensors"
+    dtype=torch.bfloat16
+
+    lora_weights_path = os.path.join(model_path, lora_weights_filename)
+
+    print(f"Loading base pipeline: {base_model_id}")
+    pipe = AutoPipelineForText2Image.from_pretrained(
+        base_model_id, 
+        torch_dtype=dtype)
+
+    print("Base pipeline loaded.")
+
+    print(f"Loading LoRA weights from: {lora_weights_path}")
+
+    pipe.load_lora_weights(
+        model_path,              # Directory path
+        weight_name=lora_weights_filename, # Specific filename
+        adapter_name="lumina2_medium_finetune_MIMIC" # Optional: Give your LoRA adapter a name
+    )
+    print("LoRA weights loaded successfully.")
 
     return pipe
-
 
 """
 General Purpose Function to load the pipeline
@@ -255,7 +273,7 @@ def load_pipeline(model_name, model_path):
     
     # Flux
     elif(model_name == "flux"):
-        pipe = load_flux_pipeline(model_path)
+        pipe = load_flux_pipeline(model_path, device)
         pipe = pipe.to(device)
 
     else:

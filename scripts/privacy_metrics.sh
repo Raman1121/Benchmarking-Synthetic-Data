@@ -7,9 +7,9 @@ export REAL_IMG_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 
 export GEN_SAVEDIR="/pvc/PatientReIdentification/Generations/"
 
-export MODEL_PATH="/pvc/Benchmarking-Synthetic-Data/OUTPUT_MIMIC_SD_V1_5_Impressions/IID/512/SD-V1-5_IID_512"
-export MODEL_NAME="SD-V1-5"
-export EXTRA_INFO="impressions"
+export MODEL_PATH="/pvc/ai-toolkit/output/flux_lora"
+export MODEL_NAME="flux"
+# export EXTRA_INFO=
 # export MODEL_PATH="/pvc/ai-toolkit/output/lumina2_lora"
 # export MODEL_NAME="lumina"
 
@@ -25,4 +25,4 @@ python metrics/privacy_metrics.py \
     --gen_savedir=$GEN_SAVEDIR \
     --results_savedir=$RESULTS_SAVEDIR \
     --subset=$SUBSET \
-    --extra_info=$EXTRA_INFO
+    # --extra_info=$EXTRA_INFO
