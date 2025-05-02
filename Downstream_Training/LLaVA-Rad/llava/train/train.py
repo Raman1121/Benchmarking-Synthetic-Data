@@ -315,8 +315,6 @@ def preprocess_multimodal(
 
     for source in sources:
         for sentence in source:
-            print("SENTENCE!!!!")
-            print(sentence)
             
             if DEFAULT_IMAGE_TOKEN in sentence['value']:
                 sentence['value'] = sentence['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
@@ -661,7 +659,7 @@ class LazySupervisedDataset(Dataset):
             # img_tokens = 128 if 'image' in sample else 0
             # img_tokens = 128 if 'image' in sample.columns or 'synthetic_filename' in sample.columns else 0
             img_tokens = 128 if 'synthetic_filename' in sample.columns else 0
-            print("Image tokens: ", img_tokens)
+            
             length_list.append(sum(len(conv['value'].split()) for conv in sample['conversations']) + img_tokens)
         return length_list
 
@@ -689,7 +687,7 @@ class LazySupervisedDataset(Dataset):
             # except:
             #     image_file = self.list_data_dict[i]['synthetic_filename']
             image_file = self.list_data_dict[i]['synthetic_filename']
-            print("Image File: ", image_file)
+            
             # image_type = self.list_data_dict[i]['img_type']
             image_folder = self.data_args.image_folder
             # syn_image_folder = self.data_args.syn_image_folder
@@ -728,7 +726,7 @@ class LazySupervisedDataset(Dataset):
             self.tokenizer,
             has_image=('synthetic_filename' in self.list_data_dict[i]))
         has_image = ('synthetic_filename' in self.list_data_dict[i])
-        print("Has Image: ", has_image)
+        
         if isinstance(i, int):
             data_dict = dict(input_ids=data_dict["input_ids"][0],
                              labels=data_dict["labels"][0])
