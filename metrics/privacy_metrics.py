@@ -471,8 +471,6 @@ def main(args):
         "flux":{
             "num_inference_steps": 50,
             "guidance_scale": 3.5,
-            "height": 512,
-            "width": 512
         }
     }
 
