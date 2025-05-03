@@ -995,7 +995,9 @@ def train():
     model.config.use_cache = True
 
     print("Modifying the save dir...")
-    training_args.output_dir = os.path.join(training_args.output_dir, training_args.t2i_model, f"percentage_{data_args.data_percentage}")
+    parent_dir = os.path.dirname(training_args.output_dir)
+    new_output_dir = os.path.join(parent_dir, training_args.t2i_model, f"percentage_{data_args.data_percentage}")
+    training_args.output_dir = new_output_dir
     print("Now saving checkpoints to: ", training_args.output_dir)
 
     if training_args.lora_enable:
