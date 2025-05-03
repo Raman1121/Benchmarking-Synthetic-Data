@@ -993,7 +993,7 @@ def train():
 
     print("Modifying the save dir...")
     parent_dir = os.path.dirname(training_args.output_dir)
-    new_output_dir = os.path.join(parent_dir, training_args.t2i_model, f"percentage_{data_args.data_percentage}")
+    new_output_dir = os.path.join(parent_dir, "llavarad_lora_" + training_args.t2i_model + f"_percentage_{data_args.data_percentage}")
     training_args.output_dir = new_output_dir
     print("Now saving checkpoints to: ", training_args.output_dir)
 

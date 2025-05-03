@@ -18,7 +18,7 @@ vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 ################## Synthetic Data Details ##################
 T2I_MODEL="sana"
 export num_samples=5
-export DATA_PERCENTAGE=0.0005
+export DATA_PERCENTAGE=0.005
 
 data_path=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL/generations_with_metadata.csv
 loader="default"
