@@ -30,20 +30,21 @@ image_folder=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL
 ################## Run name ##################
 epoch="${2:-3}"
 bsz="${3:-16}"
-# epoch=5
-# bsz=48
 
 
 lr="1e-4"
 schedule="lora-${epoch}e"
 export run_name="${vision_tower}-${schedule}-${lr}-$(date +%Y%m%d%H%M%S)"
 export num_samples=5
+export DATA_PERCENTAGE=100
 
 echo $run_name > run_name
 echo "Epoch: $epoch"
 echo "Batch size: $bsz"
 echo "Learning rate: $lr"
 echo "Num Samples: $num_samples"
+echo "T2I Model: $T2I_MODEL"
+echo "Data Percentage: $DATA_PERCENTAGE"
 ################## Run name ##################
 
 
@@ -89,4 +90,6 @@ echo "Num Samples: $num_samples"
     --dataloader_num_workers 4 \
     --report_to tensorboard \
     --run_name ${run_name} \
-    --num_samples 5
+    --num_samples 5 \
+    --t2i_model ${T2I_MODEL} \
+    --data_percentage ${DATA_PERCENTAGE}

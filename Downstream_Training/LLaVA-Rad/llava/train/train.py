@@ -82,7 +82,7 @@ class DataArguments:
         metadata={"help": "Number of samples for training."}
     )
     data_percentage: int = field(
-        default=10,
+        default=100,
         metadata={"help": "Percentage of synthetic data to use for training."}
     )
 
@@ -122,7 +122,7 @@ class TrainingArguments(transformers.TrainingArguments):
     group_by_modality_length: bool = field(default=False)
 
     t2i_model: str = field(
-        default=None,
+        default='sana',
         metadata={"help": "Which T2I model generated the synthetic data."}
     )
 
