@@ -77,7 +77,10 @@ class DataArguments:
     image_aspect_ratio: str = 'square'
     image_grid_pinpoints: Optional[str] = field(default=None)
     finetune_only_with_synthetic_data: bool = False
-    num_samples: Optional[int] = None
+    num_samples: int = field(
+        default=None,
+        metadata={"help": "Number of samples for training."}
+    )
 
 
 @dataclass
@@ -651,7 +654,7 @@ class LazySupervisedDataset(Dataset):
         if len(self.list_data_dict) == 0:
             raise ValueError(f"Dataset {data_path} is empty.")
         
-        if(self.num_samples):
+        if(self.num_samples is not None):
             print(f"Creating a subset of {self.num_samples} samples.")
             keys = list(self.list_data_dict.keys())[:self.num_samples]
             self.list_data_dict = {key: self.list_data_dict[key] for key in keys}
