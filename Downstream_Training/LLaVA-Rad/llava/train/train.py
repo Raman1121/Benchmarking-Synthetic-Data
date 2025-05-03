@@ -656,8 +656,10 @@ class LazySupervisedDataset(Dataset):
         
         if(self.num_samples is not None):
             print(f"Creating a subset of {self.num_samples} samples.")
-            keys = list(self.list_data_dict.keys())[:self.num_samples]
-            self.list_data_dict = {key: self.list_data_dict[key] for key in keys}
+            # keys = list(self.list_data_dict.keys())[:self.num_samples]
+            # self.list_data_dict = {key: self.list_data_dict[key] for key in keys}
+
+            self.list_data_dict = self.list_data_dict[:self.num_samples]
 
     def __len__(self):
         return len(self.list_data_dict)
