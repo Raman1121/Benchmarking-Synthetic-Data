@@ -81,7 +81,7 @@ class DataArguments:
     #     default=None,
     #     metadata={"help": "Number of samples for training."}
     # )
-    data_percentage: int = field(
+    data_percentage: float = field(
         default=100,
         metadata={"help": "Percentage of synthetic data to use for training."}
     )
