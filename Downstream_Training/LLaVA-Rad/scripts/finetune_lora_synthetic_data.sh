@@ -87,6 +87,6 @@ echo "Num Samples: $num_samples"
     --dataloader_num_workers 4 \
     --report_to tensorboard \
     --run_name ${run_name} \
-    --num_samples=$NUM_SAMPLES
+    --num_samples 5
 
     # NOTE: # Remove "--finetune_only_with_synthetic_data True" line to finetune on both real and synthetic data
