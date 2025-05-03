@@ -77,10 +77,10 @@ class DataArguments:
     image_aspect_ratio: str = 'square'
     image_grid_pinpoints: Optional[str] = field(default=None)
     finetune_only_with_synthetic_data: bool = False
-    num_samples: int = field(
-        default=None,
-        metadata={"help": "Number of samples for training."}
-    )
+    # num_samples: int = field(
+    #     default=None,
+    #     metadata={"help": "Number of samples for training."}
+    # )
     data_percentage: int = field(
         default=100,
         metadata={"help": "Percentage of synthetic data to use for training."}
@@ -657,24 +657,21 @@ class LazySupervisedDataset(Dataset):
         self.list_data_dict = list_data_dict
         self.data_args = data_args
         self.finetune_only_with_synthetic_data = data_args.finetune_only_with_synthetic_data
-        self.num_samples = data_args.num_samples
+        # self.num_samples = data_args.num_samples
         self.data_percentage = data_args.data_percentage
 
         print("LazySupervisedDataset: ", len(self.list_data_dict))
         if len(self.list_data_dict) == 0:
             raise ValueError(f"Dataset {data_path} is empty.")
         
-        if(self.num_samples is not None):
-            print(f"Creating a subset of {self.num_samples} samples.")
-            # keys = list(self.list_data_dict.keys())[:self.num_samples]
-            # self.list_data_dict = {key: self.list_data_dict[key] for key in keys}
+        # if(self.num_samples is not None):
+        #     print(f"Creating a subset of {self.num_samples} samples.")
+        #     self.list_data_dict = self.list_data_dict[:self.num_samples]
 
-            self.list_data_dict = self.list_data_dict[:self.num_samples]
-
-        # if(self.data_percentage is not None):
-        #     num_samples = int(len(len(self.list_data_dict)))
-        #     self.list_data_dict = self.list_data_dict[:num_samples]
-        #     print(f"Using {self.data_percentage}% of {len(self.list_data_dict)} samples --> {num_samples}")
+        if(self.data_percentage is not None):
+            num_samples = int(len(self.list_data_dict)*self.data_percentage*0.01)
+            self.list_data_dict = self.list_data_dict[:num_samples]
+            print(f"Using {self.data_percentage}% of {len(self.list_data_dict)} samples --> {num_samples}")
 
     def __len__(self):
         return len(self.list_data_dict)
@@ -1014,6 +1011,8 @@ def train():
     else:
         safe_save_model_for_hf_trainer(trainer=trainer,
                                        output_dir=training_args.output_dir)
+        
+    print("Done!!")
 
 
 if __name__ == "__main__":

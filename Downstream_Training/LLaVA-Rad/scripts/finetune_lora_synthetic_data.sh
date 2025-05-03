@@ -15,17 +15,14 @@ vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 ################## VICUNA ##################
 
 
-################## Synthetic Data ##################
-# data_path=/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+################## Synthetic Data Details ##################
 T2I_MODEL="sana"
-
+export num_samples=5
+export DATA_PERCENTAGE=0.0005
 
 data_path=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL/generations_with_metadata.csv
-# loader="mimic_train_findings"
 loader="default"
-# image_folder=/pvc/Benchmarking-Synthetic-Data/assets/synthetic_images/
 image_folder=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL
-
 
 ################## Run name ##################
 epoch="${2:-3}"
@@ -35,8 +32,6 @@ bsz="${3:-16}"
 lr="1e-4"
 schedule="lora-${epoch}e"
 export run_name="${vision_tower}-${schedule}-${lr}-$(date +%Y%m%d%H%M%S)"
-export num_samples=5
-export DATA_PERCENTAGE=100
 
 echo $run_name > run_name
 echo "Epoch: $epoch"
@@ -90,6 +85,5 @@ echo "Data Percentage: $DATA_PERCENTAGE"
     --dataloader_num_workers 4 \
     --report_to tensorboard \
     --run_name ${run_name} \
-    --num_samples 5 \
     --t2i_model ${T2I_MODEL} \
     --data_percentage ${DATA_PERCENTAGE}
