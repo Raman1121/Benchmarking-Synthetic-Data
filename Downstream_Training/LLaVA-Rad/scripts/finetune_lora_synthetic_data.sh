@@ -87,3 +87,43 @@ echo "Data Percentage: $DATA_PERCENTAGE"
     --run_name ${run_name} \
     --t2i_model ${T2I_MODEL} \
     --data_percentage ${DATA_PERCENTAGE}
+
+
+################################# INFERENCE #################################
+
+model_base=lmsys/vicuna-7b-v1.5
+model_path="${output_dir}/llavarad_lora_${T2I_MODEL}_percentage_${DATA_PERCENTAGE}"
+
+prediction_dir="${model_path}/results/llavarad"
+prediction_file=$prediction_dir/test
+
+run_name="llavarad"
+query_file=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_test_MIMIC_CXR_all_gpt4extract_rulebased_v1.json
+image_folder=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/files
+
+loader="mimic_test_findings"
+conv_mode="v1"
+
+CHUNKS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
+CHUNK_IDX=0
+NUM_CHUNKS=1
+
+python -m llava.eval.model_mimic_cxr \
+        --query_file ${query_file} \
+        --loader ${loader} \
+        --image_folder ${image_folder} \
+        --conv_mode ${conv_mode} \
+        --prediction_file ${prediction_file}_${idx}.jsonl \
+        --temperature 0 \
+        --model_path ${model_path} \
+        --model_base ${model_base} \
+        --chunk_idx ${CHUNK_IDX} \
+        --num_chunks ${NUM_CHUNKS} \
+        --batch_size 32 \
+        --group_by_length &
+
+
+wait
+echo "All done!"
+
+cat ${prediction_file}_*.jsonl > "$prediction_dir/mimic_cxr_preds_${T2I_MODEL}_percentage_${DATA_PERCENTAGE}.jsonl"
