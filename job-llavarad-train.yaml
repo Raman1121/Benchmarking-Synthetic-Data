@@ -130,6 +130,11 @@ spec:
               bash scripts/finetune_lora_synthetic_data.sh > logs_llavarad_training.txt 2>&1
               echo "Training script finished."
 
+              ############# Renaming #############
+              echo "Renaming"
+              chmod +x scripts/rename_file.sh
+              ./scripts/rename_file.sh
+
               # echo "Running EVAL!!!"
               # chmod +x ./scripts/eval.sh
               # ./scripts/eval.sh > logs_llavarad_eval.txt 2>&1
@@ -140,8 +145,6 @@ spec:
               # cd llava/eval/rrg_eval
               # python run.py mimic_cxr_preds.jsonl > logs_llavarad_metrics.txt 2>&1
               # echo "Results and metrics calculation done!"
-
-              sleep 1000
 
           resources:
             limits:

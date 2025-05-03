@@ -81,6 +81,10 @@ class DataArguments:
         default=None,
         metadata={"help": "Number of samples for training."}
     )
+    data_percentage: int = field(
+        default=10,
+        metadata={"help": "Percentage of synthetic data to use for training."}
+    )
 
 
 @dataclass
@@ -116,6 +120,11 @@ class TrainingArguments(transformers.TrainingArguments):
     lora_weight_path: str = ""
     lora_bias: str = "none"
     group_by_modality_length: bool = field(default=False)
+
+    t2i_model: str = field(
+        default=None,
+        metadata={"help": "Which T2I model generated the synthetic data."}
+    )
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):
@@ -649,6 +658,7 @@ class LazySupervisedDataset(Dataset):
         self.data_args = data_args
         self.finetune_only_with_synthetic_data = data_args.finetune_only_with_synthetic_data
         self.num_samples = data_args.num_samples
+        self.data_percentage = data_args.data_percentage
 
         print("LazySupervisedDataset: ", len(self.list_data_dict))
         if len(self.list_data_dict) == 0:
@@ -660,6 +670,11 @@ class LazySupervisedDataset(Dataset):
             # self.list_data_dict = {key: self.list_data_dict[key] for key in keys}
 
             self.list_data_dict = self.list_data_dict[:self.num_samples]
+
+        # if(self.data_percentage is not None):
+        #     num_samples = int(len(len(self.list_data_dict)))
+        #     self.list_data_dict = self.list_data_dict[:num_samples]
+        #     print(f"Using {self.data_percentage}% of {len(self.list_data_dict)} samples --> {num_samples}")
 
     def __len__(self):
         return len(self.list_data_dict)
@@ -978,6 +993,10 @@ def train():
     trainer.save_state()
 
     model.config.use_cache = True
+
+    print("Modifying the save dir...")
+    training_args.output_dir = os.path.join(training_args.output_dir, training_args.t2i_model, f"percentage_{data_args.data_percentage}")
+    print("Now saving checkpoints to: ", training_args.output_dir)
 
     if training_args.lora_enable:
         state_dict = get_peft_state_maybe_zero_3(
