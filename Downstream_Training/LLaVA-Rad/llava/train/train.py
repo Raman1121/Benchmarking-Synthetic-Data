@@ -77,6 +77,7 @@ class DataArguments:
     image_aspect_ratio: str = 'square'
     image_grid_pinpoints: Optional[str] = field(default=None)
     finetune_only_with_synthetic_data: bool = False
+    num_samples: Optional[int] = None
 
 
 @dataclass
@@ -644,10 +645,16 @@ class LazySupervisedDataset(Dataset):
         self.list_data_dict = list_data_dict
         self.data_args = data_args
         self.finetune_only_with_synthetic_data = data_args.finetune_only_with_synthetic_data
+        self.num_samples = data_args.num_samples
 
         print("LazySupervisedDataset: ", len(self.list_data_dict))
         if len(self.list_data_dict) == 0:
             raise ValueError(f"Dataset {data_path} is empty.")
+        
+        if(self.num_samples):
+            print(f"Creating a subset of {self.num_samples} samples.")
+            keys = list(self.list_data_dict.keys())[:self.num_samples]
+            self.list_data_dict = {key: self.list_data_dict[key] for key in keys}
 
     def __len__(self):
         return len(self.list_data_dict)

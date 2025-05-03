@@ -132,13 +132,13 @@ spec:
 
               # echo "Running EVAL!!!"
               # chmod +x ./scripts/eval.sh
-              # ./scripts/eval.sh > error_log.txt 2>&1
+              # ./scripts/eval.sh > logs_llavarad_eval.txt 2>&1
               # echo "Running EVAL done!!!"
 
               # echo "Calculating Results and Metrics!"
               # mv mimic_cxr_preds.jsonl llava/eval/rrg_eval/mimic_cxr_preds.jsonl
               # cd llava/eval/rrg_eval
-              # python run.py mimic_cxr_preds.jsonl > eval_logs.txt 2>&1
+              # python run.py mimic_cxr_preds.jsonl > logs_llavarad_metrics.txt 2>&1
               # echo "Results and metrics calculation done!"
 
               sleep 1000

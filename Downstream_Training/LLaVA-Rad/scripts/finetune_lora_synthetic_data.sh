@@ -35,10 +35,13 @@ bsz="${3:-16}"
 lr="1e-4"
 schedule="lora-${epoch}e"
 export run_name="${vision_tower}-${schedule}-${lr}-$(date +%Y%m%d%H%M%S)"
+export num_samples=5
+
 echo $run_name > run_name
 echo "Epoch: $epoch"
 echo "Batch size: $bsz"
 echo "Learning rate: $lr"
+echo "Num Samples: $num_samples"
 ################## Run name ##################
 
 
@@ -83,6 +86,7 @@ echo "Learning rate: $lr"
     --lazy_preprocess True \
     --dataloader_num_workers 4 \
     --report_to tensorboard \
-    --run_name ${run_name}
+    --run_name ${run_name} \
+    --num_samples=$NUM_SAMPLES
 
     # NOTE: # Remove "--finetune_only_with_synthetic_data True" line to finetune on both real and synthetic data
