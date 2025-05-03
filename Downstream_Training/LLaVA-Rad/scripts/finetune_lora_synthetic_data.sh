@@ -17,8 +17,8 @@ vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 
 ################## Synthetic Data Details ##################
 T2I_MODEL="sana"
-export num_samples=5
-export DATA_PERCENTAGE=0.005
+# export num_samples=5
+export DATA_PERCENTAGE=100
 
 data_path=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL/generations_with_metadata.csv
 loader="default"
@@ -28,7 +28,6 @@ image_folder=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL
 epoch="${2:-3}"
 bsz="${3:-16}"
 
-
 lr="1e-4"
 schedule="lora-${epoch}e"
 export run_name="${vision_tower}-${schedule}-${lr}-$(date +%Y%m%d%H%M%S)"
@@ -37,16 +36,16 @@ echo $run_name > run_name
 echo "Epoch: $epoch"
 echo "Batch size: $bsz"
 echo "Learning rate: $lr"
-echo "Num Samples: $num_samples"
+# echo "Num Samples: $num_samples"
 echo "T2I Model: $T2I_MODEL"
 echo "Data Percentage: $DATA_PERCENTAGE"
 ################## Run name ##################
 
 
 # Batch size is set for 4-GPU machines.
-    # deepspeed llava/train/train_mem.py \
-    # --deepspeed /pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/scripts/zero2.json \
-    python llava/train/train_mem.py \
+# python llava/train/train_mem.py \
+    deepspeed llava/train/train_mem.py \
+    --deepspeed /pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/scripts/zero2.json \
     --lora_enable True \
     --lora_alpha 128 \
     --model_name_or_path ${model_base} \
@@ -90,6 +89,8 @@ echo "Data Percentage: $DATA_PERCENTAGE"
 
 
 ################################# INFERENCE #################################
+
+echo "Running Inference!!!"
 
 model_base=lmsys/vicuna-7b-v1.5
 model_path="${output_dir}/llavarad_lora_${T2I_MODEL}_percentage_${DATA_PERCENTAGE}"

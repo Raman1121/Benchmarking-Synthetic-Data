@@ -668,10 +668,12 @@ class LazySupervisedDataset(Dataset):
         #     print(f"Creating a subset of {self.num_samples} samples.")
         #     self.list_data_dict = self.list_data_dict[:self.num_samples]
 
+        print("Num original samples: ", len(self.list_data_dict))
+
         if(self.data_percentage is not None):
             num_samples = int(len(self.list_data_dict)*self.data_percentage*0.01)
-            self.list_data_dict = self.list_data_dict[:num_samples]
             print(f"Using {self.data_percentage}% of {len(self.list_data_dict)} samples --> {num_samples}")
+            self.list_data_dict = self.list_data_dict[:num_samples]
 
     def __len__(self):
         return len(self.list_data_dict)
