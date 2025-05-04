@@ -176,6 +176,8 @@ def main(
         bootstrap_ci: bool = True,
         output_dir: str = "./",
         run_name: str = "mimic_cxr_eval",
+        t2i_model: str = None,
+        data_percentage: str = None
     ):
     with open(filepath) as f:
         preds, refs = [], []
@@ -183,6 +185,8 @@ def main(
             d = json.loads(l)
             preds.append(d["prediction"])
             refs.append(d["reference"])
+
+    assert (t2i_model is None and data_percentage is None) or (t2i_model is not None and data_percentage is not None)
 
     if scorers is None:
         scorers = [
@@ -219,7 +223,7 @@ def main(
     print("")
 
     os.makedirs(output_dir, exist_ok=True)
-    main_results.to_csv(os.path.join(output_dir, "main.csv"))
+    main_results.to_csv(os.path.join(output_dir, f"main_{t2i_model}_percentage_{data_percentage}.csv"))
 
     if wandb:
         wandb_results = {}
@@ -239,7 +243,7 @@ def main(
     ]
     print(breakdown_p)
     print("")
-    breakdown_p.to_csv(os.path.join(output_dir, "breakdown_p.csv"))
+    breakdown_p.to_csv(os.path.join(output_dir, f"breakdown_p_{t2i_model}_percentage_{data_percentage}.csv"))
     
     print("========== CheXbert F1 (uncertain as negative) ==========")
     breakdown_n = pd.DataFrame(results["breakdown-"])[sorted(CONDITIONS) + ["micro avg", "macro avg"]].T[
@@ -247,7 +251,8 @@ def main(
     ]
     print(breakdown_n)
     print("")
-    breakdown_n.to_csv(os.path.join(output_dir, "breakdown_n.csv"))
+    breakdown_n.to_csv(os.path.join(output_dir, f"breakdown_n_{t2i_model}_percentage_{data_percentage}.csv"))
+    
 
     if report_chexbert_f1:
         print("========== CheXbert F1 ==========")
