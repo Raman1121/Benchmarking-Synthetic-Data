@@ -44,48 +44,48 @@ echo "Data Percentage: $DATA_PERCENTAGE"
 
 # Batch size is set for 4-GPU machines.
 # python llava/train/train_mem.py \
-    deepspeed llava/train/train_mem.py \
-    --deepspeed /pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/scripts/zero2.json \
-    --lora_enable True \
-    --lora_alpha 128 \
-    --model_name_or_path ${model_base} \
-    --version $PROMPT_VERSION \
-    --data_path ${data_path} \
-    --loader ${loader} \
-    --image_folder ${image_folder} \
-    --finetune_only_with_synthetic_data True \
-    --vision_tower ${vision_tower} \
-    --vision_tower_config ${vision_tower_config} \
-    --vision_tower_checkpoint ${vision_tower_checkpoint} \
-    --pretrain_mm_mlp_adapter ${PROJECTOR} \
-    --mm_projector_type mlp2x_gelu \
-    --mm_vision_select_layer -2 \
-    --mm_use_im_start_end False \
-    --mm_use_im_patch_token False \
-    --bf16 True \
-    --output_dir ${output_dir}/${run_name} \
-    --num_train_epochs ${epoch} \
-    --per_device_train_batch_size ${bsz} \
-    --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 \
-    --evaluation_strategy "no" \
-    --save_strategy "steps" \
-    --save_steps 10000 \
-    --save_total_limit 1 \
-    --learning_rate ${lr} \
-    --weight_decay 0. \
-    --warmup_ratio 0.03 \
-    --lr_scheduler_type "cosine" \
-    --logging_steps 1 \
-    --tf32 True \
-    --model_max_length 2048 \
-    --gradient_checkpointing True \
-    --lazy_preprocess True \
-    --dataloader_num_workers 4 \
-    --report_to tensorboard \
-    --run_name ${run_name} \
-    --t2i_model ${T2I_MODEL} \
-    --data_percentage ${DATA_PERCENTAGE}
+    # deepspeed llava/train/train_mem.py \
+    # --deepspeed /pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/scripts/zero2.json \
+    # --lora_enable True \
+    # --lora_alpha 128 \
+    # --model_name_or_path ${model_base} \
+    # --version $PROMPT_VERSION \
+    # --data_path ${data_path} \
+    # --loader ${loader} \
+    # --image_folder ${image_folder} \
+    # --finetune_only_with_synthetic_data True \
+    # --vision_tower ${vision_tower} \
+    # --vision_tower_config ${vision_tower_config} \
+    # --vision_tower_checkpoint ${vision_tower_checkpoint} \
+    # --pretrain_mm_mlp_adapter ${PROJECTOR} \
+    # --mm_projector_type mlp2x_gelu \
+    # --mm_vision_select_layer -2 \
+    # --mm_use_im_start_end False \
+    # --mm_use_im_patch_token False \
+    # --bf16 True \
+    # --output_dir ${output_dir}/${run_name} \
+    # --num_train_epochs ${epoch} \
+    # --per_device_train_batch_size ${bsz} \
+    # --per_device_eval_batch_size 4 \
+    # --gradient_accumulation_steps 1 \
+    # --evaluation_strategy "no" \
+    # --save_strategy "steps" \
+    # --save_steps 10000 \
+    # --save_total_limit 1 \
+    # --learning_rate ${lr} \
+    # --weight_decay 0. \
+    # --warmup_ratio 0.03 \
+    # --lr_scheduler_type "cosine" \
+    # --logging_steps 1 \
+    # --tf32 True \
+    # --model_max_length 2048 \
+    # --gradient_checkpointing True \
+    # --lazy_preprocess True \
+    # --dataloader_num_workers 4 \
+    # --report_to tensorboard \
+    # --run_name ${run_name} \
+    # --t2i_model ${T2I_MODEL} \
+    # --data_percentage ${DATA_PERCENTAGE}
 
 
 ################################# INFERENCE #################################
