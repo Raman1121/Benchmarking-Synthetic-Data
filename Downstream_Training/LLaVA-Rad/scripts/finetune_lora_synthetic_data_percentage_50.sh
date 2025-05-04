@@ -46,8 +46,8 @@ for t2i_model in "${ALL_T2I_MODELS[@]}"; do
 
 
     # Batch size is set for 4-GPU machines.
-    python llava/train/train_mem.py \
-        deepspeed llava/train/train_mem.py \
+    # python llava/train/train_mem.py \
+    deepspeed llava/train/train_mem.py \
         --deepspeed /pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/scripts/zero2.json \
         --lora_enable True \
         --lora_alpha 128 \
