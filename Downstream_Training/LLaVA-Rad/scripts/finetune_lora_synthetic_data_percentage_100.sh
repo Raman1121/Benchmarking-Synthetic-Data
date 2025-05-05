@@ -17,7 +17,7 @@ vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 
 ################## Synthetic Data Details ##################
 # ALL_T2I_MODELS=("SD-V1-4" "SD-V1-5" "SD-V2" "SD-V2-1" "SD-V3-5" "pixart_sigma" "radedit" "sana" "lumina" "flux")
-ALL_T2I_MODELS=("SD-V2-1" "SD-V3-5" "pixart_sigma")
+ALL_T2I_MODELS=("radedit" "sana" "lumina" "flux")
 # "radedit" "sana" "lumina" "flux"
 
 for t2i_model in "${ALL_T2I_MODELS[@]}"; do
