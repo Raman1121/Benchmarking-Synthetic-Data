@@ -109,25 +109,29 @@ spec:
               pip install pillow
               pip install timm              
 
-              echo "Training the model... (Lumina)"
-              chmod +x Downstream_Training/run_training_inference_lumina.sh
-              ./Downstream_Training/run_training_inference_lumina.sh
+              # echo "Training the model... (Lumina)"
+              # chmod +x Downstream_Training/run_training_inference_lumina.sh
+              # ./Downstream_Training/run_training_inference_lumina.sh
 
-              echo "Training the model... (SDV3-5)"
-              chmod +x Downstream_Training/run_training_inference_sdv3-5.sh
-              ./Downstream_Training/run_training_inference_sdv3-5.sh
+              # echo "Training the model... (SDV3-5)"
+              # chmod +x Downstream_Training/run_training_inference_sdv3-5.sh
+              # ./Downstream_Training/run_training_inference_sdv3-5.sh
 
-              echo "Training the model... (SDV1-5)"
-              chmod +x Downstream_Training/run_training_inference_sdv15.sh
-              ./Downstream_Training/run_training_inference_sdv15.sh
+              # echo "Training the model... (SDV1-5)"
+              # chmod +x Downstream_Training/run_training_inference_sdv15.sh
+              # ./Downstream_Training/run_training_inference_sdv15.sh
 
-              echo "Training the model... (SDV2)"
-              chmod +x Downstream_Training/run_training_inference_sdv2.sh
-              ./Downstream_Training/run_training_inference_sdv2.sh
+              # echo "Training the model... (SDV2)"
+              # chmod +x Downstream_Training/run_training_inference_sdv2.sh
+              # ./Downstream_Training/run_training_inference_sdv2.sh
 
-              echo "Training the model... (SDV2-1)"
-              chmod +x Downstream_Training/run_training_inference_sdv2-1.sh
-              ./Downstream_Training/run_training_inference_sdv2-1.sh
+              # echo "Training the model... (SDV2-1)"
+              # chmod +x Downstream_Training/run_training_inference_sdv2-1.sh
+              # ./Downstream_Training/run_training_inference_sdv2-1.sh
+
+              echo "Training the model... (Flux)"
+              chmod +x Downstream_Training/run_training_inference_flux.sh
+              ./Downstream_Training/run_training_inference_flux.sh
 
           resources:
             limits:
