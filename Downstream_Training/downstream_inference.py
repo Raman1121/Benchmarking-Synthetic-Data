@@ -95,6 +95,15 @@ class MultiLabelClassifier(nn.Module):
     
     def forward(self, x):
         return self.model(x)
+    
+def fix_state_dict(state_dict):
+    new_state_dict = {}
+
+    for k,v in state_dict.items():
+        new_key = k.replace("module.", "", 1)
+        new_state_dict[new_key] = v
+
+    return new_state_dict
 
 
 def safe_collate_fn(batch):
@@ -312,7 +321,10 @@ def main(args):
     
     # Load test data
     test_df = pd.read_csv(args.test_csv)
-    test_df[args.image_col] = test_df[args.image_col].apply(lambda x: os.path.join(args.image_dir, x))
+
+    # Prepare this separately for real and synthetic images
+    test_df[args.image_col] = test_df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+    
     test_df['chexpert_labels'] = test_df['chexpert_labels'].apply(get_labels_dict_from_string)
     print(colored(f"Loaded test data from {args.test_csv}...", "green"))
     print("\n")
@@ -350,13 +362,21 @@ def main(args):
     
     # Load checkpoint
     print(colored(f"Loading checkpoint from {args.checkpoint}...", "cyan"))
+    
     checkpoint = torch.load(args.checkpoint, map_location=device)
     
     # Handle different checkpoint formats
-    if 'model_state_dict' in checkpoint:
-        model.load_state_dict(checkpoint['model_state_dict'])
-    else:
-        model.load_state_dict(checkpoint)
+    try:
+        if 'model_state_dict' in checkpoint:
+            try:
+                model.load_state_dict(checkpoint['model_state_dict'])
+            except:
+                fixed_state_dict = fix_state_dict(dict(checkpoint['model_state_dict']))
+                model.load_state_dict(fixed_state_dict)
+        else:
+            model.load_state_dict(checkpoint)
+    except:
+        import pdb; pdb.set_trace()
     
     model = model.to(device)
     print(colored("Model loaded successfully", "green"))
@@ -445,7 +465,8 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="resnet50", help="Model architecture name")
 
     parser.add_argument("--test_csv", type=str, required=True, help="Path to test CSV file")
-    parser.add_argument("--image_dir", type=str, default=None, help="Base Directory containing images")
+    parser.add_argument("--real_image_dir", type=str, default=None, help="Base Directory containing real images")
+    parser.add_argument("--synthetic_image_dir", type=str, default=None, help="Base Directory containing synthetic images")
     parser.add_argument("--image_col", type=str, default="path", help="Column name in CSV that contains image paths")
     
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for inference")
@@ -460,6 +481,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug_samples", type=int, default=500, help="Number of samples to use in debug mode")
 
     parser.add_argument("--extra_info", type=str, default=None, help="Extra info about an experiment")
+    parser.add_argument("--training_setting", type=str, default=None, help="Training setting")
     
     args = parser.parse_args()
     main(args)

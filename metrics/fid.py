@@ -147,7 +147,7 @@ def main(args):
         lambda x: os.path.join(args.real_img_dir, x)
     )
     # Drop rows with duplicate prompts
-    real_df = real_df.drop_duplicates(subset=["annotated_prompt"]).reset_index(
+    real_df = real_df.drop_duplicates(subset=[args.real_caption_col]).reset_index(
         drop=True
     )
         
@@ -183,8 +183,10 @@ def main(args):
         real_df = real_df[real_df[args.pathology] == 1].reset_index(drop=True)
         
         # Include only those images from the synthetic dataset that have the same prompts as the real dataset containing the pathology
-        real_prompts = real_df['annotated_prompt'].to_list()
+        real_prompts = real_df[args.real_caption_col].to_list()
         synthetic_df = synthetic_df[synthetic_df['prompt'].isin(real_prompts)].reset_index(drop=True)
+
+        # import pdb; pdb.set_trace()
     
     real_image_paths = real_df[
         args.real_img_col
@@ -410,6 +412,12 @@ if __name__ == "__main__":
         "--real_img_col",
         type=str,
         default="path",
+        help="Col name in real CSV for image paths.",
+    )
+    parser.add_argument(
+        "--real_caption_col",
+        type=str,
+        default="annotated_prompt",
         help="Col name in real CSV for image paths.",
     )
     parser.add_argument(

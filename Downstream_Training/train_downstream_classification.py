@@ -257,7 +257,19 @@ def main(args):
     
     # Load the dataframe containing paths and 14 labels
     df = pd.read_csv(args.csv_path)
-    df[args.image_col] = df[args.image_col].apply(lambda x: os.path.join(args.image_dir, x))
+    # df[args.image_col] = df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+    try:
+        df[args.image_col] = df[df['img_type']=='real'][args.img_col].apply(lambda x: os.path.join(args.real_image_dir, x))
+    except:
+        print("No real images found in the dataset")
+
+    try:
+        df[args.image_col] = df[df['img_type']=='synthetic'][args.img_col].apply(lambda x: os.path.join(args.synthetic_image_dir, x))
+    except:
+        print("No synthetic images found in the dataset.")
+
+    print(df['img_type'].value_counts())
+
     df['chexpert_labels'] = df['chexpert_labels'].apply(get_labels_dict_from_string)
 
     label_cols = list(df['chexpert_labels'].iloc[0].keys())
@@ -360,7 +372,7 @@ def main(args):
                 'optimizer_state_dict': optimizer.state_dict(),
                 'val_loss': val_loss,
                 'metrics': {k: v for k, v in metrics.items() if k != 'auc_per_class'},
-            }, f"checkpoints/{args.model_name}_best_model.pth")
+            }, f"{script_dir}/checkpoints/{args.model_name}_best_model.pth")
             print("Saved best model")
         
         # Update scheduler
@@ -391,7 +403,7 @@ def main(args):
 
     # Wriwte the best metrics to a CSV file
     results_df = pd.DataFrame([best_metrics])
-    results_df.to_csv(f"{script_dir}/training_results/{args.model_name}_best_metrics.csv", index=False)
+    results_df.to_csv(f"{script_dir}/training_results/{args.model_name}_{args.extra_info}.csv", index=False)
 
 
 if __name__ == "__main__":
@@ -406,7 +418,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--csv_path", type=str, required=True, help="Path to CSV with image paths and labels")
     parser.add_argument("--image_col", type=str, default="path", help="Column name in CSV that contains image paths")
-    parser.add_argument("--image_dir", type=str, default=None, help="Base Directory containing images")
+    parser.add_argument("--real_image_dir", type=str, default=None, help="Base Directory containing images")
+    parser.add_argument("--synthetic_image_dir", type=str, default=None, help="Base Directory containing synthetic images")
 
     parser.add_argument("--threshold", type=float, default=0.5, help="Threshold for binary classification")
     parser.add_argument("--num_workers", type=int, default=4, help="Number of workers for data loading")
@@ -414,6 +427,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--debug", action="store_true", help="Run in debug mode with a small subset of data")
     parser.add_argument("--debug_samples", type=int, default=500, help="Number of samples to use in debug mode")
+
+    parser.add_argument("--extra_info", type=str, default=None, help="Extra info about an experiment") # Examples: real, mix, synthetic
     
     args = parser.parse_args()
     main(args)

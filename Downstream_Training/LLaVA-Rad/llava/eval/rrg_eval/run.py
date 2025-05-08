@@ -20,6 +20,8 @@ try:
 except ImportError:
     wandb = None
 
+wandb = None
+
 
 random.seed(3)
 np.random.seed(3)
@@ -168,6 +170,8 @@ def test_evaluator():
 
     return
 
+def check_file_exists(file_path):
+    return os.path.exists(file_path)
 
 def main(
         filepath: str,
@@ -179,15 +183,25 @@ def main(
         t2i_model: str = None,
         data_percentage: str = None
     ):
+
+    print("Loading from file: ", filepath)
+    print("T2I Model: ", t2i_model)
+    print("Data Percentage: ", data_percentage)
+    print("Output Directory: ", output_dir)
+
+    check_file_exists(filepath)
+
+    print("Loading File ...")
     with open(filepath) as f:
         preds, refs = [], []
         for l in f:
             d = json.loads(l)
             preds.append(d["prediction"])
             refs.append(d["reference"])
+    print("Done!")
 
     assert (t2i_model is None and data_percentage is None) or (t2i_model is not None and data_percentage is not None)
-
+    
     if scorers is None:
         scorers = [
             'CheXbert',

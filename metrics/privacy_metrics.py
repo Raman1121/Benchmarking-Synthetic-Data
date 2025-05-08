@@ -50,10 +50,16 @@ def parse_args():
         "--real_img_dir", type=str, help="Directory containing real images."
     )
     parser.add_argument(
+        "--prompt_col", type=str, default="annotated_prompt", help="Column denoting prompts in the CSV."
+    )
+    parser.add_argument(
         "--gen_savedir", type=str, default="/pvc/PatientReIdentification", help="Directory where generations would be saved."
     )
     parser.add_argument(
         "--results_savedir", type=str, default="/pvc/PatientReIdentification", help="Directory where results would be saved."
+    )
+    parser.add_argument(
+        "--extra_info", type=str, default=None, help="Extra info to save with the results."
     )
     return parser.parse_args()
 
@@ -170,12 +176,6 @@ def encode_image(model, processor, image):
 
 def load_radedit_pipeline():
 
-    pipeline_constants = {
-        "num_inference_steps": 100,
-        "guidance_scale": 7.5,
-        "num_images_per_prompt": 1,
-    }
-
     print("!! Loading RadEdit Pipeline")
     # 1. UNet
     unet = UNet2DConditionModel.from_pretrained("microsoft/radedit", subfolder="unet")
@@ -214,7 +214,7 @@ def load_radedit_pipeline():
         feature_extractor=None,
     )
 
-    return pipe, pipeline_constants
+    return pipe
 
 
 def load_sd_pipeline(model_path):
@@ -242,14 +242,6 @@ def load_sd35_lora_pipeline(model_path, device):
     lora_weights_filename = "sd3-5_medium_lora.safetensors"
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-    #### Pipeline specific constants
-    pipeline_constants = {
-        "num_inference_steps": 40,
-        "guidance_scale": 4.5,
-        "num_images_per_prompt": 1,
-        "max_sequence_length": 512,
-    }
-
     lora_weights_path = os.path.join(model_path, lora_weights_filename)
 
     print(f"Loading base pipeline: {base_model_id}")
@@ -265,7 +257,7 @@ def load_sd35_lora_pipeline(model_path, device):
     )
     print("LoRA weights loaded successfully.")
 
-    return pipe, pipeline_constants
+    return pipe
 
 
 def load_sana_pipeline(model_path):
@@ -277,12 +269,50 @@ def load_sana_pipeline(model_path):
 
     return pipe
 
+def load_pixart_pipeline(model_path):
+    from diffusers import PixArtSigmaPipeline
+    weight_dtype = torch.float16
+
+    pipe = PixArtSigmaPipeline.from_pretrained(
+        model_path,
+        torch_dtype=weight_dtype,
+        use_safetensors=True,
+    )
+
+    return pipe
+
+def load_lumina_pipeline(model_path, device):
+    print("!! Loading Lumina 2.0 with LoRA Pipeline")
+    base_model_id = "Alpha-VLLM/Lumina-Image-2.0"
+    lora_weights_filename = "lumina2_lora.safetensors"
+    dtype = torch.bfloat16
+
+    lora_weights_path = os.path.join(model_path, lora_weights_filename)
+
+    print(f"Loading base pipeline: {base_model_id}")
+    pipe = AutoPipelineForText2Image.from_pretrained(
+        base_model_id, 
+        torch_dtype=dtype).to(device)
+
+    print("Base pipeline loaded.")
+
+    print(f"Loading LoRA weights from: {lora_weights_path}")
+
+    pipe.load_lora_weights(
+        model_path,              # Directory path
+        weight_name=lora_weights_filename, # Specific filename
+        adapter_name="lumina2_medium_finetune_MIMIC" # Optional: Give your LoRA adapter a name
+    )
+    print("LoRA weights loaded successfully.")
+
+    return pipe
+
 def load_pipeline(model_name, model_path):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # RadEdit Model
     if model_name == "radedit":
-        pipe, pipeline_constants = load_radedit_pipeline()
+        pipe = load_radedit_pipeline()
         pipe = pipe.to(device)
 
     # SD V1/ V2.x Models
@@ -293,10 +323,20 @@ def load_pipeline(model_name, model_path):
 
     # SD 3.5 Medium with LoRA
     elif(model_name == "SD-V3-5"):
-        pipe, pipeline_constants = load_sd35_lora_pipeline(model_path, device)
+        pipe = load_sd35_lora_pipeline(model_path, device)
 
+    # Sana 0.6B (512)
     elif(model_name == "sana"):
         pipe = load_sana_pipeline(model_path)
+        pipe = pipe.to(device)
+
+    # Pixart Sigma
+    elif(model_name == "pixart_sigma"):
+        pipe = load_pixart_pipeline(model_path)
+        pipe = pipe.to(device)
+
+    elif(model_name == "lumina"):
+        pipe = load_lumina_pipeline(model_path, device)
         pipe = pipe.to(device)
 
     return pipe
@@ -388,6 +428,10 @@ def main(args):
         "sana": {
             "num_inference_steps": 20,
             "guidance_scale": 4.5,
+        },
+        "pixart_sigma": {
+            "num_inference_steps": 20,
+            "guidance_scale": 4.5,
         }
     }
 
@@ -412,7 +456,12 @@ def main(args):
     df_combined = df_train
 
     # Selecting only unique prompts
-    _df = df_combined.drop_duplicates(subset=["annotated_prompt"]).reset_index(
+    _df = df_combined.drop_duplicates(subset=[args.prompt_col]).reset_index(
+        drop=True
+    )
+
+    # Removing prompts with nans
+    _df = _df.dropna(subset=[args.prompt_col]).reset_index(
         drop=True
     )
 
@@ -449,7 +498,7 @@ def main(args):
     ALL_MIN_LATENT_DISTANCES = []
 
     # LOAD SD Pipeline (RadEdit)
-    print("Loading SD Pipeline")
+    print(f"Loading {args.model_name} Pipeline")
     pipe = load_pipeline(args.model_name, args.model_path)
     print("Done!")
 
@@ -461,12 +510,14 @@ def main(args):
     print("Done!")
 
     GEN_SAVE_DIR = os.path.join(args.gen_savedir, args.model_name)
+    if(args.extra_info):
+        GEN_SAVE_DIR = os.path.join(args.gen_savedir, args.model_name + "_" + args.extra_info)
     os.makedirs(GEN_SAVE_DIR, exist_ok=True)
     print("Generations across multiple prompts and seeds would be saved at: ", GEN_SAVE_DIR)
 
     for i in tqdm(range(len(_df))):
         _PATH = _df["path"][i]
-        _PROMPT = _df["annotated_prompt"][i]
+        _PROMPT = _df[args.prompt_col][i]
         generated_images = []
         reid_scores = []
         pixel_distances = []
@@ -542,11 +593,6 @@ def main(args):
         ALL_PROMPTS.append(_PROMPT)
         print("\n")
 
-        # except:
-        #     print("No file was found for the prompt: ", _PROMPT)
-        #     ERROR_PROMPTS.append(_PROMPT)
-        #     import pdb; pdb.set_trace()
-
     # Create a dataframe of results of all scores
 
     results_df = pd.DataFrame()
@@ -564,12 +610,16 @@ def main(args):
     os.makedirs(args.results_savedir, exist_ok=True)
 
     try:
-        ## Saving results in a CSV file
-        results_name = (
-            f"privacy_metrics_{args.model_name}.csv"
-            if args.num_shards == 0
-            else f"reid_scores_shard_{args.shard}.csv"
-        )
+        results_name = f"privacy_metrics_{args.model_name}.csv"
+
+        # If shards used
+        if(args.num_shards == 0):
+            results_name = f"privacy_metrics_{args.model_name}_shard_{args.shard}.csv"
+
+        # If given extra info
+        if(args.extra_info):
+            results_name = f"privacy_metrics_{args.model_name}_{args.extra_info}.csv"
+        
         errors_name = (
             f"error.csv" if args.num_shards == 0 else f"error_shard_{args.shard}.csv"
         )
