@@ -17,13 +17,13 @@ vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 
 ################## Synthetic Data Details ##################
 # ALL_T2I_MODELS=("SD-V1-4" "SD-V1-5" "SD-V2" "SD-V2-1" "SD-V3-5" "pixart_sigma" "radedit" "sana" "lumina" "flux")
-ALL_T2I_MODELS=("flux")
+ALL_T2I_MODELS=("sana_epoch50")
 # "radedit" "sana" "lumina" "flux"
 
 for t2i_model in "${ALL_T2I_MODELS[@]}"; do
     export T2I_MODEL=$t2i_model
     export DATA_PERCENTAGE=100
-    export output_dir="checkpoints_${T2I_MODEL}"
+    export output_dir="checkpoints_sana50_${T2I_MODEL}"
 
     data_path=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL/generations_with_metadata.csv
     loader="default"
