@@ -46,6 +46,9 @@ def parse_args():
     parser.add_argument(
         "--subset", type=int, default=None, help="Create a smaller subset"
     )
+    parser.add_argument(
+        "--use_dicom_id", action="store_true", help="Use dicom ids to save the filename"
+    )
 
     return parser.parse_args()
 
@@ -293,19 +296,29 @@ def generate_synthetic_images(pipe, pipeline_constants, prompt, seed=42):
     return image
 
 class DummyDataset(Dataset):
-    def __init__(self, df):
+    def __init__(self, df, use_dicom_ids=False):
     
         self.df = df
+        self.use_dicom_ids = use_dicom_ids
+
+        if(use_dicom_ids):
+            self.df['dicom_id'] = self.df['path'].apply(lambda x: x.split("/")[-1].strip(".jpg"))
 
     def __len__(self):
         return len(self.df)
 
     def __getitem__(self, idx):
         
-        sample = {
-                'id': self.df.iloc[idx]['id'],
-                'prompt': self.df.iloc[idx]['annotated_prompt']
-                }
+        if(self.use_dicom_ids):
+            sample = {
+                    'id': self.df.iloc[idx]['dicom_id'],
+                    'prompt': self.df.iloc[idx]['annotated_prompt']
+                    }
+        else:
+            sample = {
+                    'id': self.df.iloc[idx]['id'],
+                    'prompt': self.df.iloc[idx]['annotated_prompt']
+                    }
         
         return sample
 
@@ -397,7 +410,7 @@ def main(args):
 
     print("{} Prompts found".format(len(df)))
 
-    dataset = DummyDataset(df)
+    dataset = DummyDataset(df, args.use_dicom_id)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
     SYNTHETIC_PATHS = []
