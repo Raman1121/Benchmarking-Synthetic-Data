@@ -1,22 +1,22 @@
 #!/bin/bash
 
 #################### Sana ####################
-# export MODEL_PATH="/pvc/Benchmarking-Synthetic-Data/Sana_Diffusers"
-# export MODEL_NAME="sana"
-# export EXTRA_INFO="sana"
+export MODEL_PATH="/pvc/Benchmarking-Synthetic-Data/Sana_Epoch50"
+export MODEL_NAME="sana"
+export EXTRA_INFO="sana-epoch50"
 
-# export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
-# export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
+export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
+export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana_epoch50"
 
-# export BATCH_SIZE=128
+export BATCH_SIZE=200
 
-# python tools/generate_data_common.py \
-#     --model_path=$MODEL_PATH \
-#     --model_name=$MODEL_NAME \
-#     --extra_info=$EXTRA_INFO \
-#     --real_csv=$REAL_CSV \
-#     --savedir=$SAVE_DIR \
-#     --batch_size=$BATCH_SIZE \
+python tools/generate_data_common.py \
+    --model_path=$MODEL_PATH \
+    --model_name=$MODEL_NAME \
+    --extra_info=$EXTRA_INFO \
+    --real_csv=$REAL_CSV \
+    --savedir=$SAVE_DIR \
+    --batch_size=$BATCH_SIZE \
 
 #################### RadEdit ####################
 # export MODEL_PATH="/pvc/Sana/output/Sana_Diffusers/"
@@ -163,19 +163,19 @@
 #     --batch_size=$BATCH_SIZE \
 
 #################### FLUX ####################
-export MODEL_PATH="/pvc/ai-toolkit/output/flux_lora"
-export MODEL_NAME="flux"
-export EXTRA_INFO="flux"
+# export MODEL_PATH="/pvc/ai-toolkit/output/flux_lora"
+# export MODEL_NAME="flux"
+# export EXTRA_INFO="flux"
 
-export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
-export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
+# export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/Downstream_Classification_Files/training_data_20K.csv"
+# export SAVE_DIR="/pvc/SYNTHETIC_IMAGES_NEW/"
 
-export BATCH_SIZE=64
+# export BATCH_SIZE=64
 
-python tools/generate_data_common.py \
-    --model_path=$MODEL_PATH \
-    --model_name=$MODEL_NAME \
-    --extra_info=$EXTRA_INFO \
-    --real_csv=$REAL_CSV \
-    --savedir=$SAVE_DIR \
-    --batch_size=$BATCH_SIZE \
+# python tools/generate_data_common.py \
+#     --model_path=$MODEL_PATH \
+#     --model_name=$MODEL_NAME \
+#     --extra_info=$EXTRA_INFO \
+#     --real_csv=$REAL_CSV \
+#     --savedir=$SAVE_DIR \
+#     --batch_size=$BATCH_SIZE \
