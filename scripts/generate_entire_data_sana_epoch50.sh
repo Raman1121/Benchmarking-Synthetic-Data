@@ -8,7 +8,7 @@ export EXTRA_INFO="sana_epoch50"
 export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv"
 export SAVE_DIR="/pvc/SynthCheX/"
 
-export BATCH_SIZE=256
+export BATCH_SIZE=200
 
 python tools/generate_data_common.py \
     --model_path=$MODEL_PATH \
