@@ -25,7 +25,8 @@ for t2i_model in "${ALL_T2I_MODELS[@]}"; do
     export DATA_PERCENTAGE=50
     export output_dir="checkpoints_${T2I_MODEL}"
 
-    data_path=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL/generations_with_metadata.csv
+    # data_path=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL/generations_with_metadata.csv
+    data_path=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL/sana-epoch50/generations_with_metadata.csv
     loader="default"
     image_folder=/pvc/SYNTHETIC_IMAGES_NEW/$T2I_MODEL
 
