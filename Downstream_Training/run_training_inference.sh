@@ -35,7 +35,8 @@ export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATI
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana_epoch50/sana-epoch50"
 export TRAINING_SETTING="all_synthetic"
-export export EXTRA_INFO=$TRAINING_SETTING
+# export EXTRA_INFO=$TRAINING_SETTING
+export EXTRA_INFO="Sana_Epoch50"
 
 export EPOCHS=10
 
@@ -61,7 +62,8 @@ export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATI
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana_epoch50/sana-epoch50"
 export TRAINING_SETTING="mixed"
-export EXTRA_INFO=$TRAINING_SETTING
+# export EXTRA_INFO=$TRAINING_SETTING
+export EXTRA_INFO="Sana_Epoch50"
 
 export EPOCHS=10
 
@@ -87,7 +89,8 @@ export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATI
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana_epoch50/sana-epoch50"
 export TRAINING_SETTING="augmented"
-export EXTRA_INFO=$TRAINING_SETTING
+# export EXTRA_INFO=$TRAINING_SETTING
+export EXTRA_INFO="Sana_Epoch50"
 
 export EPOCHS=20
 
