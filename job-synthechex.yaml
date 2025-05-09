@@ -122,9 +122,9 @@ spec:
               ./scripts/hf-login.sh
 
               ######## COMMON GENERATION PIPELINE
-              # echo "Generating data ..."
-              # chmod +x scripts/generate_entire_data_sana_epoch50.sh
-              # ./scripts/generate_entire_data_sana_epoch50.sh > logs_gen_synthchex.txt 2>&1
+              echo "Generating data ..."
+              chmod +x scripts/generate_entire_data_sana_epoch50.sh
+              ./scripts/generate_entire_data_sana_epoch50.sh > logs_gen_synthchex.txt 2>&1
 
           resources:
             limits:
