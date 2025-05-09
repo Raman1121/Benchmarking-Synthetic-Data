@@ -129,14 +129,18 @@ spec:
               # chmod +x Downstream_Training/run_training_inference_sdv2-1.sh
               # ./Downstream_Training/run_training_inference_sdv2-1.sh
 
-              echo "Training the model... (Flux)"
-              chmod +x Downstream_Training/run_training_inference_flux.sh
-              ./Downstream_Training/run_training_inference_flux.sh
+              # echo "Training the model... (Flux)"
+              # chmod +x Downstream_Training/run_training_inference_flux.sh
+              # ./Downstream_Training/run_training_inference_flux.sh
+              
+              echo "Training the model... (Sana 50)"
+              chmod +x Downstream_Training/run_training_inference.sh
+              ./Downstream_Training/run_training_inference.sh
 
           resources:
             limits:
               nvidia.com/gpu: "1"
-              cpu: "4"
+              cpu: "8"
               memory: "96Gi"
           volumeMounts:
             - name: workspace
