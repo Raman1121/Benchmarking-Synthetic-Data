@@ -123,6 +123,8 @@ spec:
               # chmod +x scripts/pretrain.sh
               # bash scripts/pretrain.sh > logs_llavarad_pretraining.txt 2>&1
 
+              sleep infinity
+
               ############# LoRA Fine-Tuning Step #############
               echo "Beginning training..."
               # Make sure the script exists at this path inside the PVC copy
