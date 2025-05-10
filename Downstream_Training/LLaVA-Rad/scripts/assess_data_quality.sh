@@ -5,7 +5,7 @@ set -o pipefail
 
 METADATA_CSV="/pvc/SynthCheX/sana_epoch50/generations_with_metadata.csv"
 IMAGE_DIR="/pvc/SynthCheX/sana_epoch50/"
-OUTPUT_DIR="/pvc/SynthChex/"
+OUTPUT_DIR="/pvc/SynthCheX/"
 
 IMAGE_COL="synthetic_filename"
 CAPTION_COL="annotated_prompt"
