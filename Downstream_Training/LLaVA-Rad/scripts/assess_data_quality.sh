@@ -14,7 +14,7 @@ LABELS_COL="chexpert_labels"
 NUM_SHARDS=10000
 SHARD=0
 
-python assess_data_quality.py \
+python scripts/assess_data_quality.py \
     --metadata_csv $METADATA_CSV \
     --img_dir $IMG_DIR \
     --output_dir $OUTPUT_DIR \
