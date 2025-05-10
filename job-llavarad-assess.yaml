@@ -115,8 +115,13 @@ spec:
               MAX_JOBS=4  pip install -vvv flash-attn==2.5.8 --no-build-isolation || { echo 'flash-attn install failed, check log'; cat /pvc/flash_attn_install.log; exit 1; }
               echo "flash-attn install command finished."
 
+              echo "Logging in to Hugging Face..."
+              chmod 600 /pvc/hf_token.txt
+              chmod +x scripts/hf-login.sh
+              ./scripts/hf-login.sh
+
               echo "Running Assessment!!!"
-              chmod +x ./scripts/assess_data_quality.sh
+              chmod +x scripts/assess_data_quality.sh
               ./scripts/assess_data_quality.sh > log_llavarad_assess.txt 2>&1
               # chmod +x ./scripts/eval.sh
               # ./scripts/eval.sh > log_llavarad_eval.txt 2>&1
