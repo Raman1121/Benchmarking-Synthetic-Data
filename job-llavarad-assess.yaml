@@ -116,6 +116,8 @@ spec:
               echo "flash-attn install command finished."
 
               echo "Running Assessment!!!"
+              chmod +x ./scripts/assess_data_quality.sh
+              ./scripts/assess_data_quality.sh > log_llavarad_assess.txt 2>&1
               # chmod +x ./scripts/eval.sh
               # ./scripts/eval.sh > log_llavarad_eval.txt 2>&1
 
