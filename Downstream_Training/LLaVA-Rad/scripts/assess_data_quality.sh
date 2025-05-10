@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 
 METADATA_CSV="/pvc/SynthCheX/sana_epoch50/generations_with_metadata.csv"
-IMG_DIR="/pvc/SynthCheX/sana_epoch50/"
+IMAGE_DIR="/pvc/SynthCheX/sana_epoch50/"
 OUTPUT_DIR="/pvc/SynthChex/"
 
 IMAGE_COL="synthetic_filename"
@@ -16,7 +16,7 @@ SHARD=0
 
 python scripts/assess_data_quality.py \
     --metadata_csv $METADATA_CSV \
-    --img_dir $IMG_DIR \
+    --image_dir $IMAGE_DIR \
     --output_dir $OUTPUT_DIR \
     --num_shards $NUM_SHARDS \
     --shard $SHARD \
