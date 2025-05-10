@@ -24,11 +24,11 @@ def parse_args():
     parser.add_argument("--metadata_csv", type=str, required=True, help="Path to the metadata CSV file.")
     parser.add_argument("--image_dir", type=str, required=True, help="Path to the image directory.")
     parser.add_argument("--output_dir", type=str, required=True, help="Path to save the results.")
-    parser.add_argument("--img_col", type=str, default='synthetic_filename', help="Column for caption in the metadata file.")
+    parser.add_argument("--image_col", type=str, default='synthetic_filename', help="Column for caption in the metadata file.")
     parser.add_argument("--caption_col", type=str, default='annotated_prompt', help="Column for caption in the metadata file.")
     parser.add_argument("--labels_col", type=str, default='chexpert_labels', help="Column for labels in the metadata file.")
     parser.add_argument("--img_dir", type=str, default=None, help="Directory where images are located.")
-    parser.add_argument("--num_shards", type=str, default=None, help="Number of shards to divide the dataset into.")
+    parser.add_argument("--num_shards", type=int, default=None, help="Number of shards to divide the dataset into.")
     parser.add_argument("--shard", type=int, default=None, help="Shard ID.")
     
     return parser.parse_args()
@@ -58,7 +58,7 @@ def main(args):
 
     print("Loading Dataset...")
     df = pd.read_csv(args.metadata_csv)
-    df[args.img_col] = df[args.img_col].apply(lambda x: os.path.join(args.image_dir, x))
+    df[args.image_col] = df[args.image_col].apply(lambda x: os.path.join(args.image_dir, x))
 
     try:
         df[args.labels_col] = df[args.labels_col].apply(lambda x: get_labels_dict_from_string(x))
@@ -83,7 +83,7 @@ def main(args):
             print(f"Processing sample {i}/{len(df)}...")
 
         prompt = df[args.caption_col].iloc[i]
-        image_file = df[args.img_col].iloc[i]
+        image_file = df[args.image_col].iloc[i]
         image = load_image(image_file)
 
         query = META_PROMPT + "\n" + f"<image>\nClassify the image as either 'High Quality', 'Medium Quality', or 'Low Quality' given the prompt: {prompt}" + "\n"
