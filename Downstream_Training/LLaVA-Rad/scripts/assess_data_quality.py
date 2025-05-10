@@ -47,8 +47,6 @@ def main(args):
 
     disable_torch_init()
 
-    start_time = time.time()
-
     model_path = "microsoft/llava-rad"
     model_base = "lmsys/vicuna-7b-v1.5"
     model_name = "llavarad"
@@ -76,6 +74,8 @@ def main(args):
     print("Done!")
 
     ALL_RESPONSES = []
+
+    start_time = time.time()
 
     # for i in range(len(df)):
     for i in tqdm(range(len(df))):
