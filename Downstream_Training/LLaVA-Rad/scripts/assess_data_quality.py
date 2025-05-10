@@ -128,3 +128,7 @@ def main(args):
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"Elapsed time: {elapsed_time / 3600:.2f} hours")
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(args)
