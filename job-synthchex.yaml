@@ -98,12 +98,13 @@ spec:
               pip install \
                 pandas \
                 tqdm \
-                            
-              python arrange_data_in_sana_format.py > make_data_logs.txt 2>&1
+
+              sleep infinity  
+              # python arrange_data_in_sana_format.py > make_data_logs.txt 2>&1
 
           resources:
             limits:
-              nvidia.com/gpu: "0"
+              nvidia.com/gpu: "1"
               cpu: "4"
               memory: "32Gi"
           volumeMounts:
