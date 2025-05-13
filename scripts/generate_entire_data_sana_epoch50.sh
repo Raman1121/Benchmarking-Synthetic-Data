@@ -8,7 +8,7 @@ export EXTRA_INFO="sana_epoch33"
 export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv"
 export SAVE_DIR="/pvc/SynthCheX/"
 
-export BATCH_SIZE=200
+export BATCH_SIZE=100
 
 SHARDS=2
 SHARD_ID=0
