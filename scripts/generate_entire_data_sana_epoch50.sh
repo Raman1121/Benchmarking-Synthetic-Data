@@ -22,4 +22,4 @@ python tools/generate_data_common.py \
     --batch_size=$BATCH_SIZE \
     --use_dicom_id \
     --num_shards=$SHARDS \
-    --shard_id=$SHARD_ID \
+    --shard=$SHARD_ID \
