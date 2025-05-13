@@ -1,6 +1,7 @@
 import datasets
 import pandas as pd
 import os
+import ast
 
 # TODO: Add BibTeX citation
 _CITATION = """\
@@ -26,13 +27,12 @@ _LICENSE = "apache-2.0"
 
 # Define the name of your image folder and metadata file
 _IMAGE_FOLDER = "images"
-_METADATA_FILE = "generations_with_metadata_subset.csv"
+_METADATA_FILE = "metadata_with_generations_subset.csv"
 # Define the column name in the CSV that holds the quality label
 _QUALITY_COLUMN = "Image Quality"
 
 
-class MyAwesomeImageCollection(datasets.GeneratorBasedBuilder):
-    """My Awesome Image Collection with Quality Splits."""
+class SynthCheXDataset(datasets.GeneratorBasedBuilder):
 
     VERSION = datasets.Version("1.0.0") # Incremented version for the change
 
@@ -67,7 +67,7 @@ class MyAwesomeImageCollection(datasets.GeneratorBasedBuilder):
         if not os.path.isdir(image_dir_path):
              raise FileNotFoundError(f"Image folder not found at {image_dir_path}.")
 
-        quality_splits = ["High Quality", "Medium Quality", "Low Quality"]
+        quality_splits = ["High Quality", "Medium Quality"]
         split_generators = []
 
         # Create generators for each specific quality split
@@ -86,11 +86,11 @@ class MyAwesomeImageCollection(datasets.GeneratorBasedBuilder):
         # Create generator for the "All" split, naming it 'train' (standard default)
         split_generators.append(
             datasets.SplitGenerator(
-                name=datasets.Split.TRAIN, # Standard name for the main/default split
+                name=datasets.Split.TRAIN,
                 gen_kwargs={
                     "metadata_filepath": metadata_path,
                     "image_dir": image_dir_path,
-                    "quality_filter": None, # Pass None to indicate no filtering (get all)
+                    "quality_filter": None,
                 },
             )
         )
@@ -102,12 +102,6 @@ class MyAwesomeImageCollection(datasets.GeneratorBasedBuilder):
         """Yields examples, filtering by quality_filter if provided."""
         # Load your metadata
         df = pd.read_csv(metadata_filepath)
-
-        # Check if required columns exist
-        if "filename" not in df.columns:
-            raise ValueError("The metadata CSV must contain a 'filename' column.")
-        if _QUALITY_COLUMN not in df.columns:
-            raise ValueError(f"The metadata CSV must contain the '{_QUALITY_COLUMN}' column for splitting.")
 
         # Iterate through your metadata and yield examples matching the quality_filter
         count = 0
