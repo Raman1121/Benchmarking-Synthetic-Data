@@ -49,6 +49,12 @@ def parse_args():
     parser.add_argument(
         "--use_dicom_id", action="store_true", help="Use dicom ids to save the filename"
     )
+    parser.add_argument(
+        "--num_shards", type=int, default=None, help="Number of shards"
+    )
+    parser.add_argument(
+        "--shard", type=int, default=None, help="Shard ID"
+    )
 
     return parser.parse_args()
 
@@ -397,6 +403,13 @@ def main(args):
     print(f"Loading CSV: {args.real_csv}")
     df = pd.read_csv(args.real_csv)
     print("Data loaded successfully!")
+
+    if(args.num_shards is not None):
+        # Use np.array_split to split the DataFrame into shards
+        shards = np.array_split(df, args.num_shards)
+        # Select the shard based on the shard ID
+        df = shards[args.shard].reset_index(drop=True)
+        print(f"!!! Using shard {args.shard} of {args.num_shards}")
 
     if(args.subset):
         print(f"!!! Creating a subset of {args.subset} samples")

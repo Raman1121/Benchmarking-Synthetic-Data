@@ -1,14 +1,17 @@
 #!/bin/bash
 
 #################### Sana ####################
-export MODEL_PATH="/pvc/Benchmarking-Synthetic-Data/Sana_Epoch50"
+export MODEL_PATH="/pvc/Benchmarking-Synthetic-Data/Sana_Epoch33"
 export MODEL_NAME="sana"
-export EXTRA_INFO="sana_epoch50"
+export EXTRA_INFO="sana_epoch33"
 
 export REAL_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv"
 export SAVE_DIR="/pvc/SynthCheX/"
 
 export BATCH_SIZE=200
+
+SHARDS=2
+SHARD_ID=0
 
 python tools/generate_data_common.py \
     --model_path=$MODEL_PATH \
@@ -17,4 +20,6 @@ python tools/generate_data_common.py \
     --real_csv=$REAL_CSV \
     --savedir=$SAVE_DIR \
     --batch_size=$BATCH_SIZE \
-    --use_dicom_id
+    --use_dicom_id \
+    --num_shards=$SHARDS \
+    --shard_id=$SHARD_ID \
