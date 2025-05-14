@@ -73,8 +73,18 @@ class DataArguments:
     lazy_preprocess: bool = False
     is_multimodal: bool = False
     image_folder: Optional[str] = field(default=None)
+    syn_image_folder: Optional[str] = field(default=None)
     image_aspect_ratio: str = 'square'
     image_grid_pinpoints: Optional[str] = field(default=None)
+    finetune_only_with_synthetic_data: bool = False
+    # num_samples: int = field(
+    #     default=None,
+    #     metadata={"help": "Number of samples for training."}
+    # )
+    data_percentage: int = field(
+        default=100,
+        metadata={"help": "Percentage of synthetic data to use for training."}
+    )
 
 
 @dataclass
@@ -110,6 +120,11 @@ class TrainingArguments(transformers.TrainingArguments):
     lora_weight_path: str = ""
     lora_bias: str = "none"
     group_by_modality_length: bool = field(default=False)
+
+    t2i_model: str = field(
+        default='sana',
+        metadata={"help": "Which T2I model generated the synthetic data."}
+    )
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):
@@ -313,6 +328,7 @@ def preprocess_multimodal(
 
     for source in sources:
         for sentence in source:
+            
             if DEFAULT_IMAGE_TOKEN in sentence['value']:
                 sentence['value'] = sentence['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
                 sentence['value'] = DEFAULT_IMAGE_TOKEN + '\n' + sentence['value']
@@ -640,6 +656,24 @@ class LazySupervisedDataset(Dataset):
         self.tokenizer = tokenizer
         self.list_data_dict = list_data_dict
         self.data_args = data_args
+        self.finetune_only_with_synthetic_data = data_args.finetune_only_with_synthetic_data
+        # self.num_samples = data_args.num_samples
+        self.data_percentage = data_args.data_percentage
+
+        print("LazySupervisedDataset: ", len(self.list_data_dict))
+        if len(self.list_data_dict) == 0:
+            raise ValueError(f"Dataset {data_path} is empty.")
+        
+        # if(self.num_samples is not None):
+        #     print(f"Creating a subset of {self.num_samples} samples.")
+        #     self.list_data_dict = self.list_data_dict[:self.num_samples]
+
+        print("Num original samples: ", len(self.list_data_dict))
+
+        if(self.data_percentage is not None):
+            num_samples = int(len(self.list_data_dict)*self.data_percentage*0.01)
+            print(f"Using {self.data_percentage}% of {len(self.list_data_dict)} samples --> {num_samples}")
+            self.list_data_dict = self.list_data_dict[:num_samples]
 
     def __len__(self):
         return len(self.list_data_dict)
@@ -648,7 +682,10 @@ class LazySupervisedDataset(Dataset):
     def lengths(self):
         length_list = []
         for sample in self.list_data_dict:
-            img_tokens = 128 if 'image' in sample else 0
+            # img_tokens = 128 if 'image' in sample else 0
+            # img_tokens = 128 if 'image' in sample.columns or 'synthetic_filename' in sample.columns else 0
+            img_tokens = 128 if 'synthetic_filename' in sample.columns else 0
+            
             length_list.append(sum(len(conv['value'].split()) for conv in sample['conversations']) + img_tokens)
         return length_list
 
@@ -657,7 +694,10 @@ class LazySupervisedDataset(Dataset):
         length_list = []
         for sample in self.list_data_dict:
             cur_len = sum(len(conv['value'].split()) for conv in sample['conversations'])
-            cur_len = cur_len if 'image' in sample else -cur_len
+            # cur_len = cur_len if 'image' in sample else -cur_len
+            # cur_len = cur_len if 'image' in sample or 'synthetic_filename' in sample else -cur_len
+            cur_len = cur_len if 'synthetic_filename' in sample else -cur_len
+            
             length_list.append(cur_len)
         return length_list
 
@@ -666,11 +706,22 @@ class LazySupervisedDataset(Dataset):
         if isinstance(i, int):
             sources = [sources]
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
-        if 'image' in sources[0]:
-            image_file = self.list_data_dict[i]['image']
+        # if 'image' in sources[0] or 'synthetic_filename' in sources[0]:
+        if 'synthetic_filename' in sources[0]:
+            # try:
+            #     image_file = self.list_data_dict[i]['image']
+            # except:
+            #     image_file = self.list_data_dict[i]['synthetic_filename']
+            image_file = self.list_data_dict[i]['synthetic_filename']
+            
+            # image_type = self.list_data_dict[i]['img_type']
             image_folder = self.data_args.image_folder
+            # syn_image_folder = self.data_args.syn_image_folder
             processor = self.data_args.image_processor
+
+            # FIXME: Currently, hardcoding the logic to finetune only on synthetic data
             image = open_image_with_retry(os.path.join(image_folder, image_file))
+
             if image is None:
                 logging.error("Use an empty image.")
                 image = Image.new('RGB', (224, 224), tuple(int(x*255) for x in processor.image_mean))
@@ -699,13 +750,16 @@ class LazySupervisedDataset(Dataset):
         data_dict = preprocess(
             sources,
             self.tokenizer,
-            has_image=('image' in self.list_data_dict[i]))
+            has_image=('synthetic_filename' in self.list_data_dict[i]))
+        has_image = ('synthetic_filename' in self.list_data_dict[i])
+        
         if isinstance(i, int):
             data_dict = dict(input_ids=data_dict["input_ids"][0],
                              labels=data_dict["labels"][0])
 
         # image exist in the data
-        if 'image' in self.list_data_dict[i]:
+        # if 'image' in self.list_data_dict[i] or 'synthetic_filename' in self.list_data_dict[i]:
+        if 'synthetic_filename' in self.list_data_dict[i]:
             data_dict['image'] = image
         elif self.data_args.is_multimodal:
             # image does not exist in the data, but the model is multimodal
@@ -939,6 +993,12 @@ def train():
 
     model.config.use_cache = True
 
+    print("Modifying the save dir...")
+    parent_dir = os.path.dirname(training_args.output_dir)
+    new_output_dir = os.path.join(parent_dir, "llavarad_lora_" + training_args.t2i_model + f"_percentage_{data_args.data_percentage}")
+    training_args.output_dir = new_output_dir
+    print("Now saving checkpoints to: ", training_args.output_dir)
+
     if training_args.lora_enable:
         state_dict = get_peft_state_maybe_zero_3(
             model.named_parameters(), training_args.lora_bias
@@ -953,6 +1013,8 @@ def train():
     else:
         safe_save_model_for_hf_trainer(trainer=trainer,
                                        output_dir=training_args.output_dir)
+        
+    print("Done!!")
 
 
 if __name__ == "__main__":
