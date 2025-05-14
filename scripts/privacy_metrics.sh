@@ -7,8 +7,10 @@ export REAL_IMG_DIR="/raid/s2198939/MIMIC_Dataset/physionet.org/files/mimic-cxr-
 
 export GEN_SAVEDIR="/raid/s2198939/PatientReIdentification/Generations/"
 
-export MODEL_PATH="/raid/s2198939/Sana/output/Sana_Diffusers/epoch_20_step_178057"    # Diffusers pipeline path obtained by using the script "scripts/convert_sana_to_diffusers.sh"
-export MODEL_NAME="sana"
+export MODEL_PATH="/raid/s2198939/medical-diffusion-classifier/OUTPUT_MIMIC_SD_V1_5_Impressions/SD-V1-5_IID_512"    # Diffusers pipeline path obtained by using the script "scripts/convert_<sana/pixart>_to_diffusers.sh"
+export MODEL_NAME="SD-V1-5"
+export EXTRA_INFO="Impressions"
+export PROMPT_COL="impression"
 
 export RESULTS_SAVEDIR="Results/"   
 
@@ -24,6 +26,8 @@ CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES python metrics/privacy_metrics.py \
     --real_img_dir=$REAL_IMG_DIR \
     --gen_savedir=$GEN_SAVEDIR \
     --results_savedir=$RESULTS_SAVEDIR \
-    --subset=$SUBSET
+    --subset=$SUBSET \
+    --extra_info=$EXTRA_INFO \
+    --prompt_col=$PROMPT_COL
 
     # --model_path=$MODEL_PATH \
