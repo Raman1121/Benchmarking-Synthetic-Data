@@ -105,7 +105,7 @@ cd Benchmarking-Synthetic-Data
   <strong>Tip:</strong> Enhance your results by providing additional information about the model or specific checkpoint used for generating the synthetic data. You can typically do this by setting the <code>EXTRA_INFO</code>argument when running the scripts (refer to the example scripts for specific usage).
 </div>
 
-### Privacy Metrics
+## Privacy Metrics
 ```bash
 cd Benchmarking-Synthetic-Data
 ./scripts/privacy_metrics.sh
