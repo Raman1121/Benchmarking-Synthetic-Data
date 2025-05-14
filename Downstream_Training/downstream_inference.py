@@ -28,6 +28,15 @@ def seed_everything(seed=42):
 def get_labels_dict_from_string(x):
     return ast.literal_eval(x)
 
+def fix_state_dict(state_dict):
+    new_state_dict = {}
+
+    for k,v in state_dict.items():
+        new_key = k.replace("module.", "", 1)
+        new_state_dict[new_key] = v
+
+    return new_state_dict
+
 class MIMICCXRDataset(Dataset):
     def __init__(self, dataframe, image_col='path', label_cols='chexpert_labels', transform=None):
         
@@ -35,12 +44,6 @@ class MIMICCXRDataset(Dataset):
         self.image_col = image_col
         self.transform = transform
         self.label_cols = label_cols
-        
-        # Get all columns except the image path column - these are the 14 label columns
-        # self.label_cols = [col for col in dataframe.columns if col != image_col]
-        # assert len(self.label_cols) == 14, f"Expected 14 label columns, got {len(self.label_cols)}"
-        
-        # print(f"Dataset created with {len(dataframe)} samples and labels: {self.label_cols}")
 
     def __len__(self):
         return len(self.dataframe)
@@ -50,12 +53,7 @@ class MIMICCXRDataset(Dataset):
         img_path = self.dataframe.iloc[idx][self.image_col]
             
         # Load and convert image
-        try:
-            image = Image.open(img_path).convert('RGB')
-        except Exception as e:
-            print(f"Error loading image {img_path}: {e}")
-            # Return a placeholder image in case of error
-            image = Image.new('RGB', (224, 224), color='black')
+        image = Image.open(img_path).convert('RGB')
         
         # Apply transformations
         if self.transform:
@@ -95,15 +93,6 @@ class MultiLabelClassifier(nn.Module):
     
     def forward(self, x):
         return self.model(x)
-    
-def fix_state_dict(state_dict):
-    new_state_dict = {}
-
-    for k,v in state_dict.items():
-        new_key = k.replace("module.", "", 1)
-        new_state_dict[new_key] = v
-
-    return new_state_dict
 
 
 def safe_collate_fn(batch):
@@ -322,9 +311,8 @@ def main(args):
     # Load test data
     test_df = pd.read_csv(args.test_csv)
 
-    # Prepare this separately for real and synthetic images
     test_df[args.image_col] = test_df[args.image_col].apply(lambda x: os.path.join(args.real_image_dir, x))
-    
+
     test_df['chexpert_labels'] = test_df['chexpert_labels'].apply(get_labels_dict_from_string)
     print(colored(f"Loaded test data from {args.test_csv}...", "green"))
     print("\n")
@@ -338,10 +326,6 @@ def main(args):
 
     print(colored(f"Num Test Samples: {len(test_df)}", "cyan"))
     print("\n")
-    
-    # Get label column names
-    # label_cols = [col for col in test_df.columns if col != args.image_col]
-    # assert len(label_cols) == 14, f"Expected 14 label columns, got {len(label_cols)}"
     
     # Create dataset
     test_dataset = MIMICCXRDataset(test_df, image_col=args.image_col, transform=test_transform)
@@ -362,21 +346,18 @@ def main(args):
     
     # Load checkpoint
     print(colored(f"Loading checkpoint from {args.checkpoint}...", "cyan"))
-    
     checkpoint = torch.load(args.checkpoint, map_location=device)
     
     # Handle different checkpoint formats
-    try:
-        if 'model_state_dict' in checkpoint:
-            try:
-                model.load_state_dict(checkpoint['model_state_dict'])
-            except:
-                fixed_state_dict = fix_state_dict(dict(checkpoint['model_state_dict']))
-                model.load_state_dict(fixed_state_dict)
-        else:
-            model.load_state_dict(checkpoint)
-    except:
-        import pdb; pdb.set_trace()
+    if 'model_state_dict' in checkpoint:
+        try:
+            model.load_state_dict(checkpoint['model_state_dict'])
+        except:
+            # Might have to replace "module." from every key
+            fixed_state_dict = fix_state_dict(dict(checkpoint['model_state_dict']))
+            model.load_state_dict(fixed_state_dict)
+    else:
+        model.load_state_dict(checkpoint)
     
     model = model.to(device)
     print(colored("Model loaded successfully", "green"))
@@ -384,7 +365,7 @@ def main(args):
     
     # Create output directory if it doesn't exist
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    args.output_dir = os.path.join(current_dir, args.output_dir, args.extra_info, args.model_name) if args.extra_info else os.path.join(current_dir, args.output_dir, args.model_name)
+    args.output_dir = os.path.join(current_dir, args.output_dir, args.extra_info, args.model_name) if args.extra_info else os.path.join(current_dir, args.output_dir, args.model_name, args.t2i_model)
     os.makedirs(args.output_dir, exist_ok=True)
 
     print(colored(f"Created Results Directory at {args.output_dir}", "green"))
@@ -397,7 +378,7 @@ def main(args):
     
     # Save metrics to output directory
     metrics_df = pd.DataFrame([metrics])
-    metrics_df.to_csv(os.path.join(args.output_dir, 'metrics.csv'), index=False)
+    metrics_df.to_csv(os.path.join(args.output_dir, f'metrics.csv_{args.t2i_model}'), index=False)
     
     # Create per-class metrics dataframe
     per_class_df = pd.DataFrame({
@@ -407,7 +388,7 @@ def main(args):
         'f1': per_class_metrics['f1'],
         'auc': per_class_metrics['auc']
     })
-    per_class_df.to_csv(os.path.join(args.output_dir, 'per_class_metrics.csv'), index=False)
+    per_class_df.to_csv(os.path.join(args.output_dir, f'per_class_metrics_{args.t2i_model}.csv'), index=False)
     
     # Print metrics
     print(colored("\nTest Metrics:", "cyan"))
@@ -431,7 +412,7 @@ def main(args):
         labels, 
         predictions, 
         label_cols, 
-        os.path.join(args.output_dir, 'confusion_matrices.png')
+        os.path.join(args.output_dir, f'confusion_matrices_{args.t2i_model}.png')
     )
     
     # Plot ROC curves
@@ -439,7 +420,7 @@ def main(args):
         labels, 
         outputs, 
         label_cols, 
-        os.path.join(args.output_dir, 'roc_curves.png')
+        os.path.join(args.output_dir, f'roc_curves_{args.t2i_model}.png')
     )
     
     # Save predictions if requested
@@ -453,8 +434,8 @@ def main(args):
             pred_df[f'{col}_pred'] = predictions[:, i]
         
         # Save to CSV
-        pred_df.to_csv(os.path.join(args.output_dir, 'predictions.csv'), index=False)
-        print(colored(f"Predictions saved to {os.path.join(args.output_dir, 'predictions.csv')}", "green"))
+        pred_df.to_csv(os.path.join(args.output_dir, f'predictions_{args.t2i_model}.csv'), index=False)
+        print(colored(f"Predictions saved to {os.path.join(args.output_dir, f'predictions_{args.t2i_model}.csv')}", "green"))
     
     print(colored(f"All results saved to {args.output_dir}", "green"))
 
@@ -481,7 +462,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug_samples", type=int, default=500, help="Number of samples to use in debug mode")
 
     parser.add_argument("--extra_info", type=str, default=None, help="Extra info about an experiment")
-    parser.add_argument("--training_setting", type=str, default=None, help="Training setting")
+    parser.add_argument("--t2i_model", type=str, default=None, help="Evaluation using the synthetic data from which T2I model.")
     
     args = parser.parse_args()
     main(args)
