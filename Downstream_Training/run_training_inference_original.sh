@@ -2,16 +2,16 @@
 
 ########################################### 1. Training on 20K REAL samples (baseline) ###########################################
 echo "RUNNING EXPERIMENT: ALL REAL DATA"
-export MODEL="vit_base_patch16_224.orig_in21k_ft_in1k" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
+export MODEL="resnet50" #resnet50, vit_base_patch16_224.orig_in21k_ft_in1k
 export T2I_MODEL="sana"
-export BATCH_SIZE=512
+export BATCH_SIZE=768
 export TRAIN_CSV="/pvc/SYNTHETIC_IMAGES_NEW/sana/generations_with_metadata.csv"
 export TEST_CSV="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv"
 export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0"
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana/generations_with_metadata.csv"
 export TRAINING_SETTING="all_original"
 export EXTRA_INFO=$TRAINING_SETTING
-export EPOCHS=30
+export EPOCHS=2
 
 export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}_${T2I_MODEL}.pth"
 
