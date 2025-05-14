@@ -11,7 +11,7 @@ export REAL_IMAGE_DIR="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.
 export SYNTHETIC_IMG_DIR="/pvc/SYNTHETIC_IMAGES_NEW/sana/generations_with_metadata.csv"
 export TRAINING_SETTING="all_original"
 export EXTRA_INFO=$TRAINING_SETTING
-export EPOCHS=2
+export EPOCHS=20
 
 export CHECKPOINT="Downstream_Training/checkpoints/${MODEL}_${EXTRA_INFO}_${T2I_MODEL}.pth"
 
