@@ -89,7 +89,8 @@ cd Benchmarking-Synthetic-Data
 ./scripts/image_quality_metrics.sh
 ```
 
-**Important Note:** Calculating metrics like FID and KID can be computationally intensive and may lead to "Out of Memory" (OOM) errors, especially with large datasets. If you encounter this issue, you can use the memory-saving version of the script:- [Calculating Conditional Metrics](#calculating-conditional-metrics)- [Calculating Conditional Metrics](#calculating-conditional-metrics)
+**Important Note:** Calculating metrics like FID and KID can be computationally intensive and may lead to "Out of Memory" (OOM) errors, especially with large datasets. If you encounter this issue, you can use the memory-saving version of the script:- [Calculating Conditional Metrics](#calculating-conditional-metrics)
+
 ```bash
 cd Benchmarking-Synthetic-Data
 ./scripts/image_quality_metrics_memory_saving.sh
