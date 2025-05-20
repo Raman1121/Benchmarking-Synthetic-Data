@@ -108,7 +108,6 @@ spec:
                 huggingface_hub>=0.21.0 \
                 datasets \
                 tensorboard \
-                transformers==4.50.3 \
                 xformers==0.0.27 \
                 peft \
                 huggingface-hub \
@@ -127,6 +126,9 @@ spec:
 
               pip install huggingface-hub
               pip install safetensors
+              pip install transformers==4.50.3
+
+              sleep infinity
 
               chmod +x scripts/train_sd35_lora.sh
               ./scripts/train_sd35_lora.sh > logs_sdv3_5_lora.txt 2>&1
