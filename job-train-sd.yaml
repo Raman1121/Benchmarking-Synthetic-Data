@@ -100,7 +100,7 @@ spec:
                 pandas \
                 matplotlib \
                 pillow \
-                diffusers==0.33.0 \
+                diffusers==0.34.0 \
                 safetensors \
                 packaging>=20.0 \
                 psutil \
