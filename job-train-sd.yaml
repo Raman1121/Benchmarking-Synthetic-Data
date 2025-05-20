@@ -120,8 +120,11 @@ spec:
               python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'Torch path: {torch.__file__}')"
 
               echo "Running training script..."
-              chmod +x tools/train_t2i_sd.sh
-              ./tools/train_t2i_sd.sh > t2i_log_sdv1_5_impression.txt 2>&1
+              # chmod +x tools/train_t2i_sd.sh
+              # ./tools/train_t2i_sd.sh > t2i_log_sdv1_5_impression.txt 2>&1
+
+              chmod +x scripts/train_sd35_lora.sh
+              ./scripts/train_sd35_lora.sh > logs_sdv3_5_lora.txt 2>&1
 
           resources:
             limits:
