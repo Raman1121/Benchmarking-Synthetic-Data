@@ -125,6 +125,8 @@ spec:
               # chmod +x tools/train_t2i_sd.sh
               # ./tools/train_t2i_sd.sh > t2i_log_sdv1_5_impression.txt 2>&1
 
+              pip install huggingface-hub
+
               chmod +x scripts/train_sd35_lora.sh
               ./scripts/train_sd35_lora.sh > logs_sdv3_5_lora.txt 2>&1
 
