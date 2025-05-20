@@ -111,6 +111,7 @@ spec:
                 transformers==4.50.3 \
                 xformers==0.0.27 \
                 peft \
+                huggingface-hub \
 
               echo "Installing accelerate..."
               pip install -vvv --no-cache-dir --no-deps accelerate
