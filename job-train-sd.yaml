@@ -109,7 +109,8 @@ spec:
                 datasets \
                 tensorboard \
                 transformers==4.50.3 \
-                xformers==0.0.27
+                xformers==0.0.27 \
+                peft \
 
               echo "Installing accelerate..."
               pip install -vvv --no-cache-dir --no-deps accelerate
