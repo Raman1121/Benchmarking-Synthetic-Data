@@ -99,13 +99,14 @@ spec:
                 pandas \
                 tqdm \
                             
-              python arrange_data_in_sana_format.py > make_data_logs.txt 2>&1
+              # python arrange_data_in_sana_format.py > make_data_logs.txt 2>&1
+              sleep infinity
 
           resources:
             limits:
               nvidia.com/gpu: "1"
               cpu: "4"
-              memory: "32Gi"
+              memory: "96Gi"
           volumeMounts:
             - name: workspace
               mountPath: /workspace
@@ -121,7 +122,7 @@ spec:
         - name: dshm
           emptyDir:
             medium: Memory
-            sizeLimit: 16Gi
+            sizeLimit: 128Gi
         - name: writeable
           persistentVolumeClaim:
             claimName: mimic-cxr2
