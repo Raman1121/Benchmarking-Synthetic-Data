@@ -98,8 +98,10 @@ spec:
               pip install \
                 pandas \
                 tqdm \
-                            
-              python arrange_data_in_sana_format.py > make_data_logs.txt 2>&1
+              
+              echo "Running!!"
+              # python arrange_data_in_sana_format.py > make_data_logs.txt 2>&1
+              sleep infinity
 
           resources:
             limits:
