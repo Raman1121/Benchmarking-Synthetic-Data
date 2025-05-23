@@ -55,6 +55,9 @@ def parse_args():
     parser.add_argument(
         "--shard", type=int, default=None, help="Shard ID"
     )
+    parser.add_argument(
+        "--trained_in_bfloat", action="store_true", help="If the model was trained using bfloat"
+    )
 
     return parser.parse_args()
 
@@ -194,11 +197,16 @@ def load_lumina_pipeline(model_path):
 
 ####################################
 # Sana
-def load_sana_pipeline(model_path):
+def load_sana_pipeline(model_path, trained_in_bfloat=False):
     pipe = SanaPipeline.from_pretrained(
         model_path,
-        torch_dtype=torch.float16,
+        # torch_dtype=torch.float16,
     )
+
+    if(trained_in_bfloat):
+        print("Casting text encoder and transformer to bfloat dtype.")
+        pipe.text_encoder.to(torch.bfloat16)
+        pipe.transformer = pipe.transformer.to(torch.bfloat16)
 
     return pipe
 
@@ -246,7 +254,7 @@ def load_flux_pipeline(model_path):
 General Purpose Function to load the pipeline
 """
 
-def load_pipeline(model_name, model_path):
+def load_pipeline(model_name, model_path, args):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # RadEdit Model
@@ -267,7 +275,7 @@ def load_pipeline(model_name, model_path):
 
     # Sana Model
     elif(model_name == "sana"):
-        pipe = load_sana_pipeline(model_path)
+        pipe = load_sana_pipeline(model_path, args.trained_in_bfloat)
         pipe = pipe.to(device)
 
     # Pixart Sigma Model
@@ -416,7 +424,7 @@ def main(args):
         df = df.sample(n=args.subset, random_state=42).reset_index(drop=True)
 
     ## Loading pipeline
-    pipe = load_pipeline(args.model_name, args.model_path)
+    pipe = load_pipeline(args.model_name, args.model_path, args)
     ## Loading pipeline constants
     print(f"Constants set for the {args.model_name} pipeline: ")
     print(PIPELINE_CONSTANTS[args.model_name])
