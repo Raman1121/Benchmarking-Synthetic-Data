@@ -118,8 +118,10 @@ spec:
               ./scripts/hf-login.sh
               
               echo "Running Experiment"
-              chmod +x scripts/privacy_metrics.sh
-              ./scripts/privacy_metrics.sh > logs_privacy_metrics_flux.txt 2>&1
+              # chmod +x scripts/privacy_metrics.sh
+              # ./scripts/privacy_metrics.sh > logs_privacy_metrics_flux.txt 2>&1
+
+              sleep infinity
 
           resources:
             limits:
