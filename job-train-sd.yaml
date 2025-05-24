@@ -124,19 +124,30 @@ spec:
               # chmod +x tools/train_t2i_sd.sh
               # ./tools/train_t2i_sd.sh > t2i_log_sdv1_5_impression.txt 2>&1
 
+              pip install pandas
               pip install huggingface-hub
               pip install safetensors
               pip install transformers==4.50.3
+              pip install sentencepiece
+              pip install protobuf
+
+              echo "Logging in to Hugging Face..."
+              chmod 600 /pvc/hf_token.txt
+              chmod +x scripts/hf-login.sh
+              ./scripts/hf-login.sh
 
               sleep infinity
 
-              chmod +x scripts/train_sd35_lora.sh
-              ./scripts/train_sd35_lora.sh > logs_sdv3_5_lora.txt 2>&1
+              # chmod +x scripts/train_sd35_lora.sh
+              # ./scripts/train_sd35_lora.sh > logs_sdv3_5_lora.txt 2>&1
+
+              chmod +x scripts/train_t2i_sd.sh
+              ./scripts/train_t2i_sd.sh > logs_train_sdv2.txt 2>&1
 
           resources:
             limits:
-              nvidia.com/gpu: "2"
-              cpu: "6"
+              nvidia.com/gpu: "4"
+              cpu: "12"
               memory: "96Gi"
           volumeMounts:
             - name: workspace
