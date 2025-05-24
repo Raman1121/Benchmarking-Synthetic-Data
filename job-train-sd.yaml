@@ -130,6 +130,8 @@ spec:
               pip install transformers==4.50.3
               pip install sentencepiece
               pip install protobuf
+              pip install datasets
+              pip install diffusers
 
               echo "Logging in to Hugging Face..."
               chmod 600 /pvc/hf_token.txt
@@ -142,7 +144,7 @@ spec:
               # ./scripts/train_sd35_lora.sh > logs_sdv3_5_lora.txt 2>&1
 
               chmod +x scripts/train_t2i_sd.sh
-              ./scripts/train_t2i_sd.sh > logs_train_sdv2.txt 2>&1
+              ./scripts/train_t2i_sd.sh > logs_train_sdv2-1.txt 2>&1
 
           resources:
             limits:

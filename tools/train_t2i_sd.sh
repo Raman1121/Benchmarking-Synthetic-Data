@@ -4,7 +4,7 @@
 set -e
 
 RESOLUTION=768
-BATCH_SIZE=64
+BATCH_SIZE=32
 GRAD_ACC_STEPS=1
 LR=5e-6
 WARMUP_STEPS=500
@@ -20,8 +20,8 @@ IMG_COL="path"
 CAPTION_COL="annotated_prompt"
 # CAPTION_COL="impression"
 
-MODEL_NAME="stabilityai/stable-diffusion-2"
-OUTPUT_DIR="OUTPUT_MIMIC_SD_V2_RES_${RESOLUTION}"
+MODEL_NAME="stabilityai/stable-diffusion-2-1"
+OUTPUT_DIR="OUTPUT_MIMIC_SD_V2-1_RES_${RESOLUTION}"
 
 accelerate launch --main_process_port 12345 tools/train_text_to_image.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
