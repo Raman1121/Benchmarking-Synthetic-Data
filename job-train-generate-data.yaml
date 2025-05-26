@@ -123,8 +123,10 @@ spec:
 
               ######## COMMON GENERATION PIPELINE
               echo "Generating data ..."
-              chmod +x scripts/generate_data_common.sh
-              ./scripts/generate_data_common.sh > logs_gen_train_sana_epoch50.txt 2>&1
+              # chmod +x scripts/generate_data_common.sh
+              # ./scripts/generate_data_common.sh > logs_gen_train_sana_epoch50.txt 2>&1
+
+              sleep infinity
 
           resources:
             limits:
@@ -146,7 +148,7 @@ spec:
         - name: dshm
           emptyDir:
             medium: Memory
-            sizeLimit: 16Gi
+            sizeLimit: 96Gi
         - name: writeable
           persistentVolumeClaim:
             claimName: mimic-cxr2
