@@ -131,7 +131,7 @@ spec:
           resources:
             limits:
               nvidia.com/gpu: "1"
-              cpu: "8"
+              cpu: "32"
               memory: "96Gi"
           volumeMounts:
             - name: workspace
