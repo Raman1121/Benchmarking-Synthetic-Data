@@ -125,9 +125,9 @@ spec:
               chmod +x Downstream_Training/run_training_inference_sdv2-1.sh
               ./Downstream_Training/run_training_inference_sdv2-1.sh
 
-              echo "Training the model... (Original)"
-              chmod +x Downstream_Training/run_training_inference_original.sh
-              ./Downstream_Training/run_training_inference_original.sh
+              # echo "Training the model... (Original)"
+              # chmod +x Downstream_Training/run_training_inference_original.sh
+              # ./Downstream_Training/run_training_inference_original.sh
 
           resources:
             limits:
