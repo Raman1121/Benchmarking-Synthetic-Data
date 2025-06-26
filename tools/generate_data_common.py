@@ -55,8 +55,11 @@ def parse_args():
     parser.add_argument(
         "--shard", type=int, default=None, help="Shard ID"
     )
+    # parser.add_argument(
+    #     "--trained_in_bfloat", action="store_true", help="If the model was trained using bfloat"
+    # )
     parser.add_argument(
-        "--trained_in_bfloat", action="store_true", help="If the model was trained using bfloat"
+        "--dtype", type=str, default='fp16', help="Dtype for the pipeline"
     )
 
     return parser.parse_args()
@@ -122,12 +125,6 @@ def load_radedit_pipeline():
 # Stable Diffusion 1.x/ 2.x
 
 def load_sd_pipeline(model_path):
-
-    pipeline_constants = {
-        "num_inference_steps": 50,
-        "guidance_scale": 7.5,
-        "num_images_per_prompt": 1,
-    }
 
     print("!! Loading Stable Diffusion Pipeline")
     print("!! Path: ", model_path)
@@ -197,16 +194,16 @@ def load_lumina_pipeline(model_path):
 
 ####################################
 # Sana
-def load_sana_pipeline(model_path, trained_in_bfloat=False):
+def load_sana_pipeline(model_path, dtype):
     pipe = SanaPipeline.from_pretrained(
         model_path,
-        # torch_dtype=torch.float16,
+        torch_dtype=dtype,
     )
 
-    if(trained_in_bfloat):
-        print("Casting text encoder and transformer to bfloat dtype.")
-        pipe.text_encoder.to(torch.bfloat16)
-        pipe.transformer = pipe.transformer.to(torch.bfloat16)
+    if(dtype):
+        print(f"Casting text encoder and transformer to {dtype} dtype.")
+        pipe.text_encoder.to(dtype)
+        pipe.transformer = pipe.transformer.to(dtype)
 
     return pipe
 
@@ -257,6 +254,14 @@ General Purpose Function to load the pipeline
 def load_pipeline(model_name, model_path, args):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
+    if(args.dtype == 'bf16'):
+        dtype= torch.bfloat16
+    elif(args.dtype == 'fp16'):
+        dtype = torch.float16
+    else:
+        dtype = torch.float32
+    print(f"Using dtype: {dtype}")
+
     # RadEdit Model
     if model_name == "radedit":
         pipe = load_radedit_pipeline()
@@ -275,7 +280,7 @@ def load_pipeline(model_name, model_path, args):
 
     # Sana Model
     elif(model_name == "sana"):
-        pipe = load_sana_pipeline(model_path, args.trained_in_bfloat)
+        pipe = load_sana_pipeline(model_path, dtype)
         pipe = pipe.to(device)
 
     # Pixart Sigma Model
