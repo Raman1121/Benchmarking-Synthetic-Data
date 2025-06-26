@@ -201,9 +201,9 @@ def load_sana_pipeline(model_path, dtype):
     )
 
     if(dtype):
-        print(f"Casting text encoder and transformer to {dtype} dtype.")
+        print(f"Casting text encoder and vae to {dtype} dtype.")
         pipe.text_encoder.to(dtype)
-        pipe.vae = pipe.transformer.to(dtype)
+        pipe.vae.to(dtype)
 
     return pipe
 
