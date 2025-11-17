@@ -15,6 +15,7 @@
 #    limitations under the License.
 
 import os
+import ast
 import copy
 from dataclasses import dataclass, field
 import json
@@ -668,7 +669,8 @@ class LazySupervisedDataset(Dataset):
         #     print(f"Creating a subset of {self.num_samples} samples.")
         #     self.list_data_dict = self.list_data_dict[:self.num_samples]
 
-        print("Num original samples: ", len(self.list_data_dict))
+        print("!!!!!!!! Num original samples: ", len(self.list_data_dict))
+        print("!!!!!!!! IMAGE FOLDER: ", self.data_args.image_folder)
 
         if(self.data_percentage is not None):
             num_samples = int(len(self.list_data_dict)*self.data_percentage*0.01)
@@ -705,6 +707,9 @@ class LazySupervisedDataset(Dataset):
         sources = self.list_data_dict[i]
         if isinstance(i, int):
             sources = [sources]
+        if isinstance(sources, str):
+            sources = ast.literal_eval(sources)
+            
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
         # if 'image' in sources[0] or 'synthetic_filename' in sources[0]:
         if 'synthetic_filename' in sources[0]:
@@ -720,7 +725,10 @@ class LazySupervisedDataset(Dataset):
             processor = self.data_args.image_processor
 
             # FIXME: Currently, hardcoding the logic to finetune only on synthetic data
-            image = open_image_with_retry(os.path.join(image_folder, image_file))
+            if(image_folder is None or len(image_folder) == 0):
+                image = open_image_with_retry(image_file)
+            else:
+                image = open_image_with_retry(os.path.join(image_folder, image_file))
 
             if image is None:
                 logging.error("Use an empty image.")
