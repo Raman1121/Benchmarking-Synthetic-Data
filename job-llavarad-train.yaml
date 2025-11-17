@@ -126,9 +126,10 @@ spec:
               ############# LoRA Fine-Tuning Step #############
               echo "Beginning training..."
               # Make sure the script exists at this path inside the PVC copy
-              chmod +x scripts/finetune_lora_synthetic_data_percentage_10.sh
-              bash scripts/finetune_lora_synthetic_data_percentage_10.sh > logs_llavarad_training_percentage_10_sana50.txt 2>&1
-              echo "Training script finished."
+              # chmod +x scripts/finetune_lora_synthetic_data_percentage_10.sh
+              # bash scripts/finetune_lora_synthetic_data_percentage_10.sh > logs_llavarad_training_percentage_10_sana50.txt 2>&1
+              # echo "Training script finished."
+              sleep infinity
 
           resources:
             limits:
