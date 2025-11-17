@@ -709,7 +709,7 @@ class LazySupervisedDataset(Dataset):
             sources = [sources]
         if isinstance(sources, str):
             sources = ast.literal_eval(sources)
-            
+
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
         # if 'image' in sources[0] or 'synthetic_filename' in sources[0]:
         if 'synthetic_filename' in sources[0]:
@@ -771,7 +771,10 @@ class LazySupervisedDataset(Dataset):
             data_dict['image'] = image
         elif self.data_args.is_multimodal:
             # image does not exist in the data, but the model is multimodal
-            crop_size = self.data_args.image_processor.crop_size
+            try:
+                crop_size = self.data_args.image_processor.crop_size
+            except:
+                crop_size = 518
             data_dict['image'] = torch.zeros(3, crop_size['height'], crop_size['width'])
         return data_dict
 
