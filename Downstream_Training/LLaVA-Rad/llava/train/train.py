@@ -774,7 +774,7 @@ class LazySupervisedDataset(Dataset):
             try:
                 crop_size = self.data_args.image_processor.crop_size
             except:
-                crop_size = 518
+                crop_size = {'height': 518, 'width':518}
             data_dict['image'] = torch.zeros(3, crop_size['height'], crop_size['width'])
         return data_dict
 
