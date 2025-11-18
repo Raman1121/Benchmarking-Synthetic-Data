@@ -18,7 +18,7 @@ vision_tower="biomedclip_cxr_518"
 vision_tower_config="llava/model/multimodal_encoder/open_clip_encoder/model_configs/biomedclip_cxr_518.json"
 vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt" 
 
-epoch="${2:-1}"
+epoch="${2:-3}"
 bsz="${3:-32}"
 grad_acc="${4:-2}"
 lr="1e-3"

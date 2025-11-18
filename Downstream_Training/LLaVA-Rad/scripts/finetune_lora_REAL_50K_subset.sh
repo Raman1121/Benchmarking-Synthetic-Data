@@ -28,7 +28,7 @@ image_folder=""   # Keeping this None since we have already appended the root pa
 ################## Data ##################
 
 ################## Run name ##################
-epoch="${2:-3}"
+epoch="${2:-10}"
 bsz="${3:-16}"
 lr="1e-4"
 schedule="COMBINED-lora-${epoch}e"
