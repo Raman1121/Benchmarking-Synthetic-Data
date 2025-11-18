@@ -29,8 +29,8 @@ spec:
                   - key: nvidia.com/gpu.product
                     operator: In
                     values:
-                      - NVIDIA-H200
-                      # - NVIDIA-A100-SXM4-80GB
+                      # - NVIDIA-H200
+                      - NVIDIA-A100-SXM4-80GB
       tolerations:
         - key: "eidf098"
           operator: "Equal"
@@ -135,7 +135,7 @@ spec:
             limits:
               nvidia.com/gpu: "4"
               cpu: "8" # Might need more CPU depending on data loading/preprocessing
-              memory: "96Gi" # Ensure this is sufficient
+              memory: "256Gi" # Ensure this is sufficient
           volumeMounts:
             - name: workspace # Mount read-only if code isn't modified?
               mountPath: /workspace
@@ -153,7 +153,7 @@ spec:
         - name: dshm
           emptyDir:
             medium: Memory
-            sizeLimit: 16Gi # Ensure this is large enough for multiprocessing/shm needs
+            sizeLimit: 256Gi # Ensure this is large enough for multiprocessing/shm needs
         - name: writeable
           persistentVolumeClaim:
             # Ensure this PVC exists and is bound in the correct namespace
