@@ -37,7 +37,7 @@ echo $run_name > run_name
 ################## Run name ##################
 
 # Batch size is set for 4-GPU machines.
-CUDA_VISIBLE_DEVICES=0
+CUDA_VISIBLE_DEVICES=0,1,2,3
     deepspeed llava/train/train_mem.py \
     --deepspeed ./scripts/zero2.json \
     --lora_enable True \
