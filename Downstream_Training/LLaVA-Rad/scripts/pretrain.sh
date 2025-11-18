@@ -3,7 +3,7 @@
 # Uncomment and set the following variables correspondingly to run this script:
 
 model_base=lmsys/vicuna-7b-v1.5
-output_dir="${1:-./CHECKPOINTS_NEW}"
+output_dir="${1:-./CHECKPOINTS_Real50K}"
 
 data_path=/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1_SUBSET_50K.json
 
