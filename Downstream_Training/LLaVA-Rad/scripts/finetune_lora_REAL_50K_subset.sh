@@ -9,7 +9,7 @@ model_base=lmsys/vicuna-7b-v1.5
 # output_dir="${1:-./checkpoints_test}"
 
 # PROJECTOR="/pvc/mm_projector.bin" # generated using pretrain.sh
-PROJECTOR="/pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/CHECKPOINTS_NEW_AUGMENTED_sana/llavarad_lora_sana_percentage_100/mm_projector_cleaned.bin" # Using a new projector TFS on mixed data
+PROJECTOR="/pvc/Benchmarking-Synthetic-Data/Downstream_Training/LLaVA-Rad/CHECKPOINTS_Real50K/mm_projector_cleaned.bin" # Using a new projector TFS on mixed data
 vision_tower="biomedclip_cxr_518"
 vision_tower_config="llava/model/multimodal_encoder/open_clip_encoder/model_configs/biomedclip_cxr_518.json"
 vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
@@ -19,10 +19,10 @@ vision_tower_checkpoint="biomedclipcxr_518_checkpoint.pt"
 t2i_model="sana"
 export T2I_MODEL=$t2i_model
 export DATA_PERCENTAGE=100
-export output_dir="checkpoints_COMBINED_${T2I_MODEL}"
+export output_dir="CHECKPOINTS_Real50K"
 
 # data_path=/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/REAL_SYN_COMBINED_CSV_RRG/combined_CSV_${T2I_MODEL}.json
-data_path="/pvc/Benchmarking-Synthetic-Data/MIMIC_Splits/REAL_SYN_COMBINED_CSV_RRG_SUBSET_50K/combined_CSV_${T2I_MODEL}_SUBSET_50K.json"
+data_path="/pvc/MIMIC_Dataset/physionet.org/files/mimic-cxr-jpg/2.0.0/LLavA-Rad-Annotations/chat_train_MIMIC_CXR_all_gpt4extract_rulebased_v1_SUBSET_50K.json"
 loader="default"
 image_folder=""   # Keeping this None since we have already appended the root path in the CSV/JSON file
 ################## Data ##################
